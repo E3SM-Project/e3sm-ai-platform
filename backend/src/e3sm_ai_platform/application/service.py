@@ -10,7 +10,8 @@ from e3sm_ai_platform.application.generation import generate_response
 from e3sm_ai_platform.application.routing import DeterministicRouter
 from e3sm_ai_platform.domain.models import Evidence, QueryRequest, QueryResponse, RouteName
 from e3sm_ai_platform.infrastructure.settings import Settings, load_settings
-from e3sm_ai_platform.integrations.livai import build_generator
+from e3sm_ai_platform.integrations.argo import build_generator as build_argo_generator
+from e3sm_ai_platform.integrations.livai import build_generator as build_livai_generator
 from e3sm_ai_platform.knowledge.corpus import chunk_corpus, corpus_summary, load_corpus
 from e3sm_ai_platform.knowledge.interfaces import VectorStore
 from e3sm_ai_platform.knowledge.retrieval import build_retriever
@@ -30,6 +31,17 @@ class Generator(Protocol):
         """Generate a response from an accepted route and evidence."""
 
 
+def build_provider_generator(settings: Settings) -> Generator | None:
+    """Return the configured provider generator, or None for deterministic output.
+
+    Exactly one provider can be active because ``INFERENCE_BACKEND`` names a
+    single value. Each builder re-checks its own enablement, so an unset or
+    unrecognized value falls through to deterministic generation rather than
+    failing a request.
+    """
+    return build_livai_generator(settings) or build_argo_generator(settings)
+
+
 class CompassService:
     """Application service wiring retrieval, routing, and response generation."""
 
@@ -47,7 +59,7 @@ class CompassService:
         if retriever is None:
             self.store.add(self.chunks)
         self.router = router or DeterministicRouter()
-        self.generator = generator or build_generator(self.settings) or generate_response
+        self.generator = generator or build_provider_generator(self.settings) or generate_response
 
     def query(self, request: QueryRequest) -> QueryResponse:
         """Answer a request using retrieval, routing, and generation."""
@@ -80,10 +92,14 @@ class CompassService:
                 generate_span.set_attribute("generation.route", response.route.value)
                 generate_span.set_attribute("generation.mode", response.generation_mode.value)
                 generate_span.set_attribute(
-                    "generation.provider_fallback", bool(response.debug.get("livai_fallback"))
+                    "generation.provider_fallback",
+                    bool(
+                        response.debug.get("livai_fallback") or response.debug.get("argo_fallback")
+                    ),
                 )
                 generate_span.set_attribute(
-                    "generation.provider_used", bool(response.debug.get("livai_used"))
+                    "generation.provider_used",
+                    bool(response.debug.get("livai_used") or response.debug.get("argo_used")),
                 )
 
             return response

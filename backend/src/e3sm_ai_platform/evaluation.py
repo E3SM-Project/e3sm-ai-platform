@@ -5,14 +5,22 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
+from e3sm_ai_platform.application.generation import generate_response
 from e3sm_ai_platform.application.service import CompassService
 from e3sm_ai_platform.domain.models import QueryRequest
 
 
 @lru_cache(maxsize=1)
 def _service() -> CompassService:
-    """Return the evaluator's cached application service without HTTP wiring."""
-    return CompassService()
+    """Return the evaluator's cached application service without HTTP wiring.
+
+    Generation is pinned to the deterministic generator regardless of
+    ``INFERENCE_BACKEND``. The suite asserts routing, evidence, and citation
+    behavior, none of which depend on provider wording, and a developer with
+    LivAI or Argo configured in ``backend/.env`` would otherwise turn every
+    run into live, non-reproducible, billable model calls.
+    """
+    return CompassService(generator=generate_response)
 
 
 def evaluate(question: str) -> dict[str, Any]:
