@@ -79,11 +79,13 @@ class ArgoChatClient:
         base_url: str,
         transport: HTTPTransport | None = None,
         timeout: float = DEFAULT_TIMEOUT_SECONDS,
+        temperature: float | None = None,
     ) -> None:
         self.base_url = base_url
         self.user = user
         self.model = model
         self.timeout = timeout
+        self.temperature = temperature
         self._validate_https_base_url()
         self._transport = transport
 
@@ -98,14 +100,18 @@ class ArgoChatClient:
             span.set_attribute("generation.provider", "argo")
             span.set_attribute("generation.model", self.model)
             self._validate_https_base_url()
-            payload = {
+            payload: dict[str, Any] = {
                 "user": self.user,
                 "model": self.model,
                 # Argo rejects a top-level system field when messages are sent,
                 # so the system prompt stays inside the message list.
                 "messages": messages,
-                "temperature": 0.0,
             }
+            # Omitted unless configured. Claude Sonnet 5 on Argo returns 400
+            # "`temperature` is deprecated for this model" when it is present,
+            # verified live 2026-10-07; older models accept it but do not need it.
+            if self.temperature is not None:
+                payload["temperature"] = self.temperature
             try:
                 response = self._post(payload)
             except Exception as exc:
@@ -205,6 +211,7 @@ def build_generator(settings: Settings) -> ArgoEvidenceGenerator | None:
         user=settings.argo_user,
         model=settings.argo_model,
         base_url=settings.argo_base_url,
+        temperature=settings.argo_temperature,
     )
     return ArgoEvidenceGenerator(client)
 

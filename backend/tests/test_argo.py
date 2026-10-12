@@ -39,6 +39,7 @@ ARGO_ENV_KEYS = [
     "ARGO_API_KEY",
     "ARGO_MODEL",
     "ARGO_BASE_URL",
+    "ARGO_TEMPERATURE",
     "LIVAI_API_KEY",
     "CORS_ALLOW_ORIGINS",
 ]
@@ -123,12 +124,14 @@ def _evidence() -> list[Evidence]:
 
 
 def _client(**kwargs: Any) -> tuple[ArgoChatClient, FakeTransport]:
+    temperature = kwargs.pop("temperature", None)
     transport = kwargs.pop("transport", None) or FakeTransport(**kwargs)
     client = ArgoChatClient(
         user="testuser",
         model="gpt4o",
         base_url=DEFAULT_ARGO_BASE_URL,
         transport=transport,
+        temperature=temperature,
     )
     return client, transport
 
@@ -187,9 +190,39 @@ def test_argo_request_uses_body_auth_and_documented_endpoint() -> None:
     # Argo authenticates on a body field, not an Authorization header.
     assert transport.json_body["user"] == "testuser"
     assert transport.json_body["model"] == "gpt4o"
-    assert transport.json_body["temperature"] == 0.0
     # A top-level system field is rejected when messages are present.
     assert "system" not in transport.json_body
+
+
+def test_argo_omits_temperature_by_default() -> None:
+    """Claude Sonnet 5 on Argo returns 400 when temperature is present at all."""
+    client, transport = _client()
+
+    client.complete(build_argo_messages("question", _evidence()))
+
+    assert transport.json_body is not None
+    assert "temperature" not in transport.json_body
+
+
+def test_argo_sends_temperature_only_when_configured() -> None:
+    client, transport = _client(temperature=0.0)
+
+    client.complete(build_argo_messages("question", _evidence()))
+
+    assert transport.json_body is not None
+    assert transport.json_body["temperature"] == 0.0
+
+
+def test_argo_temperature_setting_parses_blank_as_unset(
+    clear_argo_env: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert load_settings(load_dotenv_file=False).argo_temperature is None
+
+    monkeypatch.setenv("ARGO_TEMPERATURE", "")
+    assert load_settings(load_dotenv_file=False).argo_temperature is None
+
+    monkeypatch.setenv("ARGO_TEMPERATURE", "0.2")
+    assert load_settings(load_dotenv_file=False).argo_temperature == 0.2
 
 
 def test_argo_prompt_keeps_system_constraints_separate_from_evidence() -> None:
@@ -208,9 +241,7 @@ def test_argo_prompt_matches_livai_prompt() -> None:
     from e3sm_ai_platform.integrations.livai import build_livai_messages
 
     question = "How do I choose a compset?"
-    assert build_argo_messages(question, _evidence()) == build_livai_messages(
-        question, _evidence()
-    )
+    assert build_argo_messages(question, _evidence()) == build_livai_messages(question, _evidence())
 
 
 # --------------------------------------------------------------------------
@@ -415,9 +446,7 @@ def test_provider_selection_is_exclusive(clear_argo_env: None) -> None:
         ArgoEvidenceGenerator,
     )
     assert isinstance(
-        build_provider_generator(
-            Settings(assistant_generator="livai", livai_api_key="secret")
-        ),
+        build_provider_generator(Settings(assistant_generator="livai", livai_api_key="secret")),
         LivAIEvidenceGenerator,
     )
 

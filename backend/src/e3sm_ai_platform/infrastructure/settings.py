@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 DEFAULT_LIVAI_BASE_URL = "https://livai-api.llnl.gov/"
 DEFAULT_LIVAI_MODEL = "gpt-5.5"
 DEFAULT_ARGO_BASE_URL = "https://apps.inside.anl.gov/argoapi"
-DEFAULT_ARGO_MODEL = "gpt4o"
+DEFAULT_ARGO_MODEL = "claudesonnet5"
 DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 RETRIEVAL_MODES = frozenset({"lexical", "semantic", "hybrid"})
 ENV_FILE = Path(__file__).parents[3] / ".env"
@@ -28,6 +28,7 @@ class Settings:
     argo_user: str | None = None
     argo_model: str = DEFAULT_ARGO_MODEL
     argo_base_url: str = DEFAULT_ARGO_BASE_URL
+    argo_temperature: float | None = None
     cors_allow_origins: tuple[str, ...] = ("http://localhost:5173",)
     service_name: str = "e3sm-ai-platform-backend"
     deployment_environment: str = "development"
@@ -75,6 +76,13 @@ class Settings:
         return self.assistant_generator.lower() == "argo" and bool(self.argo_user)
 
 
+def _optional_float(raw: str | None) -> float | None:
+    """Parse an optional float env value, treating unset or blank as None."""
+    if raw is None or not raw.strip():
+        return None
+    return float(raw)
+
+
 def load_settings(load_dotenv_file: bool = True) -> Settings:
     """Load settings from environment, optionally reading backend/.env if present."""
     if load_dotenv_file:
@@ -98,6 +106,7 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         argo_user=os.getenv("ARGO_USER") or os.getenv("ARGO_API_KEY") or None,
         argo_model=os.getenv("ARGO_MODEL", DEFAULT_ARGO_MODEL),
         argo_base_url=os.getenv("ARGO_BASE_URL", DEFAULT_ARGO_BASE_URL),
+        argo_temperature=_optional_float(os.getenv("ARGO_TEMPERATURE")),
         cors_allow_origins=origins or ("http://localhost:5173",),
         service_name=os.getenv("SERVICE_NAME", "e3sm-ai-platform-backend"),
         deployment_environment=os.getenv("DEPLOYMENT_ENVIRONMENT", "development"),
