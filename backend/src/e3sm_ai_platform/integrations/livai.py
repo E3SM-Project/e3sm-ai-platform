@@ -64,7 +64,11 @@ class LivAIChatClient:
         agent: SyncAgent | None = None,
     ) -> None:
         self.base_url = base_url
-        self._validate_https_base_url()
+        # The base URL is validated in complete() before any network call, not
+        # here. OpenAIProvider only stores the key; nothing is transmitted until
+        # run_sync, which complete() guards. Raising at construction would
+        # surface inside the lazily built CompassService and turn every request
+        # including /health into a 500 instead of the documented fallback.
         if agent is None:
             provider = OpenAIProvider(base_url=f"{base_url.rstrip('/')}/v1", api_key=api_key)
             chat_model = OpenAIChatModel(model, provider=provider)

@@ -86,7 +86,12 @@ class ArgoChatClient:
         self.model = model
         self.timeout = timeout
         self.temperature = temperature
-        self._validate_https_base_url()
+        # The base URL is validated in complete(), not here. Raising during
+        # construction would surface inside CompassService.__init__, which the
+        # API builds lazily on the first request, so a bad ARGO_BASE_URL would
+        # turn every request including /health into a 500 with no fallback.
+        # Validating per call lets ArgoEvidenceGenerator catch it and return the
+        # deterministic cited answer as documented.
         self._transport = transport
 
     @property

@@ -249,16 +249,49 @@ def test_argo_prompt_matches_livai_prompt() -> None:
 # --------------------------------------------------------------------------
 
 
-def test_argo_rejects_non_https_base_url() -> None:
+def test_argo_rejects_non_https_base_url_before_sending() -> None:
+    """A plaintext URL is refused at call time, and nothing is sent."""
+    transport = FakeTransport()
+    client = ArgoChatClient(
+        user="testuser",
+        model="gpt4o",
+        base_url="http://apps.inside.anl.gov/argoapi",
+        transport=transport,
+    )
+
     with pytest.raises(ArgoProviderError) as excinfo:
-        ArgoChatClient(
-            user="testuser",
-            model="gpt4o",
-            base_url="http://apps.inside.anl.gov/argoapi",
-            transport=FakeTransport(),
-        )
+        client.complete(build_argo_messages("question", _evidence()))
 
     assert excinfo.value.code == "invalid_https_base_url"
+    assert transport.calls == 0
+
+
+def test_argo_bad_base_url_does_not_break_service_construction() -> None:
+    """Construction must succeed so the API keeps serving with fallback.
+
+    CompassService is built lazily on the first request. If the client raised
+    here, every request including /health would return 500 and the documented
+    deterministic fallback would never run.
+    """
+    transport = FakeTransport()
+    client = ArgoChatClient(
+        user="testuser",
+        model="gpt4o",
+        base_url="http://apps.inside.anl.gov/argoapi",
+        transport=transport,
+    )
+    service = CompassService(
+        generator=ArgoEvidenceGenerator(client),
+        settings=load_settings(load_dotenv_file=False),
+    )
+
+    response = service.query(QueryRequest(question="How do I choose an E3SM compset?"))
+
+    assert response.generation_mode is GenerationMode.DETERMINISTIC_FALLBACK
+    assert response.debug["argo_error_code"] == "invalid_https_base_url"
+    assert response.citations
+    assert transport.calls == 0
+    assert service.health()["status"] == "ok"
 
 
 @pytest.mark.parametrize(
