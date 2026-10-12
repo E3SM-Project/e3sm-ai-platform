@@ -46,7 +46,7 @@ After dependencies are installed, the default configuration runs and tests local
 `make backend-env` creates `backend/.env` from `backend/.env.example` when it
 does not already exist. It never overwrites an existing local configuration.
 
-See [Developer setup](docs/dev/setup.md) for optional retrieval modes and LivAI configuration.
+See [Developer setup](docs/dev/setup.md) for optional retrieval modes and LLM provider configuration (LivAI at LLNL, Argo at ANL).
 
 ## Features
 
@@ -58,7 +58,7 @@ See [Developer setup](docs/dev/setup.md) for optional retrieval modes and LivAI 
 ### Backend and inference
 
 - **Query API:** FastAPI `POST /query` endpoint with deterministic routing.
-- **Response generation:** Deterministic generation by default and as a fallback, with optional backend-only LivAI integration through PydanticAI.
+- **Response generation:** Deterministic generation by default and as a fallback, with optional backend-only LLM providers: LivAI (LLNL) through PydanticAI, or Argo (ANL) through its gateway API.
 - **Insufficient-evidence handling:** Explicit responses when the available evidence cannot support an answer.
 - **Extensible interfaces:** Provider-independent retrieval and generation, with extension points for future web and operational connectors. Live connectors are not bundled.
 
@@ -88,6 +88,7 @@ flowchart TD
     Retrieval -->|Accepted evidence| Generation["Response generation"]
     Retrieval -->|Insufficient evidence| Insufficient
     Generation -. Optional .-> LivAI["LivAI via PydanticAI"]
+    Generation -. Optional .-> Argo["Argo (ANL) gateway"]
     Generation --> Answer["Answer with citations and provenance"]
     Answer --> UI
     Insufficient --> UI
@@ -97,7 +98,7 @@ For supported documentation questions, the backend:
 
 1. Retrieves and ranks passages from the curated corpus.
 2. Applies relevance and coherence checks to select acceptable evidence.
-3. Generates a response using the deterministic generator or optional LivAI integration.
+3. Generates a response using the deterministic generator or an optional LLM provider (LivAI or Argo).
 4. Returns the answer with citations, provenance, and route/debug metadata.
 
 Unsupported questions or questions without adequate evidence receive an explicit insufficient-evidence response.
@@ -143,7 +144,7 @@ The optional tracing stack uses Docker Compose. See [Observability](docs/dev/obs
 - The corpus is small and may not reflect current E3SM documentation. Answer quality depends on coverage, chunking, and retrieval configuration.
 - Web and operational connectors are extension points without bundled live production implementations.
 - Authentication, access control, and persistent conversation history are not implemented.
-- Optional LivAI requires backend-only credentials. Never place secrets in the frontend or commit them. See [Developer setup](docs/dev/setup.md).
+- Optional LivAI requires a backend-only API key; optional Argo requires an ANL username and the ANL network. Never place secrets in the frontend or commit them. See [Developer setup](docs/dev/setup.md).
 
 ## Documentation
 

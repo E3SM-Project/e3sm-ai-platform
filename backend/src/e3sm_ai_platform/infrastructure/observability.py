@@ -118,6 +118,9 @@ def get_logger() -> logging.Logger:
 def log_startup_configuration(settings: Settings) -> None:
     """Display the effective non-secret configuration once during application startup."""
     get_logger().info(format_startup_configuration(settings), extra={"human_readable": True})
+    warning = settings.provider_misconfiguration()
+    if warning is not None:
+        get_logger().warning(warning, extra={"human_readable": True})
 
 
 def format_startup_configuration(settings: Settings) -> str:
@@ -136,6 +139,9 @@ def format_startup_configuration(settings: Settings) -> str:
             f"    LivAI enabled: {settings.livai_enabled}",
             f"    LivAI model: {settings.livai_model}",
             f"    LivAI base URL: {settings.livai_base_url}",
+            f"    Argo enabled: {settings.argo_enabled}",
+            f"    Argo model: {settings.argo_model}",
+            f"    Argo base URL: {settings.argo_base_url}",
             "  Retrieval",
             f"    Mode: {settings.retrieval_mode}",
             f"    Embedding model: {settings.embedding_model}",
@@ -161,6 +167,9 @@ def startup_configuration(settings: Settings) -> dict[str, object]:
         "livai_base_url": settings.livai_base_url,
         "livai_enabled": settings.livai_enabled,
         "livai_model": settings.livai_model,
+        "argo_base_url": settings.argo_base_url,
+        "argo_enabled": settings.argo_enabled,
+        "argo_model": settings.argo_model,
         "retrieval_mode": settings.retrieval_mode,
         "embedding_model": settings.embedding_model,
         "retrieval_lexical_min_coverage": settings.retrieval_lexical_min_coverage,

@@ -3,6 +3,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
+from e3sm_ai_platform.application.generation import generate_response
 from e3sm_ai_platform.evaluation import evaluate
 from e3sm_ai_platform.knowledge.corpus import load_corpus
 
@@ -139,3 +142,40 @@ def test_e3sm_unified_urls_are_canonicalized() -> None:
 
     assert unified_entries
     assert all("/e3sm-unified/main/" in str(entry.url) for entry in unified_entries)
+
+
+def test_evaluator_is_deterministic_even_when_a_provider_is_configured(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The deterministic suite must not issue live provider calls.
+
+    ``load_settings`` reads ``backend/.env``, so a developer with Argo or LivAI
+    configured would otherwise make every evaluation run hit a live model.
+    """
+    import e3sm_ai_platform.evaluation as evaluation_module
+
+    monkeypatch.setenv("INFERENCE_BACKEND", "argo")
+    monkeypatch.setenv("ARGO_USER", "testuser")
+    evaluation_module._service.cache_clear()
+
+    calls: list[str] = []
+
+    def _record(*args: object, **kwargs: object) -> object:
+        calls.append("provider")
+        raise AssertionError("evaluator attempted a live provider call")
+
+    # Patch the symbol the adapter actually resolves, and assert on the
+    # generator the service selected, so this fails if the pin is removed.
+    monkeypatch.setattr("e3sm_ai_platform.integrations.argo.httpx.post", _record)
+    try:
+        service = evaluation_module._service()
+        assert service.generator is generate_response, (
+            "evaluator must pin deterministic generation regardless of INFERENCE_BACKEND"
+        )
+        result = evaluation_module.evaluate("How do I choose an E3SM compset?")
+    finally:
+        evaluation_module._service.cache_clear()
+
+    assert calls == []
+    assert result["route"] == "curated"
+    assert result["citations"]

@@ -199,13 +199,46 @@ def test_livai_invocation_keeps_system_prompt_separate_from_evidence() -> None:
 
 
 def test_livai_rejects_non_https_base_url_before_sending_credential() -> None:
+    """A plaintext URL is refused at call time and the agent is never invoked."""
+    invoked = False
+
+    def complete(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        nonlocal invoked
+        invoked = True
+        return ModelResponse(parts=[TextPart(content="answer")])
+
+    client = LivAIChatClient(
+        api_key="secret-key",
+        model="gpt-5.5",
+        base_url="http://livai-api.llnl.gov/",
+        agent=Agent(FunctionModel(complete), output_type=str),
+    )
+
     with pytest.raises(LivAIProviderError, match="invalid_https_base_url"):
-        LivAIChatClient(
-            api_key="secret-key",
-            model="gpt-5.5",
-            base_url="http://livai-api.llnl.gov/",
-            agent=_function_agent("answer"),
-        )
+        client.complete([{"role": "user", "content": "hello"}])
+
+    assert invoked is False
+
+
+def test_livai_bad_base_url_does_not_break_service_construction() -> None:
+    """Construction must succeed so the lazily built service keeps serving with fallback."""
+    client = LivAIChatClient(
+        api_key="secret-key",
+        model="gpt-5.5",
+        base_url="http://livai-api.llnl.gov/",
+        agent=_function_agent("answer"),
+    )
+    service = CompassService(
+        generator=LivAIEvidenceGenerator(client),
+        settings=load_settings(load_dotenv_file=False),
+    )
+
+    response = service.query(QueryRequest(question="How do I choose an E3SM compset?"))
+
+    assert response.generation_mode is GenerationMode.DETERMINISTIC_FALLBACK
+    assert response.debug["livai_error_code"] == "invalid_https_base_url"
+    assert response.citations
+    assert service.health()["status"] == "ok"
 
 
 def test_livai_agent_failure_is_sanitized() -> None:

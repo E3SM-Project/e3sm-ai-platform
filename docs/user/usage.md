@@ -91,10 +91,15 @@ Retrieval scores and semantic similarity values are relevance signals, not
 confidence percentages. See [developer setup](../dev/setup.md) for retrieval
 mode, model, weight, and threshold configuration.
 
-## Optional LivAI generation
+## Optional LLM generation
 
-Deterministic generation is the default. To opt into LivAI for answers that
-already have curated supporting evidence, configure the backend process only:
+Deterministic generation is the default. Two providers can be enabled for
+answers that already have curated supporting evidence. Set `INFERENCE_BACKEND`
+to exactly one of them in the backend environment only. Both are optional, and
+either provider's errors fall back to deterministic, evidence-constrained output
+without enabling live web retrieval.
+
+### LivAI (LLNL)
 
 ```bash
 INFERENCE_BACKEND=livai
@@ -105,8 +110,26 @@ LIVAI_BASE_URL=https://livai-api.llnl.gov/
 
 Inject secrets through an untracked backend environment, `backend/.env`, or a
 deployment secret manager. Do not use `VITE_` names for backend secrets and never
-commit API keys. LivAI provider errors fall back to deterministic,
-evidence-constrained output and do not enable live web retrieval.
+commit API keys.
+
+### Argo (ANL)
+
+```bash
+INFERENCE_BACKEND=argo
+ARGO_USER=your-anl-username
+ARGO_MODEL=claudesonnet5
+ARGO_BASE_URL=https://apps.inside.anl.gov/argoapi
+```
+
+Argo is reachable only from the Argonne network or VPN. It authenticates with an
+ANL username sent in the request body rather than an API key, so `ARGO_USER` is
+an identifier, not a secret. `ARGO_MODEL` takes the `internal_id` reported by the
+gateway's `/api/v1/models/` endpoint (for example `claudesonnet5`, `gpt4o`,
+`gemini25pro`), not the display name. Leave `ARGO_TEMPERATURE` blank unless the
+selected model accepts it; Claude Sonnet 5 rejects the parameter.
+
+If `INFERENCE_BACKEND` names a provider whose required setting is blank, the
+backend logs a warning at startup and runs deterministic generation.
 
 ## Observability
 

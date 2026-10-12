@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 
 DEFAULT_LIVAI_BASE_URL = "https://livai-api.llnl.gov/"
 DEFAULT_LIVAI_MODEL = "gpt-5.5"
+DEFAULT_ARGO_BASE_URL = "https://apps.inside.anl.gov/argoapi"
+DEFAULT_ARGO_MODEL = "claudesonnet5"
 DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 RETRIEVAL_MODES = frozenset({"lexical", "semantic", "hybrid"})
 ENV_FILE = Path(__file__).parents[3] / ".env"
@@ -23,6 +25,10 @@ class Settings:
     livai_api_key: str | None = None
     livai_model: str = DEFAULT_LIVAI_MODEL
     livai_base_url: str = DEFAULT_LIVAI_BASE_URL
+    argo_user: str | None = None
+    argo_model: str = DEFAULT_ARGO_MODEL
+    argo_base_url: str = DEFAULT_ARGO_BASE_URL
+    argo_temperature: float | None = None
     cors_allow_origins: tuple[str, ...] = ("http://localhost:5173",)
     service_name: str = "e3sm-ai-platform-backend"
     deployment_environment: str = "development"
@@ -59,6 +65,44 @@ class Settings:
         """LivAI is explicitly enabled only when requested and a key is present."""
         return self.assistant_generator.lower() == "livai" and bool(self.livai_api_key)
 
+    @property
+    def argo_enabled(self) -> bool:
+        """Argo is explicitly enabled only when requested and a user is present.
+
+        Argo authenticates with an ANL username rather than a secret, so the
+        presence check is on ``argo_user``. The username is not a credential
+        and access still depends on reaching the ANL network.
+        """
+        return self.assistant_generator.lower() == "argo" and bool(self.argo_user)
+
+    def provider_misconfiguration(self) -> str | None:
+        """Explain why a requested provider is inactive, or None when configuration is coherent.
+
+        ``INFERENCE_BACKEND`` naming a provider whose required setting is blank
+        silently falls back to deterministic generation. That is the safe
+        behavior, but it is also the most common setup mistake, so startup
+        surfaces it instead of leaving the operator to notice slow-looking
+        deterministic answers.
+        """
+        backend = self.assistant_generator.lower()
+        if backend == "livai" and not self.livai_enabled:
+            return "INFERENCE_BACKEND=livai but LIVAI_API_KEY is not set; using deterministic."
+        if backend == "argo" and not self.argo_enabled:
+            return "INFERENCE_BACKEND=argo but ARGO_USER is not set; using deterministic."
+        if backend not in {"deterministic", "livai", "argo"}:
+            return (
+                f"INFERENCE_BACKEND={self.assistant_generator!r} is not a known provider; "
+                "using deterministic."
+            )
+        return None
+
+
+def _optional_float(raw: str | None) -> float | None:
+    """Parse an optional float env value, treating unset or blank as None."""
+    if raw is None or not raw.strip():
+        return None
+    return float(raw)
+
 
 def load_settings(load_dotenv_file: bool = True) -> Settings:
     """Load settings from environment, optionally reading backend/.env if present."""
@@ -80,6 +124,10 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         livai_api_key=os.getenv("LIVAI_API_KEY") or None,
         livai_model=os.getenv("LIVAI_MODEL", DEFAULT_LIVAI_MODEL),
         livai_base_url=os.getenv("LIVAI_BASE_URL", DEFAULT_LIVAI_BASE_URL),
+        argo_user=os.getenv("ARGO_USER") or os.getenv("ARGO_API_KEY") or None,
+        argo_model=os.getenv("ARGO_MODEL", DEFAULT_ARGO_MODEL),
+        argo_base_url=os.getenv("ARGO_BASE_URL", DEFAULT_ARGO_BASE_URL),
+        argo_temperature=_optional_float(os.getenv("ARGO_TEMPERATURE")),
         cors_allow_origins=origins or ("http://localhost:5173",),
         service_name=os.getenv("SERVICE_NAME", "e3sm-ai-platform-backend"),
         deployment_environment=os.getenv("DEPLOYMENT_ENVIRONMENT", "development"),
