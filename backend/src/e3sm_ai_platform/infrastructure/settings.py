@@ -75,6 +75,27 @@ class Settings:
         """
         return self.assistant_generator.lower() == "argo" and bool(self.argo_user)
 
+    def provider_misconfiguration(self) -> str | None:
+        """Explain why a requested provider is inactive, or None when configuration is coherent.
+
+        ``INFERENCE_BACKEND`` naming a provider whose required setting is blank
+        silently falls back to deterministic generation. That is the safe
+        behavior, but it is also the most common setup mistake, so startup
+        surfaces it instead of leaving the operator to notice slow-looking
+        deterministic answers.
+        """
+        backend = self.assistant_generator.lower()
+        if backend == "livai" and not self.livai_enabled:
+            return "INFERENCE_BACKEND=livai but LIVAI_API_KEY is not set; using deterministic."
+        if backend == "argo" and not self.argo_enabled:
+            return "INFERENCE_BACKEND=argo but ARGO_USER is not set; using deterministic."
+        if backend not in {"deterministic", "livai", "argo"}:
+            return (
+                f"INFERENCE_BACKEND={self.assistant_generator!r} is not a known provider; "
+                "using deterministic."
+            )
+        return None
+
 
 def _optional_float(raw: str | None) -> float | None:
     """Parse an optional float env value, treating unset or blank as None."""

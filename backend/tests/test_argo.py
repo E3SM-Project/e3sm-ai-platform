@@ -476,3 +476,52 @@ def test_service_routes_through_argo_when_configured(clear_argo_env: None) -> No
     assert response.generation_mode is GenerationMode.LLM
     assert response.debug["argo_used"] is True
     assert response.citations
+
+
+# --------------------------------------------------------------------------
+# Misconfiguration surfacing
+# --------------------------------------------------------------------------
+
+
+def test_provider_misconfiguration_is_none_when_coherent(clear_argo_env: None) -> None:
+    assert Settings().provider_misconfiguration() is None
+    assert (
+        Settings(assistant_generator="argo", argo_user="testuser").provider_misconfiguration()
+        is None
+    )
+    assert (
+        Settings(assistant_generator="livai", livai_api_key="k").provider_misconfiguration() is None
+    )
+
+
+def test_provider_misconfiguration_names_the_missing_setting(clear_argo_env: None) -> None:
+    """Forgetting ARGO_USER must say so rather than silently going deterministic."""
+    argo = Settings(assistant_generator="argo").provider_misconfiguration()
+    livai = Settings(assistant_generator="livai").provider_misconfiguration()
+    unknown = Settings(assistant_generator="openai").provider_misconfiguration()
+
+    assert argo is not None and "ARGO_USER" in argo
+    assert livai is not None and "LIVAI_API_KEY" in livai
+    assert unknown is not None and "openai" in unknown
+
+
+def test_startup_logs_a_warning_for_misconfigured_provider(
+    clear_argo_env: None, caplog: pytest.LogCaptureFixture
+) -> None:
+    import logging
+
+    from e3sm_ai_platform.infrastructure.observability import (
+        LOGGER_NAME,
+        log_startup_configuration,
+    )
+
+    with caplog.at_level(logging.WARNING, logger=LOGGER_NAME):
+        log_startup_configuration(Settings(assistant_generator="argo"))
+
+    assert any("ARGO_USER" in record.getMessage() for record in caplog.records)
+
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger=LOGGER_NAME):
+        log_startup_configuration(Settings(assistant_generator="argo", argo_user="testuser"))
+
+    assert not [r for r in caplog.records if r.levelno >= logging.WARNING]

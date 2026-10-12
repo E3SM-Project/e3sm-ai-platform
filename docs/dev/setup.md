@@ -73,9 +73,17 @@ Common local settings are:
 
 - `CORS_ALLOW_ORIGINS`: comma-separated browser origins allowed by
   FastAPI CORS; defaults to `http://localhost:5173`.
-- `INFERENCE_BACKEND`: `deterministic` by default; set to `livai` only with a
-  configured backend API key.
-- `LIVAI_API_KEY`, `LIVAI_MODEL`, `LIVAI_BASE_URL`: backend-only LivAI settings.
+- `INFERENCE_BACKEND`: `deterministic` by default; set to `livai` or `argo`
+  only when that provider's required setting below is present. A named provider
+  with a blank required setting logs a startup warning and stays deterministic.
+- `LIVAI_API_KEY`, `LIVAI_MODEL`, `LIVAI_BASE_URL`: backend-only LivAI (LLNL)
+  settings. The key is a secret.
+- `ARGO_USER`, `ARGO_MODEL`, `ARGO_BASE_URL`, `ARGO_TEMPERATURE`: backend-only
+  Argo (ANL) settings. `ARGO_USER` is an ANL username sent in the request body,
+  not a secret; access depends on the ANL network. `ARGO_MODEL` is the
+  gateway's `internal_id` (default `claudesonnet5`). `ARGO_TEMPERATURE` is
+  omitted from requests when blank; some models reject it. `ARGO_API_KEY` is
+  read as a fallback for `ARGO_USER` because existing ANL tooling exports it.
 - `OTLP_ENDPOINT`, `SERVICE_NAME`, `DEPLOYMENT_ENVIRONMENT`, `OTLP_HEADERS`: optional
   backend observability settings.
 - `RETRIEVAL_MODE`: `lexical` (default), `semantic`, or `hybrid`.
