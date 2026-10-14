@@ -1,7 +1,7 @@
 name: Refactor
 description: Propose an internal structural change without changing intended product behavior.
 title: "[Refactor]: "
-labels: ["type: refactor"]
+labels: ["refactor"]
 assignees: []
 
 body:
