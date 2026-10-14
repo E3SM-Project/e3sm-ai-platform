@@ -26,7 +26,7 @@ guides linked from [../README.md](../README.md).
 - Evaluation-compatible response fields (`route`, `retrieved_evidence`, citation provenance) and a packaged evaluator at `e3sm_ai_platform.evaluation:evaluate`.
 - React/Vite chat UI with loading/error states, citations, expandable evidence, and a debug route/source view.
 - Local integration support through the Vite `/query` proxy and configurable FastAPI CORS (`CORS_ALLOW_ORIGINS`).
-- Optional backend-only LLM generation for curated-evidence answers through either LivAI (LLNL) or Argo (ANL), selected by `INFERENCE_BACKEND`, with deterministic fallback if the provider is unavailable.
+- Optional backend-only LLM generation for curated-evidence answers through either an OpenAI-compatible gateway (LivAI, GitHub Copilot) or Argo (ANL), selected by `INFERENCE_BACKEND`, with deterministic fallback if the provider is unavailable.
 
 ## Not delivered
 

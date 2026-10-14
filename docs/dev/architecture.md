@@ -133,7 +133,7 @@ connector. Those routes currently produce explicit insufficient-evidence
 messages.
 
 Generation is deterministic by default and cites only accepted curated evidence.
-Optional LivAI generation can be enabled for curated-evidence answers with
+Optional LLM generation through an OpenAI-compatible gateway or Argo can be enabled for curated-evidence answers with
 backend-only environment variables; provider errors fall back to deterministic
 generation.
 

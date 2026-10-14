@@ -149,7 +149,7 @@ def test_evaluator_is_deterministic_even_when_a_provider_is_configured(
 ) -> None:
     """The deterministic suite must not issue live provider calls.
 
-    ``load_settings`` reads ``backend/.env``, so a developer with Argo or LivAI
+    ``load_settings`` reads ``backend/.env``, so a developer with any provider
     configured would otherwise make every evaluation run hit a live model.
     """
     import e3sm_ai_platform.evaluation as evaluation_module

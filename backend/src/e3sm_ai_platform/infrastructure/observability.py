@@ -121,6 +121,9 @@ def log_startup_configuration(settings: Settings) -> None:
     warning = settings.provider_misconfiguration()
     if warning is not None:
         get_logger().warning(warning, extra={"human_readable": True})
+    notice = settings.deprecation_notice()
+    if notice is not None:
+        get_logger().warning(notice, extra={"human_readable": True})
 
 
 def format_startup_configuration(settings: Settings) -> str:
@@ -136,9 +139,9 @@ def format_startup_configuration(settings: Settings) -> str:
             f"    CORS origins: {cors_origins}",
             "  Inference",
             f"    Backend: {settings.assistant_generator}",
-            f"    LivAI enabled: {settings.livai_enabled}",
-            f"    LivAI model: {settings.livai_model}",
-            f"    LivAI base URL: {settings.livai_base_url}",
+            f"    OpenAI-compatible enabled: {settings.openai_compatible_enabled}",
+            f"    OpenAI-compatible model: {settings.openai_compatible_model}",
+            f"    OpenAI-compatible base URL: {settings.openai_compatible_base_url or 'not set'}",
             f"    Argo enabled: {settings.argo_enabled}",
             f"    Argo model: {settings.argo_model}",
             f"    Argo base URL: {settings.argo_base_url}",
@@ -164,9 +167,9 @@ def startup_configuration(settings: Settings) -> dict[str, object]:
     return {
         "cors_allow_origins": list(settings.cors_allow_origins),
         "inference_backend": settings.assistant_generator,
-        "livai_base_url": settings.livai_base_url,
-        "livai_enabled": settings.livai_enabled,
-        "livai_model": settings.livai_model,
+        "openai_compatible_base_url": settings.openai_compatible_base_url,
+        "openai_compatible_enabled": settings.openai_compatible_enabled,
+        "openai_compatible_model": settings.openai_compatible_model,
         "argo_base_url": settings.argo_base_url,
         "argo_enabled": settings.argo_enabled,
         "argo_model": settings.argo_model,
