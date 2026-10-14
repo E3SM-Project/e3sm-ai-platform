@@ -1,10 +1,17 @@
 name: Bug Report
 description: File a bug report to help improve E3SM AI Platform and E3SM Compass.
 title: "[Bug]: "
-labels: ["type: bug"]
+labels: ["bug"]
 assignees: []
 
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for defects, including UI/UX and accessibility problems. Use Enhancement Request for new capabilities or improvements. Maintainers can add `ui/ux` or `accessibility` labels during triage.
+
+        Do not report security vulnerabilities or share exploit details in public issues. Use [GitHub private vulnerability reporting](https://github.com/E3SM-Project/e3sm-ai-platform/security/advisories/new).
+
   - type: textarea
     id: what-happened
     attributes:
@@ -37,7 +44,13 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include OS, Python, uv, Node.js, browser, and relevant configuration details.
+      description: Include the affected component (backend, frontend, evaluation, or tooling), commit or release version, and relevant runtime and configuration details. Remove secrets.
+      placeholder: |
+        Affected component:
+        Commit or release version:
+        OS:
+        Relevant runtime versions (Python, uv, Node.js, browser):
+        Relevant configuration (no secrets):
     validations:
       required: false
 

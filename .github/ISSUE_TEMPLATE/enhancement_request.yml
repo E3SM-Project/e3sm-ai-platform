@@ -1,10 +1,17 @@
 name: Enhancement Request
 description: Suggest an improvement to E3SM AI Platform or E3SM Compass.
 title: "[Enhancement]: "
-labels: ["type: enhancement"]
+labels: ["enhancement"]
 assignees: []
 
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for new capabilities and improvements, including UI/UX and accessibility work. Use Bug Report for existing behavior that is broken. Maintainers can add `ui/ux` or `accessibility` labels during triage.
+
+        Do not report security vulnerabilities or share exploit details in public issues. Use [GitHub private vulnerability reporting](https://github.com/E3SM-Project/e3sm-ai-platform/security/advisories/new).
+
   - type: textarea
     id: problem
     attributes:
@@ -18,6 +25,17 @@ body:
     attributes:
       label: Proposed solution
       description: Describe the outcome or behavior you would like.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: List observable outcomes that will show this enhancement is complete. Describe behavior or results, not implementation steps.
+      placeholder: |
+        - Given ..., when ..., then ...
+        - Completion can be verified by ...
     validations:
       required: true
 
