@@ -11,6 +11,7 @@ from e3sm_ai_platform.application.routing import DeterministicRouter
 from e3sm_ai_platform.domain.models import Evidence, QueryRequest, QueryResponse, RouteName
 from e3sm_ai_platform.infrastructure.settings import Settings, load_settings
 from e3sm_ai_platform.integrations.argo import build_generator as build_argo_generator
+from e3sm_ai_platform.integrations.ollama import build_generator as build_ollama_generator
 from e3sm_ai_platform.integrations.openai_compatible import (
     build_generator as build_openai_compatible_generator,
 )
@@ -41,7 +42,11 @@ def build_provider_generator(settings: Settings) -> Generator | None:
     unrecognized value falls through to deterministic generation rather than
     failing a request.
     """
-    return build_openai_compatible_generator(settings) or build_argo_generator(settings)
+    return (
+        build_openai_compatible_generator(settings)
+        or build_argo_generator(settings)
+        or build_ollama_generator(settings)
+    )
 
 
 class CompassService:
@@ -98,11 +103,16 @@ class CompassService:
                     bool(
                         response.debug.get("provider_fallback")
                         or response.debug.get("argo_fallback")
+                        or response.debug.get("ollama_fallback")
                     ),
                 )
                 generate_span.set_attribute(
                     "generation.provider_used",
-                    bool(response.debug.get("provider_used") or response.debug.get("argo_used")),
+                    bool(
+                        response.debug.get("provider_used")
+                        or response.debug.get("argo_used")
+                        or response.debug.get("ollama_used")
+                    ),
                 )
 
             return response

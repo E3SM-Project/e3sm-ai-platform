@@ -98,3 +98,20 @@ def test_removed_livai_alias_logs_one_unknown_provider_warning(caplog: LogCaptur
     warnings = [record.message for record in caplog.records if record.levelno == logging.WARNING]
     assert warnings == ["INFERENCE_BACKEND='livai' is not a known provider; using deterministic."]
     assert "secret-key" not in caplog.text
+
+
+def test_ollama_startup_omits_unvalidated_endpoint_and_model() -> None:
+    settings = Settings(
+        assistant_generator="ollama",
+        ollama_base_url="http://user:secret@remote.invalid/v1/",
+        ollama_model="private-model-name",
+    )
+    configuration = startup_configuration(settings)
+    summary = format_startup_configuration(settings)
+
+    assert configuration["ollama_enabled"] is True
+    assert configuration["ollama_endpoint_policy"] == "loopback_only"
+    assert "Ollama enabled: True" in summary
+    assert "secret" not in summary
+    assert "remote.invalid" not in str(configuration)
+    assert "private-model-name" not in summary

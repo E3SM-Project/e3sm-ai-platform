@@ -13,7 +13,8 @@ delivered features; this document focuses on durable operating guidance.
   [usage guide](../user/usage.md).
 - The backend service performs deterministic retrieval, accepted-evidence
   filtering, route selection, and deterministic generation. Optional LLM
-  generation through an OpenAI-compatible gateway or Argo is available only when that provider's
+  generation through an OpenAI-compatible gateway, Argo, or local Ollama is
+  available only when that provider's
   backend-only environment variables are configured.
 - Query responses expose `route`, `route_alias`, citations, returned evidence,
   `retrieved_evidence`, and debug metadata for evaluation and support.
@@ -140,9 +141,9 @@ intended durable topology is:
 5. `routing.select`: deterministic route decision with the route value and
    sanitized reason.
 6. `generation.build`: evidence-constrained deterministic response construction.
-7. `generation.provider`: optional call to the OpenAI-compatible provider or Argo, only when
+7. `generation.provider`: optional call to the OpenAI-compatible provider, Argo, or Ollama, only when
    that provider is explicitly enabled for curated-evidence answers. The span
-   carries `generation.provider` (`openai_compatible` or `argo`), `generation.fallback`,
+   carries `generation.provider` (`openai_compatible`, `argo`, or `ollama`), `generation.fallback`,
    and a sanitized `generation.provider_error` code when the call fails. The
    Argo span also records `generation.model`.
 
@@ -166,7 +167,7 @@ Recommended low-cardinality span attributes:
 - `rag.corpus_snapshot_id`: stable corpus snapshot identifier when available
 - `rag.retrieval_policy_version`: retrieval/chunking/scoring policy version when
   available
-- `llm.provider`: `deterministic`, `openai_compatible`, or `argo`
+- `llm.provider`: `deterministic`, `openai_compatible`, `argo`, or `ollama`
 - `llm.model`: configured model name when a hosted provider is used
 - `error.type`: sanitized exception class or internal error code
 
@@ -189,6 +190,17 @@ Allowed in logs/traces by default:
   `argo_fallback`, and the sanitized `provider_error_code` / `argo_error_code`
   values. These codes never include the provider URL, the API key, or the Argo
   username.
+
+Ollama adds `ollama_used`, `ollama_fallback`, and `ollama_error_code` debug state.
+Codes are `busy`, `invalid_loopback_base_url`, `context_budget_exceeded`,
+`timeout`, `empty_content`, `output_truncated`, or generic `provider_error`. Some malformed/empty
+responses are rejected by the agent and map to `provider_error`. Service generation
+spans include Ollama in `generation.provider_used` and `generation.provider_fallback`.
+Ollama startup summaries show enablement, loopback-only policy, and numeric limits,
+not the unvalidated endpoint or model string. Provider failures do not record raw
+exception events, prompts, evidence, or provider payloads. Existing OpenAI-compatible and Argo
+fields remain unchanged. `/health` reports backend health, not model readiness;
+see [setup](setup.md#local-ollama-inference) for failure recovery and rollback.
 
 Prohibited unless a separate data-governance review explicitly approves it:
 
