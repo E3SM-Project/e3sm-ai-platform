@@ -80,3 +80,20 @@ def test_startup_configuration_excludes_secrets() -> None:
     assert "E3SM AI Platform startup configuration" in rendered
     assert "Backend: livai" in rendered
     assert "OTLP headers: configured" in rendered
+
+
+def test_ollama_startup_omits_unvalidated_endpoint_and_model() -> None:
+    settings = Settings(
+        assistant_generator="ollama",
+        ollama_base_url="http://user:secret@remote.invalid/v1/",
+        ollama_model="private-model-name",
+    )
+    configuration = startup_configuration(settings)
+    summary = format_startup_configuration(settings)
+
+    assert configuration["ollama_enabled"] is True
+    assert configuration["ollama_endpoint_policy"] == "loopback_only"
+    assert "Ollama enabled: True" in summary
+    assert "secret" not in summary
+    assert "remote.invalid" not in str(configuration)
+    assert "private-model-name" not in summary

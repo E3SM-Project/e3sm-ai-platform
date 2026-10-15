@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,6 +30,11 @@ class Settings:
     argo_model: str = DEFAULT_ARGO_MODEL
     argo_base_url: str = DEFAULT_ARGO_BASE_URL
     argo_temperature: float | None = None
+    ollama_model: str = "compass-gemma3:4b"
+    ollama_base_url: str = "http://localhost:11434/v1/"
+    ollama_timeout_seconds: float = 120.0
+    ollama_context_tokens: int = 4096
+    ollama_max_output_tokens: int = 512
     cors_allow_origins: tuple[str, ...] = ("http://localhost:5173",)
     service_name: str = "e3sm-ai-platform-backend"
     deployment_environment: str = "development"
@@ -43,7 +49,7 @@ class Settings:
     retrieval_semantic_weight: float = 0.5
 
     def __post_init__(self) -> None:
-        """Validate retrieval configuration independently of environment loading."""
+        """Validate retrieval and local inference configuration."""
         if self.retrieval_mode not in RETRIEVAL_MODES:
             modes = ", ".join(sorted(RETRIEVAL_MODES))
             raise ValueError(f"retrieval_mode must be one of: {modes}")
@@ -59,6 +65,17 @@ class Settings:
             raise ValueError("retrieval weights must be non-negative")
         if self.retrieval_lexical_weight + self.retrieval_semantic_weight == 0.0:
             raise ValueError("at least one retrieval weight must be positive")
+        if not self.ollama_model.strip():
+            raise ValueError("ollama_model must not be empty")
+        if (
+            not math.isfinite(self.ollama_timeout_seconds)
+            or not 0 < self.ollama_timeout_seconds <= 300
+        ):
+            raise ValueError("ollama_timeout_seconds must be finite and between 0 and 300")
+        if not 1024 <= self.ollama_context_tokens <= 32768:
+            raise ValueError("ollama_context_tokens must be between 1024 and 32768")
+        if not 0 < self.ollama_max_output_tokens < self.ollama_context_tokens - 512:
+            raise ValueError("ollama_max_output_tokens must leave room for prompt and template")
 
     @property
     def livai_enabled(self) -> bool:
@@ -89,7 +106,7 @@ class Settings:
             return "INFERENCE_BACKEND=livai but LIVAI_API_KEY is not set; using deterministic."
         if backend == "argo" and not self.argo_enabled:
             return "INFERENCE_BACKEND=argo but ARGO_USER is not set; using deterministic."
-        if backend not in {"deterministic", "livai", "argo"}:
+        if backend not in {"deterministic", "livai", "argo", "ollama"}:
             return (
                 f"INFERENCE_BACKEND={self.assistant_generator!r} is not a known provider; "
                 "using deterministic."
@@ -128,6 +145,11 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         argo_model=os.getenv("ARGO_MODEL", DEFAULT_ARGO_MODEL),
         argo_base_url=os.getenv("ARGO_BASE_URL", DEFAULT_ARGO_BASE_URL),
         argo_temperature=_optional_float(os.getenv("ARGO_TEMPERATURE")),
+        ollama_model=os.getenv("OLLAMA_MODEL", "compass-gemma3:4b"),
+        ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1/"),
+        ollama_timeout_seconds=float(os.getenv("OLLAMA_TIMEOUT_SECONDS", "120")),
+        ollama_context_tokens=int(os.getenv("OLLAMA_CONTEXT_TOKENS", "4096")),
+        ollama_max_output_tokens=int(os.getenv("OLLAMA_MAX_OUTPUT_TOKENS", "512")),
         cors_allow_origins=origins or ("http://localhost:5173",),
         service_name=os.getenv("SERVICE_NAME", "e3sm-ai-platform-backend"),
         deployment_environment=os.getenv("DEPLOYMENT_ENVIRONMENT", "development"),
