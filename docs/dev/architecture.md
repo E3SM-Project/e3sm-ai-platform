@@ -133,9 +133,29 @@ connector. Those routes currently produce explicit insufficient-evidence
 messages.
 
 Generation is deterministic by default and cites only accepted curated evidence.
-Optional LivAI generation can be enabled for curated-evidence answers with
+Optional LivAI, Argo, or local Ollama generation can be enabled for curated-evidence answers with
 backend-only environment variables; provider errors fall back to deterministic
 generation.
+
+`application/service.py` extends the existing provider selection with
+`integrations/ollama.py`. Ollama uses the existing Pydantic AI/OpenAI-compatible
+stack, preserves deterministic response metadata, and replaces only the answer
+on success. Other routes and absent accepted evidence bypass generation.
+LivAI and Argo behavior and debug fields remain unchanged.
+
+Ollama accepts loopback endpoints only, disables proxies/redirects and retries,
+and applies a total asynchronous provider deadline. A nonblocking process-wide
+lock allows one active generation; busy requests fall back immediately. Use one
+backend worker for the laptop deployment. Cancellation closes the client request
+but cannot guarantee immediate server-side cancellation.
+
+The prompt budget counts UTF-8 bytes conservatively for the baseline tokenizers,
+reserving output and 512 chat-template tokens. It retains complete evidence
+chunks in order and falls back if none fit. Operators must configure the actual
+Ollama model context through a Modelfile; the OpenAI-compatible API cannot set it
+per request. Custom tokenizers/templates require validation. See
+[setup](setup.md#local-ollama-inference) for model approval, runtime limits, laptop
+comparison, rollback, and the separately scoped future NERSC hosting option.
 
 ## API response shape
 

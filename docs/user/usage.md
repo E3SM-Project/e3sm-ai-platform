@@ -93,10 +93,10 @@ mode, model, weight, and threshold configuration.
 
 ## Optional LLM generation
 
-Deterministic generation is the default. Two providers can be enabled for
+Deterministic generation is the default. LivAI, Argo, or local Ollama can be enabled for
 answers that already have curated supporting evidence. Set `INFERENCE_BACKEND`
-to exactly one of them in the backend environment only. Both are optional, and
-either provider's errors fall back to deterministic, evidence-constrained output
+to exactly one of them in the backend environment only. All are optional, and
+provider errors fall back to deterministic, evidence-constrained output
 without enabling live web retrieval.
 
 ### LivAI (LLNL)
@@ -128,8 +128,30 @@ gateway's `/api/v1/models/` endpoint (for example `claudesonnet5`, `gpt4o`,
 `gemini25pro`), not the display name. Leave `ARGO_TEMPERATURE` blank unless the
 selected model accepts it; Claude Sonnet 5 rejects the parameter.
 
-If `INFERENCE_BACKEND` names a provider whose required setting is blank, the
-backend logs a warning at startup and runs deterministic generation.
+If LivAI credentials or the Argo username are missing for the selected provider,
+the backend logs a warning at startup and runs deterministic generation.
+
+### Ollama (local)
+
+Follow [local Ollama setup](../dev/setup.md#local-ollama-inference) for native macOS
+installation, institutional model approval, and a 4K-context derived model before
+enabling inference. The initial candidate is 4-bit Gemma 3 4B on a 16 GB M2 Air;
+quality and performance still require a live comparison with approved Llama 3.1 8B.
+
+```bash
+INFERENCE_BACKEND=ollama
+OLLAMA_MODEL=compass-gemma3:4b
+OLLAMA_BASE_URL=http://localhost:11434/v1/
+```
+
+No LivAI/Argo credentials are required. Only loopback endpoints work. Generation
+defaults to a 120-second deadline, 4096-token context budget, 512-token output,
+and one active generation per backend process. Requests arriving while busy,
+oversized prompts, missing models, stopped servers, and invalid/empty responses
+fall back to cited deterministic answers. Unsupported or insufficient-evidence
+routes never invoke Ollama. Citations remain server-owned but do not prove model
+faithfulness; check claims against the evidence. Roll back by setting
+`INFERENCE_BACKEND=deterministic` and restarting the backend.
 
 ## Observability
 
