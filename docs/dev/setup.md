@@ -73,11 +73,18 @@ Common local settings are:
 
 - `CORS_ALLOW_ORIGINS`: comma-separated browser origins allowed by
   FastAPI CORS; defaults to `http://localhost:5173`.
-- `INFERENCE_BACKEND`: `deterministic` by default; set to `livai` or `argo`
-  only when that provider's required setting below is present. A named provider
-  with a blank required setting logs a startup warning and stays deterministic.
-- `LIVAI_API_KEY`, `LIVAI_MODEL`, `LIVAI_BASE_URL`: backend-only LivAI (LLNL)
-  settings. The key is a secret.
+- `INFERENCE_BACKEND`: `deterministic` by default; set to `openai_compatible`
+  or `argo` only when that provider's required settings below are present. A
+  named provider with a blank required setting logs a startup warning and stays
+  deterministic. `livai` is accepted as a deprecated alias for
+  `openai_compatible`.
+- `OPENAI_COMPATIBLE_API_KEY`, `OPENAI_COMPATIBLE_MODEL`,
+  `OPENAI_COMPATIBLE_BASE_URL`: backend-only settings for any gateway speaking
+  the OpenAI chat completions API (LivAI, GitHub Copilot, Azure OpenAI, vLLM).
+  The key is a secret. There is no default base URL; the value is used verbatim,
+  so include `/v1` only where the gateway expects it. The deprecated `LIVAI_*`
+  names are still read and fill any of these that are unset; a legacy
+  `LIVAI_BASE_URL` has `/v1` appended, matching the old client's behavior.
 - `ARGO_USER`, `ARGO_MODEL`, `ARGO_BASE_URL`, `ARGO_TEMPERATURE`: backend-only
   Argo (ANL) settings. `ARGO_USER` is an ANL username sent in the request body,
   not a secret; access depends on the ANL network. `ARGO_MODEL` is the

@@ -8,8 +8,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-DEFAULT_LIVAI_BASE_URL = "https://livai-api.llnl.gov/"
-DEFAULT_LIVAI_MODEL = "gpt-5.5"
+# The generic provider has no default URL: an operator must say which gateway
+# they mean. LivAI's values are kept only to resolve the deprecated alias.
+DEFAULT_OPENAI_COMPATIBLE_MODEL = "gpt-4o"
+LEGACY_LIVAI_BASE_URL = "https://livai-api.llnl.gov/v1"
+LEGACY_LIVAI_MODEL = "gpt-5.5"
 DEFAULT_ARGO_BASE_URL = "https://apps.inside.anl.gov/argoapi"
 DEFAULT_ARGO_MODEL = "claudesonnet5"
 DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
@@ -22,9 +25,12 @@ class Settings:
     """Runtime settings for provider selection and local prototype access."""
 
     assistant_generator: str = "deterministic"
-    livai_api_key: str | None = None
-    livai_model: str = DEFAULT_LIVAI_MODEL
-    livai_base_url: str = DEFAULT_LIVAI_BASE_URL
+    openai_compatible_api_key: str | None = None
+    openai_compatible_model: str = DEFAULT_OPENAI_COMPATIBLE_MODEL
+    openai_compatible_base_url: str | None = None
+    # True when the deprecated ``livai`` backend name or ``LIVAI_*`` variables
+    # supplied the values above. Used only to emit a one-time startup notice.
+    openai_compatible_from_legacy_livai: bool = False
     argo_user: str | None = None
     argo_model: str = DEFAULT_ARGO_MODEL
     argo_base_url: str = DEFAULT_ARGO_BASE_URL
@@ -61,9 +67,24 @@ class Settings:
             raise ValueError("at least one retrieval weight must be positive")
 
     @property
-    def livai_enabled(self) -> bool:
-        """LivAI is explicitly enabled only when requested and a key is present."""
-        return self.assistant_generator.lower() == "livai" and bool(self.livai_api_key)
+    def inference_backend(self) -> str:
+        """Return the normalized backend name with the deprecated ``livai`` alias resolved."""
+        backend = self.assistant_generator.lower()
+        return "openai_compatible" if backend == "livai" else backend
+
+    @property
+    def openai_compatible_enabled(self) -> bool:
+        """The generic provider needs the backend selected plus a key and a base URL.
+
+        There is no default URL on purpose: ``openai_compatible`` could mean
+        LivAI, GitHub Copilot, Azure, or a local vLLM, and guessing would send
+        a credential to the wrong host.
+        """
+        return (
+            self.inference_backend == "openai_compatible"
+            and bool(self.openai_compatible_api_key)
+            and bool(self.openai_compatible_base_url)
+        )
 
     @property
     def argo_enabled(self) -> bool:
@@ -84,17 +105,90 @@ class Settings:
         surfaces it instead of leaving the operator to notice slow-looking
         deterministic answers.
         """
-        backend = self.assistant_generator.lower()
-        if backend == "livai" and not self.livai_enabled:
-            return "INFERENCE_BACKEND=livai but LIVAI_API_KEY is not set; using deterministic."
+        backend = self.inference_backend
+        if backend == "openai_compatible" and not self.openai_compatible_enabled:
+            # Under the deprecated alias the operator is still editing LIVAI_*,
+            # so name the variable they would actually look for.
+            key_name = (
+                "LIVAI_API_KEY"
+                if self.openai_compatible_from_legacy_livai
+                else ("OPENAI_COMPATIBLE_API_KEY")
+            )
+            missing = []
+            if not self.openai_compatible_api_key:
+                missing.append(key_name)
+            if not self.openai_compatible_base_url:
+                missing.append("OPENAI_COMPATIBLE_BASE_URL")
+            return (
+                f"INFERENCE_BACKEND={self.assistant_generator} but {' and '.join(missing)} "
+                "not set; using deterministic."
+            )
         if backend == "argo" and not self.argo_enabled:
             return "INFERENCE_BACKEND=argo but ARGO_USER is not set; using deterministic."
-        if backend not in {"deterministic", "livai", "argo"}:
+        if backend not in {"deterministic", "openai_compatible", "argo"}:
             return (
                 f"INFERENCE_BACKEND={self.assistant_generator!r} is not a known provider; "
                 "using deterministic."
             )
         return None
+
+    def deprecation_notice(self) -> str | None:
+        """Return a one-line notice when deprecated LivAI names are still in use."""
+        if not self.openai_compatible_from_legacy_livai:
+            return None
+        return (
+            "INFERENCE_BACKEND=livai and LIVAI_* variables are deprecated; use "
+            "INFERENCE_BACKEND=openai_compatible with OPENAI_COMPATIBLE_API_KEY, "
+            "OPENAI_COMPATIBLE_MODEL, and OPENAI_COMPATIBLE_BASE_URL. "
+            "The base URL must now include /v1 where the gateway requires it."
+        )
+
+
+@dataclass(frozen=True)
+class _ResolvedProvider:
+    api_key: str | None
+    model: str
+    base_url: str | None
+    from_legacy_livai: bool
+
+
+def _resolve_openai_compatible(backend: str) -> _ResolvedProvider:
+    """Resolve the generic provider settings, honoring the deprecated ``livai`` alias.
+
+    The ``LIVAI_*`` variables are consulted only when ``INFERENCE_BACKEND`` is
+    literally ``livai``. That keeps an untouched LivAI deployment working with
+    zero edits while making sure a stale ``LIVAI_BASE_URL`` left in a copied
+    ``.env`` can never become the destination for some other provider's key.
+    Under the alias, a legacy URL gets ``/v1`` appended as the old client did,
+    and the historical LivAI endpoint and model are the defaults.
+    """
+    is_livai_alias = backend.lower() == "livai"
+    api_key = os.getenv("OPENAI_COMPATIBLE_API_KEY") or None
+    model = os.getenv("OPENAI_COMPATIBLE_MODEL") or None
+    base_url = os.getenv("OPENAI_COMPATIBLE_BASE_URL") or None
+
+    if not is_livai_alias:
+        return _ResolvedProvider(
+            api_key=api_key,
+            model=model or DEFAULT_OPENAI_COMPATIBLE_MODEL,
+            base_url=base_url,
+            from_legacy_livai=False,
+        )
+
+    legacy_url = os.getenv("LIVAI_BASE_URL") or None
+    if base_url is None:
+        base_url = _ensure_v1_suffix(legacy_url) if legacy_url else LEGACY_LIVAI_BASE_URL
+    return _ResolvedProvider(
+        api_key=api_key or os.getenv("LIVAI_API_KEY") or None,
+        model=model or os.getenv("LIVAI_MODEL") or LEGACY_LIVAI_MODEL,
+        base_url=base_url,
+        from_legacy_livai=True,
+    )
+
+
+def _ensure_v1_suffix(url: str) -> str:
+    stripped = url.rstrip("/")
+    return stripped if stripped.endswith("/v1") else f"{stripped}/v1"
 
 
 def _optional_float(raw: str | None) -> float | None:
@@ -119,11 +213,14 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         for name, value in [item.split("=", maxsplit=1)]
         if name.strip() and value.strip()
     )
+    backend = os.getenv("INFERENCE_BACKEND", "deterministic")
+    provider = _resolve_openai_compatible(backend)
     return Settings(
-        assistant_generator=os.getenv("INFERENCE_BACKEND", "deterministic"),
-        livai_api_key=os.getenv("LIVAI_API_KEY") or None,
-        livai_model=os.getenv("LIVAI_MODEL", DEFAULT_LIVAI_MODEL),
-        livai_base_url=os.getenv("LIVAI_BASE_URL", DEFAULT_LIVAI_BASE_URL),
+        assistant_generator=backend,
+        openai_compatible_api_key=provider.api_key,
+        openai_compatible_model=provider.model,
+        openai_compatible_base_url=provider.base_url,
+        openai_compatible_from_legacy_livai=provider.from_legacy_livai,
         argo_user=os.getenv("ARGO_USER") or os.getenv("ARGO_API_KEY") or None,
         argo_model=os.getenv("ARGO_MODEL", DEFAULT_ARGO_MODEL),
         argo_base_url=os.getenv("ARGO_BASE_URL", DEFAULT_ARGO_BASE_URL),

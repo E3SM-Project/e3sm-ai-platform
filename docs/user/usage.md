@@ -99,18 +99,37 @@ to exactly one of them in the backend environment only. Both are optional, and
 either provider's errors fall back to deterministic, evidence-constrained output
 without enabling live web retrieval.
 
-### LivAI (LLNL)
+### OpenAI-compatible gateways
+
+Any endpoint that speaks the OpenAI chat completions API works through one
+provider. The base URL is used exactly as written, so include `/v1` only where
+the gateway expects it.
+
+LivAI (LLNL):
 
 ```bash
-INFERENCE_BACKEND=livai
-LIVAI_API_KEY=your-secret-key
-LIVAI_MODEL=gpt-5.5
-LIVAI_BASE_URL=https://livai-api.llnl.gov/
+INFERENCE_BACKEND=openai_compatible
+OPENAI_COMPATIBLE_API_KEY=your-secret-key
+OPENAI_COMPATIBLE_MODEL=gpt-5.5
+OPENAI_COMPATIBLE_BASE_URL=https://livai-api.llnl.gov/v1
+```
+
+GitHub Copilot (requires a Copilot seat; a `gh auth token` works as the key):
+
+```bash
+INFERENCE_BACKEND=openai_compatible
+OPENAI_COMPATIBLE_API_KEY=your-github-token
+OPENAI_COMPATIBLE_MODEL=gpt-4o
+OPENAI_COMPATIBLE_BASE_URL=https://api.business.githubcopilot.com
 ```
 
 Inject secrets through an untracked backend environment, `backend/.env`, or a
 deployment secret manager. Do not use `VITE_` names for backend secrets and never
 commit API keys.
+
+The previous `INFERENCE_BACKEND=livai` with `LIVAI_API_KEY`, `LIVAI_MODEL`, and
+`LIVAI_BASE_URL` is deprecated but still accepted; it maps onto the settings
+above and logs a startup notice. Existing LivAI configurations need no changes.
 
 ### Argo (ANL)
 
