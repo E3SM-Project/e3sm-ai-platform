@@ -177,6 +177,7 @@ def build_generator(settings: Settings) -> OpenAICompatibleEvidenceGenerator | N
         api_key=settings.openai_compatible_api_key,
         model=settings.openai_compatible_model,
         base_url=settings.openai_compatible_base_url,
+        temperature=settings.openai_compatible_temperature,
     )
     return OpenAICompatibleEvidenceGenerator(client)
 

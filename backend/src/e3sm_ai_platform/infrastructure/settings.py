@@ -11,6 +11,10 @@ from dotenv import load_dotenv
 # The generic provider has no default URL: an operator must say which gateway
 # they mean. LivAI's values are kept only to resolve the deprecated alias.
 DEFAULT_OPENAI_COMPATIBLE_MODEL = "gpt-4o"
+# Determinism is the default, but OPENAI_COMPATIBLE_TEMPERATURE=omit drops the
+# parameter for models that refuse it outright.
+DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE = 0.0
+OMIT_TEMPERATURE_VALUES = frozenset({"omit", "none", "unset"})
 LEGACY_LIVAI_BASE_URL = "https://livai-api.llnl.gov/v1"
 LEGACY_LIVAI_MODEL = "gpt-5.5"
 DEFAULT_ARGO_BASE_URL = "https://apps.inside.anl.gov/argoapi"
@@ -28,6 +32,9 @@ class Settings:
     openai_compatible_api_key: str | None = None
     openai_compatible_model: str = DEFAULT_OPENAI_COMPATIBLE_MODEL
     openai_compatible_base_url: str | None = None
+    # None omits the parameter entirely. Reasoning models reject any value,
+    # so sending the default 0.0 would make every call fall back.
+    openai_compatible_temperature: float | None = DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE
     # True when the deprecated ``livai`` backend name or ``LIVAI_*`` variables
     # supplied the values above. Used only to emit a one-time startup notice.
     openai_compatible_from_legacy_livai: bool = False
@@ -186,6 +193,21 @@ def _resolve_openai_compatible(backend: str) -> _ResolvedProvider:
     )
 
 
+def _resolve_temperature(raw: str | None) -> float | None:
+    """Parse ``OPENAI_COMPATIBLE_TEMPERATURE``.
+
+    Unset or blank keeps the deterministic default. ``omit`` (or ``none`` /
+    ``unset``) drops the field from the request entirely, which is the only
+    thing that works for models that reject any temperature value rather than
+    just disliking a particular one.
+    """
+    if raw is None or not raw.strip():
+        return DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE
+    if raw.strip().lower() in OMIT_TEMPERATURE_VALUES:
+        return None
+    return float(raw)
+
+
 def _ensure_v1_suffix(url: str) -> str:
     stripped = url.rstrip("/")
     return stripped if stripped.endswith("/v1") else f"{stripped}/v1"
@@ -220,6 +242,9 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         openai_compatible_api_key=provider.api_key,
         openai_compatible_model=provider.model,
         openai_compatible_base_url=provider.base_url,
+        openai_compatible_temperature=_resolve_temperature(
+            os.getenv("OPENAI_COMPATIBLE_TEMPERATURE")
+        ),
         openai_compatible_from_legacy_livai=provider.from_legacy_livai,
         argo_user=os.getenv("ARGO_USER") or os.getenv("ARGO_API_KEY") or None,
         argo_model=os.getenv("ARGO_MODEL", DEFAULT_ARGO_MODEL),

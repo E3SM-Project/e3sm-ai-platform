@@ -127,9 +127,15 @@ Inject secrets through an untracked backend environment, `backend/.env`, or a
 deployment secret manager. Do not use `VITE_` names for backend secrets and never
 commit API keys.
 
+Requests send `temperature=0.0` for reproducibility. Some reasoning models
+reject the parameter outright; set `OPENAI_COMPATIBLE_TEMPERATURE=omit` to drop
+it from the request.
+
 The previous `INFERENCE_BACKEND=livai` with `LIVAI_API_KEY`, `LIVAI_MODEL`, and
 `LIVAI_BASE_URL` is deprecated but still accepted; it maps onto the settings
 above and logs a startup notice. Existing LivAI configurations need no changes.
+Those variables apply only under that alias, so migrating to
+`openai_compatible` means renaming the key and base URL too.
 
 ### Argo (ANL)
 

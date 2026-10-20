@@ -82,9 +82,17 @@ Common local settings are:
   `OPENAI_COMPATIBLE_BASE_URL`: backend-only settings for any gateway speaking
   the OpenAI chat completions API (LivAI, GitHub Copilot, Azure OpenAI, vLLM).
   The key is a secret. There is no default base URL; the value is used verbatim,
-  so include `/v1` only where the gateway expects it. The deprecated `LIVAI_*`
-  names are still read and fill any of these that are unset; a legacy
-  `LIVAI_BASE_URL` has `/v1` appended, matching the old client's behavior.
+  so include `/v1` only where the gateway expects it.
+- `OPENAI_COMPATIBLE_TEMPERATURE`: defaults to `0.0`. Set it to `omit` to drop
+  the field from requests entirely, which some reasoning models require because
+  they reject any temperature value.
+- The deprecated `LIVAI_*` names are read **only** when
+  `INFERENCE_BACKEND=livai`, never as fallbacks for `openai_compatible`. Under
+  that alias a legacy `LIVAI_BASE_URL` has `/v1` appended, matching the old
+  client. Switching to `openai_compatible` therefore requires renaming the key
+  and URL as well; leaving only `LIVAI_*` set logs a warning and stays
+  deterministic. This is deliberate, so a stale `LIVAI_BASE_URL` in a copied
+  `.env` cannot become the destination for another provider's key.
 - `ARGO_USER`, `ARGO_MODEL`, `ARGO_BASE_URL`, `ARGO_TEMPERATURE`: backend-only
   Argo (ANL) settings. `ARGO_USER` is an ANL username sent in the request body,
   not a secret; access depends on the ANL network. `ARGO_MODEL` is the

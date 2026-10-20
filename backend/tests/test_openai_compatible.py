@@ -20,6 +20,7 @@ from e3sm_ai_platform.domain.models import (
 )
 from e3sm_ai_platform.infrastructure.settings import (
     DEFAULT_OPENAI_COMPATIBLE_MODEL,
+    DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE,
     LEGACY_LIVAI_BASE_URL,
     LEGACY_LIVAI_MODEL,
     Settings,
@@ -43,6 +44,7 @@ PROVIDER_ENV_KEYS = [
     "OPENAI_COMPATIBLE_API_KEY",
     "OPENAI_COMPATIBLE_MODEL",
     "OPENAI_COMPATIBLE_BASE_URL",
+    "OPENAI_COMPATIBLE_TEMPERATURE",
     "LIVAI_API_KEY",
     "LIVAI_MODEL",
     "LIVAI_BASE_URL",
@@ -647,3 +649,62 @@ def test_service_routes_through_provider_when_configured(clear_provider_env: Non
     assert response.generation_mode is GenerationMode.LLM
     assert response.debug["provider_used"] is True
     assert response.citations
+
+
+# --------------------------------------------------------------------------
+# Temperature is reachable from configuration
+# --------------------------------------------------------------------------
+
+
+def test_temperature_defaults_to_zero_and_blank_keeps_it(
+    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert load_settings(load_dotenv_file=False).openai_compatible_temperature == (
+        DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE
+    )
+
+    monkeypatch.setenv("OPENAI_COMPATIBLE_TEMPERATURE", "")
+    assert load_settings(load_dotenv_file=False).openai_compatible_temperature == 0.0
+
+    monkeypatch.setenv("OPENAI_COMPATIBLE_TEMPERATURE", "0.7")
+    assert load_settings(load_dotenv_file=False).openai_compatible_temperature == 0.7
+
+
+@pytest.mark.parametrize("sentinel", ["omit", "OMIT", " none ", "unset"])
+def test_temperature_sentinel_disables_the_parameter(
+    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch, sentinel: str
+) -> None:
+    """Some reasoning models reject any value, so the field must be droppable."""
+    monkeypatch.setenv("OPENAI_COMPATIBLE_TEMPERATURE", sentinel)
+
+    assert load_settings(load_dotenv_file=False).openai_compatible_temperature is None
+
+
+@pytest.mark.parametrize("configured", [0.0, None, 0.7])
+def test_build_generator_forwards_configured_temperature(
+    clear_provider_env: None, configured: float | None
+) -> None:
+    """Regression: build_generator dropped temperature, so omit was unreachable."""
+    generator = build_generator(
+        Settings(
+            assistant_generator="openai_compatible",
+            openai_compatible_api_key="k",
+            openai_compatible_base_url=TEST_URL,
+            openai_compatible_temperature=configured,
+        )
+    )
+
+    assert generator is not None
+    client = generator.client
+    assert isinstance(client, OpenAICompatibleChatClient)
+    assert client.temperature == configured
+
+
+def test_configured_omit_reaches_the_request_body(clear_provider_env: None) -> None:
+    """End to end: an operator setting omit must produce a request without it."""
+    client, fake = _client(temperature=None)
+
+    client.complete(build_messages("question", _evidence()))
+
+    assert fake.last_request is not None
+    assert "temperature" not in fake.last_request
