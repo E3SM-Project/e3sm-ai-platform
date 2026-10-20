@@ -40,6 +40,8 @@ ARGO_ENV_KEYS = [
     "ARGO_MODEL",
     "ARGO_BASE_URL",
     "ARGO_TEMPERATURE",
+    "OPENAI_COMPATIBLE_API_KEY",
+    "OPENAI_COMPATIBLE_BASE_URL",
     "LIVAI_API_KEY",
     "CORS_ALLOW_ORIGINS",
 ]
@@ -168,11 +170,16 @@ def test_argo_user_falls_back_to_existing_anl_env_var(
     assert load_settings(load_dotenv_file=False).argo_user == "fromuser"
 
 
-def test_selecting_argo_does_not_enable_livai(clear_argo_env: None) -> None:
-    settings = Settings(assistant_generator="argo", argo_user="testuser", livai_api_key="secret")
+def test_selecting_argo_does_not_enable_openai_compatible(clear_argo_env: None) -> None:
+    settings = Settings(
+        assistant_generator="argo",
+        argo_user="testuser",
+        openai_compatible_api_key="secret",
+        openai_compatible_base_url="https://gateway.example.org/v1",
+    )
 
     assert settings.argo_enabled is True
-    assert settings.livai_enabled is False
+    assert settings.openai_compatible_enabled is False
 
 
 # --------------------------------------------------------------------------
@@ -236,12 +243,12 @@ def test_argo_prompt_keeps_system_constraints_separate_from_evidence() -> None:
     assert SYSTEM_PROMPT not in messages[1]["content"]
 
 
-def test_argo_prompt_matches_livai_prompt() -> None:
+def test_argo_prompt_matches_shared_prompt() -> None:
     """One prompt builder keeps evidence-first wording identical across providers."""
-    from e3sm_ai_platform.integrations.livai import build_livai_messages
+    from e3sm_ai_platform.integrations.prompting import build_messages
 
     question = "How do I choose a compset?"
-    assert build_argo_messages(question, _evidence()) == build_livai_messages(question, _evidence())
+    assert build_argo_messages(question, _evidence()) == build_messages(question, _evidence())
 
 
 # --------------------------------------------------------------------------
@@ -470,17 +477,23 @@ def test_build_generator_returns_none_unless_enabled(clear_argo_env: None) -> No
     )
 
 
-def test_provider_selection_is_exclusive(clear_argo_env: None) -> None:
-    from e3sm_ai_platform.integrations.livai import LivAIEvidenceGenerator
-
+def test_argo_is_selected_only_when_named(clear_argo_env: None) -> None:
+    """Cross-provider exclusivity is covered in test_openai_compatible.py."""
     assert build_provider_generator(Settings()) is None
     assert isinstance(
         build_provider_generator(Settings(assistant_generator="argo", argo_user="testuser")),
         ArgoEvidenceGenerator,
     )
-    assert isinstance(
-        build_provider_generator(Settings(assistant_generator="livai", livai_api_key="secret")),
-        LivAIEvidenceGenerator,
+    assert (
+        build_provider_generator(
+            Settings(
+                assistant_generator="openai_compatible",
+                argo_user="testuser",
+                openai_compatible_api_key="k",
+                openai_compatible_base_url="https://gateway.example.org/v1",
+            )
+        ).__class__.__name__
+        != "ArgoEvidenceGenerator"
     )
 
 
@@ -523,7 +536,12 @@ def test_provider_misconfiguration_is_none_when_coherent(clear_argo_env: None) -
         is None
     )
     assert (
-        Settings(assistant_generator="livai", livai_api_key="k").provider_misconfiguration() is None
+        Settings(
+            assistant_generator="openai_compatible",
+            openai_compatible_api_key="k",
+            openai_compatible_base_url="https://gateway.example.org/v1",
+        ).provider_misconfiguration()
+        is None
     )
 
 
@@ -531,11 +549,13 @@ def test_provider_misconfiguration_names_the_missing_setting(clear_argo_env: Non
     """Forgetting ARGO_USER must say so rather than silently going deterministic."""
     argo = Settings(assistant_generator="argo").provider_misconfiguration()
     livai = Settings(assistant_generator="livai").provider_misconfiguration()
-    unknown = Settings(assistant_generator="openai").provider_misconfiguration()
+    unknown = Settings(assistant_generator="anthropic").provider_misconfiguration()
 
     assert argo is not None and "ARGO_USER" in argo
-    assert livai is not None and "LIVAI_API_KEY" in livai
-    assert unknown is not None and "openai" in unknown
+    # The deprecated alias resolves to the generic provider, so the warning
+    # points at the new variable names rather than LIVAI_*.
+    assert livai is not None and "OPENAI_COMPATIBLE_API_KEY" in livai
+    assert unknown is not None and "anthropic" in unknown
 
 
 def test_startup_logs_a_warning_for_misconfigured_provider(
