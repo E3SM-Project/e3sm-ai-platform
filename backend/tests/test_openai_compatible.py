@@ -1,4 +1,4 @@
-"""Tests for the generic OpenAI-compatible provider and the deprecated LivAI alias.
+"""Tests for the generic OpenAI-compatible provider.
 
 Every test runs offline. The ``openai`` SDK's ``chat.completions`` surface is
 injected, so no test depends on reaching LLNL, GitHub, or any other gateway.
@@ -24,8 +24,6 @@ from e3sm_ai_platform.domain.models import (
 from e3sm_ai_platform.infrastructure.settings import (
     DEFAULT_OPENAI_COMPATIBLE_MODEL,
     DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE,
-    LEGACY_LIVAI_BASE_URL,
-    LEGACY_LIVAI_MODEL,
     Settings,
     load_settings,
 )
@@ -48,9 +46,6 @@ PROVIDER_ENV_KEYS = [
     "OPENAI_COMPATIBLE_MODEL",
     "OPENAI_COMPATIBLE_BASE_URL",
     "OPENAI_COMPATIBLE_TEMPERATURE",
-    "LIVAI_API_KEY",
-    "LIVAI_MODEL",
-    "LIVAI_BASE_URL",
     "ARGO_USER",
     "ARGO_API_KEY",
     "CORS_ALLOW_ORIGINS",
@@ -173,7 +168,6 @@ def test_settings_defaults(clear_provider_env: None) -> None:
     assert settings.openai_compatible_base_url is None
     assert settings.openai_compatible_model == DEFAULT_OPENAI_COMPATIBLE_MODEL
     assert settings.openai_compatible_enabled is False
-    assert settings.openai_compatible_from_legacy_livai is False
 
 
 def test_enablement_requires_backend_key_and_base_url(clear_provider_env: None) -> None:
@@ -215,109 +209,50 @@ def test_new_env_names_are_read_verbatim(
     assert settings.openai_compatible_enabled is True
     assert settings.openai_compatible_model == "gpt-4o-mini"
     assert settings.openai_compatible_base_url == "https://api.business.githubcopilot.com"
-    assert settings.openai_compatible_from_legacy_livai is False
-    assert settings.deprecation_notice() is None
 
 
 # --------------------------------------------------------------------------
-# Settings: deprecated livai alias
+# Settings: removed LivAI compatibility
 # --------------------------------------------------------------------------
 
 
-def test_livai_alias_with_untouched_legacy_env_still_works(
-    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize("backend", ["deterministic", "openai_compatible", "livai", "LIVAI"])
+def test_legacy_variables_are_ignored(
+    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch, backend: str
 ) -> None:
-    """An existing LivAI .env must keep working with zero edits.
-
-    The old client appended /v1 to LIVAI_BASE_URL. The alias preserves that so
-    the deployment reaches the same endpoint it always did.
-    """
-    monkeypatch.setenv("INFERENCE_BACKEND", "livai")
-    monkeypatch.setenv("LIVAI_API_KEY", "legacy-key")
-    monkeypatch.setenv("LIVAI_MODEL", "gpt-5.5")
-    monkeypatch.setenv("LIVAI_BASE_URL", "https://livai-api.llnl.gov/")
-
-    settings = load_settings(load_dotenv_file=False)
-
-    assert settings.inference_backend == "openai_compatible"
-    assert settings.openai_compatible_enabled is True
-    assert settings.openai_compatible_api_key == "legacy-key"
-    assert settings.openai_compatible_model == "gpt-5.5"
-    assert settings.openai_compatible_base_url == "https://livai-api.llnl.gov/v1"
-    assert settings.openai_compatible_from_legacy_livai is True
-    notice = settings.deprecation_notice()
-    assert notice is not None and "OPENAI_COMPATIBLE_BASE_URL" in notice
-
-
-def test_livai_alias_falls_back_to_historical_defaults(
-    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setenv("INFERENCE_BACKEND", "livai")
-    monkeypatch.setenv("LIVAI_API_KEY", "legacy-key")
-
-    settings = load_settings(load_dotenv_file=False)
-
-    assert settings.openai_compatible_base_url == LEGACY_LIVAI_BASE_URL
-    assert settings.openai_compatible_model == LEGACY_LIVAI_MODEL
-    assert settings.openai_compatible_enabled is True
-
-
-def test_legacy_url_already_ending_in_v1_is_not_doubled(
-    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setenv("INFERENCE_BACKEND", "livai")
-    monkeypatch.setenv("LIVAI_API_KEY", "k")
-    monkeypatch.setenv("LIVAI_BASE_URL", "https://livai-api.llnl.gov/v1/")
-
-    assert load_settings(load_dotenv_file=False).openai_compatible_base_url == (
-        "https://livai-api.llnl.gov/v1"
-    )
-
-
-def test_legacy_variables_are_ignored_unless_backend_is_livai(
-    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Stale LIVAI_* lines in a copied .env must not leak into another provider.
-
-    If they did, a Copilot token could be sent to the LLNL endpoint, and a
-    plain deterministic start would log a spurious deprecation notice.
-    """
+    """Ignore removed settings regardless of the selected backend."""
+    monkeypatch.setenv("INFERENCE_BACKEND", backend)
     monkeypatch.setenv("LIVAI_API_KEY", "old-key")
     monkeypatch.setenv("LIVAI_MODEL", "gpt-5.5")
     monkeypatch.setenv("LIVAI_BASE_URL", "https://livai-api.llnl.gov/")
 
-    monkeypatch.setenv("INFERENCE_BACKEND", "deterministic")
-    deterministic = load_settings(load_dotenv_file=False)
-    assert deterministic.openai_compatible_api_key is None
-    assert deterministic.openai_compatible_base_url is None
-    assert deterministic.openai_compatible_from_legacy_livai is False
-    assert deterministic.deprecation_notice() is None
+    settings = load_settings(load_dotenv_file=False)
 
-    monkeypatch.setenv("INFERENCE_BACKEND", "openai_compatible")
-    monkeypatch.setenv("OPENAI_COMPATIBLE_API_KEY", "copilot-token")
-    monkeypatch.setenv("OPENAI_COMPATIBLE_BASE_URL", TEST_URL)
-    generic = load_settings(load_dotenv_file=False)
-    assert generic.openai_compatible_api_key == "copilot-token"
-    assert generic.openai_compatible_base_url == TEST_URL
-    assert generic.openai_compatible_from_legacy_livai is False
+    assert settings.openai_compatible_api_key is None
+    assert settings.openai_compatible_base_url is None
+    assert settings.openai_compatible_model == DEFAULT_OPENAI_COMPATIBLE_MODEL
+    assert settings.openai_compatible_enabled is False
+    assert build_provider_generator(settings) is None
 
 
-def test_new_names_override_legacy_under_the_alias(
-    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize("backend", ["livai", "LIVAI"])
+def test_removed_alias_does_not_enable_generic_provider(
+    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch, backend: str
 ) -> None:
-    """A half-migrated .env (alias backend, new variable names) still resolves."""
-    monkeypatch.setenv("INFERENCE_BACKEND", "livai")
+    """Treat the removed alias as unknown even with generic credentials present."""
+    monkeypatch.setenv("INFERENCE_BACKEND", backend)
     monkeypatch.setenv("OPENAI_COMPATIBLE_API_KEY", "new-key")
     monkeypatch.setenv("OPENAI_COMPATIBLE_BASE_URL", TEST_URL)
-    monkeypatch.setenv("LIVAI_API_KEY", "old-key")
-    monkeypatch.setenv("LIVAI_BASE_URL", "https://livai-api.llnl.gov/")
 
     settings = load_settings(load_dotenv_file=False)
 
     assert settings.openai_compatible_api_key == "new-key"
-    # Explicit new URL is verbatim; no /v1 is appended to it.
     assert settings.openai_compatible_base_url == TEST_URL
-    assert settings.openai_compatible_from_legacy_livai is True
+    assert settings.inference_backend == "livai"
+    assert settings.openai_compatible_enabled is False
+    assert build_provider_generator(settings) is None
+    warning = settings.provider_misconfiguration()
+    assert warning is not None and "is not a known provider; using deterministic." in warning
 
 
 def test_misconfiguration_names_the_missing_variables(clear_provider_env: None) -> None:
@@ -325,7 +260,6 @@ def test_misconfiguration_names_the_missing_variables(clear_provider_env: None) 
     only_key = Settings(
         assistant_generator="openai_compatible", openai_compatible_api_key="k"
     ).provider_misconfiguration()
-    alias = Settings(assistant_generator="livai").provider_misconfiguration()
     complete = Settings(
         assistant_generator="openai_compatible",
         openai_compatible_api_key="k",
@@ -336,21 +270,7 @@ def test_misconfiguration_names_the_missing_variables(clear_provider_env: None) 
     assert "OPENAI_COMPATIBLE_API_KEY" in only_backend
     assert "OPENAI_COMPATIBLE_BASE_URL" in only_backend
     assert only_key is not None and "OPENAI_COMPATIBLE_BASE_URL" in only_key
-    assert alias is not None and "INFERENCE_BACKEND=livai" in alias
     assert complete is None
-
-
-def test_alias_misconfiguration_names_the_legacy_variable(
-    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """An operator still on the alias is editing LIVAI_*, so say LIVAI_API_KEY."""
-    monkeypatch.setenv("INFERENCE_BACKEND", "livai")
-
-    warning = load_settings(load_dotenv_file=False).provider_misconfiguration()
-
-    assert warning is not None
-    assert "LIVAI_API_KEY" in warning
-    assert "OPENAI_COMPATIBLE_BASE_URL" not in warning  # URL defaulted under the alias
 
 
 def test_unknown_backend_is_reported(clear_provider_env: None) -> None:
@@ -689,14 +609,20 @@ def test_build_generator_returns_none_unless_fully_configured(clear_provider_env
     )
 
 
-def test_livai_alias_builds_the_generic_generator(clear_provider_env: None) -> None:
-    generator = build_provider_generator(
-        Settings(
-            assistant_generator="livai",
-            openai_compatible_api_key="k",
-            openai_compatible_base_url=LEGACY_LIVAI_BASE_URL,
-        )
-    )
+def test_livai_uses_explicit_generic_settings(
+    clear_provider_env: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Keep LivAI usable through the generic provider without endpoint rewriting."""
+    monkeypatch.setenv("INFERENCE_BACKEND", "OPENAI_COMPATIBLE")
+    monkeypatch.setenv("OPENAI_COMPATIBLE_API_KEY", "k")
+    monkeypatch.setenv("OPENAI_COMPATIBLE_MODEL", "example-model")
+    monkeypatch.setenv("OPENAI_COMPATIBLE_BASE_URL", "https://livai-api.llnl.gov/v1/")
+    settings = load_settings(load_dotenv_file=False)
+    generator = build_provider_generator(settings)
+
+    assert settings.inference_backend == "openai_compatible"
+    assert settings.openai_compatible_model == "example-model"
+    assert settings.openai_compatible_base_url == "https://livai-api.llnl.gov/v1/"
     assert isinstance(generator, OpenAICompatibleEvidenceGenerator)
 
 

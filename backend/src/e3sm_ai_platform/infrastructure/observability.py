@@ -121,9 +121,6 @@ def log_startup_configuration(settings: Settings) -> None:
     warning = settings.provider_misconfiguration()
     if warning is not None:
         get_logger().warning(warning, extra={"human_readable": True})
-    notice = settings.deprecation_notice()
-    if notice is not None:
-        get_logger().warning(notice, extra={"human_readable": True})
 
 
 def format_startup_configuration(settings: Settings) -> str:

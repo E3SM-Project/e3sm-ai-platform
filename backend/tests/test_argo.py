@@ -42,7 +42,6 @@ ARGO_ENV_KEYS = [
     "ARGO_TEMPERATURE",
     "OPENAI_COMPATIBLE_API_KEY",
     "OPENAI_COMPATIBLE_BASE_URL",
-    "LIVAI_API_KEY",
     "CORS_ALLOW_ORIGINS",
 ]
 
@@ -548,13 +547,11 @@ def test_provider_misconfiguration_is_none_when_coherent(clear_argo_env: None) -
 def test_provider_misconfiguration_names_the_missing_setting(clear_argo_env: None) -> None:
     """Forgetting ARGO_USER must say so rather than silently going deterministic."""
     argo = Settings(assistant_generator="argo").provider_misconfiguration()
-    livai = Settings(assistant_generator="livai").provider_misconfiguration()
+    generic = Settings(assistant_generator="openai_compatible").provider_misconfiguration()
     unknown = Settings(assistant_generator="anthropic").provider_misconfiguration()
 
     assert argo is not None and "ARGO_USER" in argo
-    # The deprecated alias resolves to the generic provider, so the warning
-    # points at the new variable names rather than LIVAI_*.
-    assert livai is not None and "OPENAI_COMPATIBLE_API_KEY" in livai
+    assert generic is not None and "OPENAI_COMPATIBLE_API_KEY" in generic
     assert unknown is not None and "anthropic" in unknown
 
 

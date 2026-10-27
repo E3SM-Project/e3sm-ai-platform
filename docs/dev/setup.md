@@ -76,8 +76,7 @@ Common local settings are:
 - `INFERENCE_BACKEND`: `deterministic` by default; set to `openai_compatible`
   or `argo` only when that provider's required settings below are present. A
   named provider with a blank required setting logs a startup warning and stays
-  deterministic. `livai` is accepted as a deprecated alias for
-  `openai_compatible`.
+  deterministic.
 - `OPENAI_COMPATIBLE_API_KEY`, `OPENAI_COMPATIBLE_MODEL`,
   `OPENAI_COMPATIBLE_BASE_URL`: backend-only settings for any gateway speaking
   the OpenAI chat completions API (LivAI, GitHub Copilot, Azure OpenAI, vLLM).
@@ -93,13 +92,6 @@ Common local settings are:
   `OPENAI_COMPATIBLE_TEMPERATURE=omit` in `backend/.env` and restart the backend
   to stop sending the parameter. Detection happens on a provider request, not
   at startup; other provider failures still use the deterministic fallback.
-- The deprecated `LIVAI_*` names are read **only** when
-  `INFERENCE_BACKEND=livai`, never as fallbacks for `openai_compatible`. Under
-  that alias a legacy `LIVAI_BASE_URL` has `/v1` appended, matching the old
-  client. Switching to `openai_compatible` therefore requires renaming the key
-  and URL as well; leaving only `LIVAI_*` set logs a warning and stays
-  deterministic. This is deliberate, so a stale `LIVAI_BASE_URL` in a copied
-  `.env` cannot become the destination for another provider's key.
 - `ARGO_USER`, `ARGO_MODEL`, `ARGO_BASE_URL`, `ARGO_TEMPERATURE`: backend-only
   Argo (ANL) settings. `ARGO_USER` is an ANL username sent in the request body,
   not a secret; access depends on the ANL network. `ARGO_MODEL` is the
