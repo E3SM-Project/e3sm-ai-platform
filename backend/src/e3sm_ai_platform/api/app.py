@@ -7,14 +7,14 @@ from time import perf_counter
 from typing import Annotated
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
 from e3sm_ai_platform.application.service import CompassService
-from e3sm_ai_platform.domain.models import QueryRequest, QueryResponse
+from e3sm_ai_platform.domain.models import QueryRequest, QueryResponse, UnsupportedTemperatureError
 from e3sm_ai_platform.infrastructure.observability import (
     configure_observability,
     instrument_fastapi,
@@ -90,5 +90,17 @@ def query(
     request: QueryRequest,
     service: Annotated[CompassService, Depends(get_service)],
 ) -> QueryResponse:
-    """Return the response for a query endpoint request."""
-    return service.query(request)
+    """Return a query response or a sanitized provider configuration error.
+
+    Raises
+    ------
+    HTTPException
+        If the provider rejects the configured temperature, with status 503.
+    """
+    try:
+        return service.query(request)
+    except UnsupportedTemperatureError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={"code": "unsupported_temperature", "message": str(exc)},
+        ) from None

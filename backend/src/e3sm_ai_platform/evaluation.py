@@ -17,7 +17,7 @@ def _service() -> CompassService:
     Generation is pinned to the deterministic generator regardless of
     ``INFERENCE_BACKEND``. The suite asserts routing, evidence, and citation
     behavior, none of which depend on provider wording, and a developer with
-    LivAI or Argo configured in ``backend/.env`` would otherwise turn every
+    any LLM provider configured in ``backend/.env`` would otherwise turn every
     run into live, non-reproducible, billable model calls.
     """
     return CompassService(generator=generate_response)

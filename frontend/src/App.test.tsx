@@ -13,6 +13,19 @@ afterEach(() => {
 })
 
 describe('App', () => {
+  it('shows a temperature configuration error instead of a fallback answer', async () => {
+    const { queryAssistant } = await import('./api')
+    vi.mocked(queryAssistant).mockRejectedValue(new Error(
+      'The configured model rejected the temperature setting. Set OPENAI_COMPATIBLE_TEMPERATURE=omit in backend/.env and restart the backend.',
+    ))
+    render(<App />)
+    fireEvent.change(screen.getByLabelText('Ask E3SM Compass a question'), { target: { value: 'Question' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Send question' }))
+
+    expect((await screen.findByRole('alert')).textContent).toContain('OPENAI_COMPATIBLE_TEMPERATURE=omit')
+    expect(screen.queryByRole('article')).toBeNull()
+  })
+
   it('renders a source metadata object as curated evidence without rendering an object child', async () => {
     const { queryAssistant } = await import('./api')
     vi.mocked(queryAssistant).mockResolvedValue({

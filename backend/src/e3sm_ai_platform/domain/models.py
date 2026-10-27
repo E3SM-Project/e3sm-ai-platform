@@ -25,6 +25,17 @@ class GenerationMode(StrEnum):
     DETERMINISTIC_FALLBACK = "deterministic_fallback"
 
 
+class UnsupportedTemperatureError(RuntimeError):
+    """Report a provider-confirmed temperature configuration error safely."""
+
+    def __init__(self) -> None:
+        """Initialize the error with fixed, credential-free corrective guidance."""
+        super().__init__(
+            "The configured model rejected the temperature setting. "
+            "Set OPENAI_COMPATIBLE_TEMPERATURE=omit in backend/.env and restart the backend."
+        )
+
+
 ROUTE_ALIASES: dict[RouteName, str] = {
     RouteName.CURATED_RAG: "curated_rag",
     RouteName.WEB_SEARCH: "web_search",

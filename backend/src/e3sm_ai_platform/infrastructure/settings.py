@@ -8,8 +8,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-DEFAULT_LIVAI_BASE_URL = "https://livai-api.llnl.gov/"
-DEFAULT_LIVAI_MODEL = "gpt-5.5"
+# The generic provider has no default URL: an operator must say which gateway
+# they mean.
+DEFAULT_OPENAI_COMPATIBLE_MODEL = "gpt-4o"
+# Determinism is the default, but OPENAI_COMPATIBLE_TEMPERATURE=omit drops the
+# parameter for models that refuse it outright.
+DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE = 0.0
+OMIT_TEMPERATURE_VALUES = frozenset({"omit", "none", "unset"})
 DEFAULT_ARGO_BASE_URL = "https://apps.inside.anl.gov/argoapi"
 DEFAULT_ARGO_MODEL = "claudesonnet5"
 DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
@@ -22,9 +27,12 @@ class Settings:
     """Runtime settings for provider selection and local prototype access."""
 
     assistant_generator: str = "deterministic"
-    livai_api_key: str | None = None
-    livai_model: str = DEFAULT_LIVAI_MODEL
-    livai_base_url: str = DEFAULT_LIVAI_BASE_URL
+    openai_compatible_api_key: str | None = None
+    openai_compatible_model: str = DEFAULT_OPENAI_COMPATIBLE_MODEL
+    openai_compatible_base_url: str | None = None
+    # None omits the parameter entirely. Reasoning models reject any value,
+    # so sending the default 0.0 would make every call fall back.
+    openai_compatible_temperature: float | None = DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE
     argo_user: str | None = None
     argo_model: str = DEFAULT_ARGO_MODEL
     argo_base_url: str = DEFAULT_ARGO_BASE_URL
@@ -61,9 +69,23 @@ class Settings:
             raise ValueError("at least one retrieval weight must be positive")
 
     @property
-    def livai_enabled(self) -> bool:
-        """LivAI is explicitly enabled only when requested and a key is present."""
-        return self.assistant_generator.lower() == "livai" and bool(self.livai_api_key)
+    def inference_backend(self) -> str:
+        """Return the normalized backend name."""
+        return self.assistant_generator.lower()
+
+    @property
+    def openai_compatible_enabled(self) -> bool:
+        """The generic provider needs the backend selected plus a key and a base URL.
+
+        There is no default URL on purpose: ``openai_compatible`` could mean
+        LivAI, GitHub Copilot, Azure, or a local vLLM, and guessing would send
+        a credential to the wrong host.
+        """
+        return (
+            self.inference_backend == "openai_compatible"
+            and bool(self.openai_compatible_api_key)
+            and bool(self.openai_compatible_base_url)
+        )
 
     @property
     def argo_enabled(self) -> bool:
@@ -84,17 +106,40 @@ class Settings:
         surfaces it instead of leaving the operator to notice slow-looking
         deterministic answers.
         """
-        backend = self.assistant_generator.lower()
-        if backend == "livai" and not self.livai_enabled:
-            return "INFERENCE_BACKEND=livai but LIVAI_API_KEY is not set; using deterministic."
+        backend = self.inference_backend
+        if backend == "openai_compatible" and not self.openai_compatible_enabled:
+            missing = []
+            if not self.openai_compatible_api_key:
+                missing.append("OPENAI_COMPATIBLE_API_KEY")
+            if not self.openai_compatible_base_url:
+                missing.append("OPENAI_COMPATIBLE_BASE_URL")
+            return (
+                f"INFERENCE_BACKEND={self.assistant_generator} but {' and '.join(missing)} "
+                "not set; using deterministic."
+            )
         if backend == "argo" and not self.argo_enabled:
             return "INFERENCE_BACKEND=argo but ARGO_USER is not set; using deterministic."
-        if backend not in {"deterministic", "livai", "argo"}:
+        if backend not in {"deterministic", "openai_compatible", "argo"}:
             return (
                 f"INFERENCE_BACKEND={self.assistant_generator!r} is not a known provider; "
                 "using deterministic."
             )
         return None
+
+
+def _resolve_temperature(raw: str | None) -> float | None:
+    """Parse ``OPENAI_COMPATIBLE_TEMPERATURE``.
+
+    Unset or blank keeps the deterministic default. ``omit`` (or ``none`` /
+    ``unset``) drops the field from the request entirely, which is the only
+    thing that works for models that reject any temperature value rather than
+    just disliking a particular one.
+    """
+    if raw is None or not raw.strip():
+        return DEFAULT_OPENAI_COMPATIBLE_TEMPERATURE
+    if raw.strip().lower() in OMIT_TEMPERATURE_VALUES:
+        return None
+    return float(raw)
 
 
 def _optional_float(raw: str | None) -> float | None:
@@ -119,11 +164,18 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         for name, value in [item.split("=", maxsplit=1)]
         if name.strip() and value.strip()
     )
+    backend = os.getenv("INFERENCE_BACKEND", "deterministic")
+
     return Settings(
-        assistant_generator=os.getenv("INFERENCE_BACKEND", "deterministic"),
-        livai_api_key=os.getenv("LIVAI_API_KEY") or None,
-        livai_model=os.getenv("LIVAI_MODEL", DEFAULT_LIVAI_MODEL),
-        livai_base_url=os.getenv("LIVAI_BASE_URL", DEFAULT_LIVAI_BASE_URL),
+        assistant_generator=backend,
+        openai_compatible_api_key=os.getenv("OPENAI_COMPATIBLE_API_KEY") or None,
+        openai_compatible_model=(
+            os.getenv("OPENAI_COMPATIBLE_MODEL") or DEFAULT_OPENAI_COMPATIBLE_MODEL
+        ),
+        openai_compatible_base_url=os.getenv("OPENAI_COMPATIBLE_BASE_URL") or None,
+        openai_compatible_temperature=_resolve_temperature(
+            os.getenv("OPENAI_COMPATIBLE_TEMPERATURE")
+        ),
         argo_user=os.getenv("ARGO_USER") or os.getenv("ARGO_API_KEY") or None,
         argo_model=os.getenv("ARGO_MODEL", DEFAULT_ARGO_MODEL),
         argo_base_url=os.getenv("ARGO_BASE_URL", DEFAULT_ARGO_BASE_URL),

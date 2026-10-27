@@ -1,11 +1,14 @@
 import logging
 from pathlib import Path
 
+from pytest import LogCaptureFixture
+
 from e3sm_ai_platform.infrastructure.observability import (
     LOGGER_NAME,
     JsonFormatter,
     configure_observability,
     format_startup_configuration,
+    log_startup_configuration,
     startup_configuration,
 )
 from e3sm_ai_platform.infrastructure.settings import Settings
@@ -48,10 +51,10 @@ def test_configure_observability_uses_configured_log_identity() -> None:
 
 def test_startup_configuration_excludes_secrets() -> None:
     settings = Settings(
-        assistant_generator="livai",
-        livai_api_key="secret-key",
-        livai_model="example-model",
-        livai_base_url="https://livai.example.test/",
+        assistant_generator="openai_compatible",
+        openai_compatible_api_key="secret-key",
+        openai_compatible_model="example-model",
+        openai_compatible_base_url="https://gateway.example.test/v1",
         otlp_endpoint="https://otel.example.test/v1/traces",
         otlp_headers=(("Authorization", "Bearer secret-token"),),
         retrieval_mode="hybrid",
@@ -71,12 +74,27 @@ def test_startup_configuration_excludes_secrets() -> None:
     record.human_readable = True
     rendered = JsonFormatter().format(record)
 
-    assert configuration["inference_backend"] == "livai"
-    assert configuration["livai_enabled"] is True
+    assert configuration["inference_backend"] == "openai_compatible"
+    assert configuration["openai_compatible_enabled"] is True
     assert configuration["otlp_headers_configured"] is True
     assert "secret-key" not in rendered
     assert "secret-token" not in rendered
     assert rendered == summary
     assert "E3SM AI Platform startup configuration" in rendered
-    assert "Backend: livai" in rendered
+    assert "Backend: openai_compatible" in rendered
     assert "OTLP headers: configured" in rendered
+
+
+def test_removed_livai_alias_logs_one_unknown_provider_warning(caplog: LogCaptureFixture) -> None:
+    settings = Settings(
+        assistant_generator="livai",
+        openai_compatible_api_key="secret-key",
+        openai_compatible_base_url="https://livai-api.llnl.gov/v1",
+    )
+
+    with caplog.at_level(logging.WARNING, logger=LOGGER_NAME):
+        log_startup_configuration(settings)
+
+    warnings = [record.message for record in caplog.records if record.levelno == logging.WARNING]
+    assert warnings == ["INFERENCE_BACKEND='livai' is not a known provider; using deterministic."]
+    assert "secret-key" not in caplog.text

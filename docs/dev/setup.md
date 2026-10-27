@@ -73,11 +73,25 @@ Common local settings are:
 
 - `CORS_ALLOW_ORIGINS`: comma-separated browser origins allowed by
   FastAPI CORS; defaults to `http://localhost:5173`.
-- `INFERENCE_BACKEND`: `deterministic` by default; set to `livai` or `argo`
-  only when that provider's required setting below is present. A named provider
-  with a blank required setting logs a startup warning and stays deterministic.
-- `LIVAI_API_KEY`, `LIVAI_MODEL`, `LIVAI_BASE_URL`: backend-only LivAI (LLNL)
-  settings. The key is a secret.
+- `INFERENCE_BACKEND`: `deterministic` by default; set to `openai_compatible`
+  or `argo` only when that provider's required settings below are present. A
+  named provider with a blank required setting logs a startup warning and stays
+  deterministic.
+- `OPENAI_COMPATIBLE_API_KEY`, `OPENAI_COMPATIBLE_MODEL`,
+  `OPENAI_COMPATIBLE_BASE_URL`: backend-only settings for any gateway speaking
+  the OpenAI chat completions API (LivAI, GitHub Copilot, Azure OpenAI, vLLM).
+  The key is a secret. There is no default base URL; the value is used verbatim,
+  so include `/v1` only where the gateway expects it.
+- `OPENAI_COMPATIBLE_TEMPERATURE`: defaults to `0.0`. Set it to `omit` to drop
+  the field from requests entirely, which some reasoning models require because
+  they reject any temperature value.
+  Blank also uses `0.0`; it does not omit the field. If the provider explicitly
+  rejects temperature, `/query` returns HTTP 503 with
+  `detail.code=unsupported_temperature` instead of a deterministic fallback.
+  Compass displays the configuration error. Set
+  `OPENAI_COMPATIBLE_TEMPERATURE=omit` in `backend/.env` and restart the backend
+  to stop sending the parameter. Detection happens on a provider request, not
+  at startup; other provider failures still use the deterministic fallback.
 - `ARGO_USER`, `ARGO_MODEL`, `ARGO_BASE_URL`, `ARGO_TEMPERATURE`: backend-only
   Argo (ANL) settings. `ARGO_USER` is an ANL username sent in the request body,
   not a secret; access depends on the ANL network. `ARGO_MODEL` is the

@@ -69,9 +69,9 @@ function requestId(response: Response): string | undefined {
   return value && value.length <= 128 && /^[A-Za-z0-9._:-]+$/.test(value) ? value : undefined
 }
 
-function requestError(response?: Response): Error {
+function requestError(response?: Response, message = publicRequestError): Error {
   const id = response ? requestId(response) : undefined
-  return new Error(id ? `${publicRequestError} Request ID: ${id}.` : publicRequestError)
+  return new Error(id ? `${message} Request ID: ${id}.` : message)
 }
 
 function text(value: unknown): string | undefined {
@@ -146,6 +146,14 @@ export async function queryAssistant(question: string): Promise<QueryResponse> {
   }
 
   if (!response.ok) {
+    if (response.status === 503) {
+      const payload: unknown = await response.json().catch(() => undefined)
+      if (record(record(payload)?.detail)?.code === 'unsupported_temperature') {
+        throw requestError(response,
+          'The configured model rejected the temperature setting. Set OPENAI_COMPATIBLE_TEMPERATURE=omit in backend/.env and restart the backend.',
+        )
+      }
+    }
     throw requestError(response)
   }
 

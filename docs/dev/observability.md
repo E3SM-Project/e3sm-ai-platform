@@ -13,7 +13,7 @@ delivered features; this document focuses on durable operating guidance.
   [usage guide](../user/usage.md).
 - The backend service performs deterministic retrieval, accepted-evidence
   filtering, route selection, and deterministic generation. Optional LLM
-  generation through LivAI or Argo is available only when that provider's
+  generation through an OpenAI-compatible gateway or Argo is available only when that provider's
   backend-only environment variables are configured.
 - Query responses expose `route`, `route_alias`, citations, returned evidence,
   `retrieved_evidence`, and debug metadata for evaluation and support.
@@ -140,9 +140,9 @@ intended durable topology is:
 5. `routing.select`: deterministic route decision with the route value and
    sanitized reason.
 6. `generation.build`: evidence-constrained deterministic response construction.
-7. `generation.provider`: optional provider call to LivAI or Argo, only when
+7. `generation.provider`: optional call to the OpenAI-compatible provider or Argo, only when
    that provider is explicitly enabled for curated-evidence answers. The span
-   carries `generation.provider` (`livai` or `argo`), `generation.fallback`,
+   carries `generation.provider` (`openai_compatible` or `argo`), `generation.fallback`,
    and a sanitized `generation.provider_error` code when the call fails. The
    Argo span also records `generation.model`.
 
@@ -166,7 +166,7 @@ Recommended low-cardinality span attributes:
 - `rag.corpus_snapshot_id`: stable corpus snapshot identifier when available
 - `rag.retrieval_policy_version`: retrieval/chunking/scoring policy version when
   available
-- `llm.provider`: `deterministic`, `livai`, or `argo`
+- `llm.provider`: `deterministic`, `openai_compatible`, or `argo`
 - `llm.model`: configured model name when a hosted provider is used
 - `error.type`: sanitized exception class or internal error code
 
@@ -185,8 +185,8 @@ Allowed in logs/traces by default:
   and `include_evidence`.
 - Public source identifiers, corpus version labels already present in source
   metadata, and policy/snapshot identifiers.
-- Sanitized provider state such as `livai_used`, `livai_fallback`, `argo_used`,
-  `argo_fallback`, and the sanitized `livai_error_code` / `argo_error_code`
+- Sanitized provider state such as `provider_used`, `provider_fallback`, `argo_used`,
+  `argo_fallback`, and the sanitized `provider_error_code` / `argo_error_code`
   values. These codes never include the provider URL, the API key, or the Argo
   username.
 
@@ -255,7 +255,7 @@ Recommended fields:
 | `corpus_snapshot_id` | Corpus snapshot identifier when available. |
 | `retrieval_policy_version` | Retrieval/chunking/scoring policy version. |
 | `prompt_policy_version` | Prompt and generation policy version. |
-| `provider` | `deterministic`, `livai`, `argo`, or another future provider. |
+| `provider` | `deterministic`, `openai_compatible`, `argo`, or another future provider. |
 | `provider_model` | Hosted provider model name when applicable. |
 | `provider_fallback` | Boolean fallback indicator. |
 | `error_code` | Sanitized internal error code. |
@@ -333,7 +333,7 @@ OTEL_TRACES_SAMPLER_ARG=0.10
 ```
 
 These `OTEL_*` variables are future deployment examples, not current repository
-requirements. Keep provider secrets such as `LIVAI_API_KEY`, and identifiers
+requirements. Keep provider secrets such as `OPENAI_COMPATIBLE_API_KEY`, and identifiers
 such as `ARGO_USER`, out of all telemetry configuration and exported resource
 attributes.
 
@@ -373,7 +373,7 @@ Support requests should include only safe correlation details:
    was returned.
 5. A redacted or paraphrased question if the original may contain sensitive
    operational or personal data.
-6. Whether optional LivAI or Argo generation was enabled in the backend
+6. Whether an optional OpenAI-compatible or Argo provider was enabled in the backend
    environment, and which one.
 
 Future request ID requirements:

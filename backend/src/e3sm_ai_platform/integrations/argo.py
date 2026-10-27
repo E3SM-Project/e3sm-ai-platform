@@ -1,8 +1,8 @@
 """Optional Argo generator integration with deterministic fallback.
 
 Argo is the Argonne National Laboratory LLM gateway. It is reachable only from
-the ANL network and differs from the OpenAI-compatible LivAI path in two ways
-that this adapter exists to absorb:
+the ANL network and differs from the generic OpenAI-compatible provider in two
+ways that this adapter exists to absorb:
 
 - Authentication is an ANL username in the ``user`` body field, not a bearer
   token. There is no secret to place in a header, and network position is part
@@ -19,8 +19,8 @@ secondary guard for the case where the gateway returns 200 while the body
 carries a diagnostic rather than an answer; it is cheap and keeps gateway
 prose from reaching users as a cited E3SM answer if that behavior changes.
 
-Everything else follows the LivAI adapter so both providers behave identically
-from the service's perspective.
+Everything else follows the OpenAI-compatible adapter so both providers behave
+identically from the service's perspective.
 """
 
 from __future__ import annotations
@@ -34,11 +34,7 @@ from opentelemetry import trace
 from e3sm_ai_platform.application.generation import generate_response
 from e3sm_ai_platform.domain.models import Evidence, GenerationMode, QueryResponse, RouteName
 from e3sm_ai_platform.infrastructure.settings import Settings
-from e3sm_ai_platform.integrations.livai import (
-    SYSTEM_PROMPT,
-    ChatClient,
-    build_livai_messages,
-)
+from e3sm_ai_platform.integrations.prompting import SYSTEM_PROMPT, ChatClient, build_messages
 
 DEFAULT_TIMEOUT_SECONDS = 120.0
 
@@ -199,12 +195,12 @@ class ArgoEvidenceGenerator:
 def build_argo_messages(question: str, evidence: list[Evidence]) -> list[dict[str, str]]:
     """Build a source-constrained prompt for Argo.
 
-    Argo accepts the same system/user message shape as the LivAI path, so the
-    prompt is shared rather than duplicated. Keeping one builder means the
-    evidence-first wording and the deterministic context bound cannot drift
-    between the two providers.
+    Argo accepts the same system/user message shape as every other provider,
+    so the prompt is shared rather than duplicated. Keeping one builder means
+    the evidence-first wording and the deterministic context bound cannot drift
+    between providers.
     """
-    return build_livai_messages(question, evidence)
+    return build_messages(question, evidence)
 
 
 def build_generator(settings: Settings) -> ArgoEvidenceGenerator | None:
