@@ -408,6 +408,24 @@ def test_sdk_exception_is_sanitized_to_request_error() -> None:
         (422, {"message": "Unsupported parameter: 'temperature'"}, 0.0, "unsupported_temperature"),
         (
             400,
+            {
+                "message": (
+                    "litellm.UnsupportedParamsError: gpt-5.5doesn't support temperature=0.0 "
+                    "while reasoning is active. Only temperature=1 is supported unless "
+                    "reasoning_effort resolves to 'none', either set explicitly on the "
+                    "request or declared as the model's default_reasoning_effort. "
+                    "To drop unsupported params set `litellm.drop_params = True`. "
+                    "Received Model Group=gpt-5.5\nAvailable Model Group Fallbacks=None"
+                ),
+                "type": "invalid_request_error",
+                "param": None,
+                "code": "400",
+            },
+            0.0,
+            "unsupported_temperature",
+        ),
+        (
+            400,
             {"message": "Unsupported value: 'temperature' does not support 0.0 with this model."},
             0.0,
             "unsupported_temperature",
@@ -445,13 +463,20 @@ def test_sdk_exception_is_sanitized_to_request_error() -> None:
             "request_error",
         ),
         (400, {"message": "temperature is not supported for values > 1"}, 0.0, "request_error"),
+        (
+            400,
+            {"message": "This model doesn't support temperature above 1.0"},
+            0.0,
+            "request_error",
+        ),
+        (400, {"message": "This model doesn't support top_p=0.0"}, 0.0, "request_error"),
         (400, {"param": "temperature", "code": "unsupported_parameter"}, None, "request_error"),
     ],
 )
 @pytest.mark.parametrize("nested", [False, True])
 def test_temperature_rejection_raises_configuration_error_only_when_explicit(
     status: int,
-    details: dict[str, str],
+    details: dict[str, str | None],
     temperature: float | None,
     expected_code: str,
     nested: bool,

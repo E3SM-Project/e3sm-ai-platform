@@ -236,7 +236,8 @@ def _is_temperature_rejection(exc: Exception) -> bool:
             r"unsupported (?:parameter|value):?\s*['\"]?temperature\b"
             r"|\btemperature['\"]?\s+(?:is\s+)?(?:not supported|unsupported)"
             r"(?=\s*(?:[.!]|$|(?:for|with|by)\s+(?:this|the)\s+model\b))"
-            r"|\bdoes not support\s+(?:the\s+)?['\"]?temperature['\"]?(?=\s*(?:[.!]|$))",
+            r"|does(?: not|n't) support\s+(?:the\s+)?['\"]?temperature['\"]?"
+            r"(?=\s*(?:=|[.!]|$))",
             message,
             re.IGNORECASE,
         )
