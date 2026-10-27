@@ -20,14 +20,21 @@ against the GitHub Copilot endpoint:
 
 from __future__ import annotations
 
+import re
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
-from openai import OpenAI
+from openai import APIStatusError, OpenAI
 from opentelemetry import trace
 
 from e3sm_ai_platform.application.generation import generate_response
-from e3sm_ai_platform.domain.models import Evidence, GenerationMode, QueryResponse, RouteName
+from e3sm_ai_platform.domain.models import (
+    Evidence,
+    GenerationMode,
+    QueryResponse,
+    RouteName,
+    UnsupportedTemperatureError,
+)
 from e3sm_ai_platform.infrastructure.settings import Settings
 from e3sm_ai_platform.integrations.prompting import SYSTEM_PROMPT, ChatClient, build_messages
 
@@ -108,6 +115,8 @@ class OpenAICompatibleChatClient:
             try:
                 response = self._create_completion(**request)
             except Exception as exc:
+                if self.temperature is not None and _is_temperature_rejection(exc):
+                    raise self._fail(span, "unsupported_temperature") from exc
                 raise self._fail(span, "request_error") from exc
 
             content = _first_choice_content(response)
@@ -127,7 +136,8 @@ class OpenAICompatibleChatClient:
     @staticmethod
     def _fail(span: trace.Span, code: str) -> OpenAICompatibleProviderError:
         span.set_attribute("generation.provider_error", code)
-        span.set_attribute("generation.fallback", True)
+        span.set_attribute("generation.fallback", code != "unsupported_temperature")
+
         return OpenAICompatibleProviderError(code)
 
 
@@ -145,7 +155,13 @@ class OpenAICompatibleEvidenceGenerator:
         include_evidence: bool,
         reason: str,
     ) -> QueryResponse:
-        """Generate a curated response with the provider or the deterministic fallback."""
+        """Generate an answer, raising on unsupported temperature instead of falling back.
+
+        Raises
+        ------
+        UnsupportedTemperatureError
+            If the provider explicitly rejects the configured temperature.
+        """
         if route is not RouteName.CURATED_RAG or not evidence:
             return generate_response(question, route, evidence, include_evidence, reason)
 
@@ -154,16 +170,25 @@ class OpenAICompatibleEvidenceGenerator:
         try:
             answer = self.client.complete(build_messages(question, evidence))
         except Exception as exc:
+            if (
+                isinstance(exc, OpenAICompatibleProviderError)
+                and exc.code == "unsupported_temperature"
+            ):
+                raise UnsupportedTemperatureError() from None
+
             fallback.generation_mode = GenerationMode.DETERMINISTIC_FALLBACK
             fallback.debug["provider_fallback"] = True
             fallback.debug["provider_error"] = "provider_error"
+
             if isinstance(exc, OpenAICompatibleProviderError):
                 fallback.debug["provider_error_code"] = exc.code
+
             return fallback
 
         fallback.answer = answer + "\n\nI have not added claims beyond the cited E3SM sources."
         fallback.generation_mode = GenerationMode.LLM
         fallback.debug["provider_used"] = True
+
         return fallback
 
 
@@ -180,6 +205,43 @@ def build_generator(settings: Settings) -> OpenAICompatibleEvidenceGenerator | N
         temperature=settings.openai_compatible_temperature,
     )
     return OpenAICompatibleEvidenceGenerator(client)
+
+
+def _is_temperature_rejection(exc: Exception) -> bool:
+    """Recognize explicit temperature rejections without exposing provider details."""
+    if not isinstance(exc, APIStatusError) or exc.status_code not in {400, 422}:
+        return False
+
+    body = exc.body
+    if not isinstance(body, dict):
+        return False
+
+    error = body.get("error", body)
+    if not isinstance(error, dict):
+        return False
+
+    param = error.get("param", exc.param)
+    code = error.get("code", exc.code)
+    if param is not None and param != "temperature":
+        return False
+    if param == "temperature" and code in ("unsupported_parameter", "unsupported_value"):
+        return True
+
+    message = error.get("message")
+    if not isinstance(message, str):
+        return False
+
+    return (
+        re.search(
+            r"unsupported (?:parameter|value):?\s*['\"]?temperature\b"
+            r"|\btemperature['\"]?\s+(?:is\s+)?(?:not supported|unsupported)"
+            r"(?=\s*(?:[.!]|$|(?:for|with|by)\s+(?:this|the)\s+model\b))"
+            r"|\bdoes not support\s+(?:the\s+)?['\"]?temperature['\"]?(?=\s*(?:[.!]|$))",
+            message,
+            re.IGNORECASE,
+        )
+        is not None
+    )
 
 
 def _first_choice_content(response: object) -> str | None:

@@ -8,7 +8,9 @@ from collections.abc import Iterator
 from types import SimpleNamespace
 from typing import Any
 
+import httpx2
 import pytest
+from openai import APIStatusError
 
 from e3sm_ai_platform.application.service import CompassService, build_provider_generator
 from e3sm_ai_platform.domain.models import (
@@ -17,6 +19,7 @@ from e3sm_ai_platform.domain.models import (
     QueryRequest,
     RouteName,
     SourceMetadata,
+    UnsupportedTemperatureError,
 )
 from e3sm_ai_platform.infrastructure.settings import (
     DEFAULT_OPENAI_COMPATIBLE_MODEL,
@@ -465,6 +468,113 @@ def test_sdk_exception_is_sanitized_to_request_error() -> None:
 
     assert excinfo.value.code == "request_error"
     assert "secret-key" not in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    ("status", "details", "temperature", "expected_code"),
+    [
+        (
+            400,
+            {"param": "temperature", "code": "unsupported_parameter"},
+            0.0,
+            "unsupported_temperature",
+        ),
+        (
+            400,
+            {"param": "temperature", "code": "unsupported_value"},
+            0.0,
+            "unsupported_temperature",
+        ),
+        (422, {"message": "Unsupported parameter: 'temperature'"}, 0.0, "unsupported_temperature"),
+        (
+            400,
+            {"message": "Unsupported value: 'temperature' does not support 0.0 with this model."},
+            0.0,
+            "unsupported_temperature",
+        ),
+        (
+            400,
+            {"message": "temperature is not supported for this model"},
+            0.0,
+            "unsupported_temperature",
+        ),
+        (
+            400,
+            {"message": "This model does not support temperature."},
+            0.0,
+            "unsupported_temperature",
+        ),
+        (401, {"param": "temperature", "code": "unsupported_parameter"}, 0.0, "request_error"),
+        (
+            400,
+            {"param": "model", "message": "Unsupported parameter: temperature"},
+            0.0,
+            "request_error",
+        ),
+        (
+            400,
+            {"param": "temperature", "message": "temperature must be between 0 and 2"},
+            0.0,
+            "request_error",
+        ),
+        (400, {"message": "Model not supported; temperature was 0.0"}, 0.0, "request_error"),
+        (
+            400,
+            {"message": "This model does not support temperature above 1.0"},
+            0.0,
+            "request_error",
+        ),
+        (400, {"message": "temperature is not supported for values > 1"}, 0.0, "request_error"),
+        (400, {"param": "temperature", "code": "unsupported_parameter"}, None, "request_error"),
+    ],
+)
+@pytest.mark.parametrize("nested", [False, True])
+def test_temperature_rejection_raises_configuration_error_only_when_explicit(
+    status: int,
+    details: dict[str, str],
+    temperature: float | None,
+    expected_code: str,
+    nested: bool,
+) -> None:
+    error = APIStatusError(
+        "secret-key " + TEST_URL,
+        response=httpx2.Response(status, request=httpx2.Request("POST", TEST_URL)),
+        body={"error": details} if nested else details,
+    )
+    client, fake = _client(FakeCompletions(raise_exc=error), temperature=temperature)
+
+    generator = OpenAICompatibleEvidenceGenerator(client)
+    if expected_code == "unsupported_temperature":
+        with pytest.raises(UnsupportedTemperatureError) as excinfo:
+            generator(
+                question="How do I choose a compset?",
+                route=RouteName.CURATED_RAG,
+                evidence=_evidence(),
+                include_evidence=True,
+                reason="curated",
+            )
+
+        assert fake.calls == 1
+        assert "OPENAI_COMPATIBLE_TEMPERATURE=omit" in str(excinfo.value)
+        assert "secret-key" not in str(excinfo.value)
+        assert TEST_URL not in str(excinfo.value)
+        return
+
+    response = generator(
+        question="How do I choose a compset?",
+        route=RouteName.CURATED_RAG,
+        evidence=_evidence(),
+        include_evidence=True,
+        reason="curated",
+    )
+
+    assert fake.calls == 1
+    assert response.generation_mode is GenerationMode.DETERMINISTIC_FALLBACK
+    assert response.debug["provider_error_code"] == expected_code
+    assert [c.source_id for c in response.citations] == ["user-guide:compsets"]
+    assert response.evidence
+    assert "secret-key" not in response.model_dump_json()
+    assert TEST_URL not in response.model_dump_json()
 
 
 def test_rejects_non_https_base_url_before_sending() -> None:

@@ -1,7 +1,10 @@
-from fastapi.testclient import TestClient
-from pytest import LogCaptureFixture
+from unittest.mock import Mock
 
-from e3sm_ai_platform.api.app import app
+from fastapi.testclient import TestClient
+from pytest import LogCaptureFixture, MonkeyPatch
+
+from e3sm_ai_platform.api.app import app, get_service
+from e3sm_ai_platform.domain.models import UnsupportedTemperatureError
 from e3sm_ai_platform.infrastructure.observability import JsonFormatter
 
 client = TestClient(app)
@@ -118,3 +121,20 @@ def test_query_validation_rejects_too_short_question() -> None:
     response = client.post("/query", json={"question": "hi"})
 
     assert response.status_code == 422
+
+
+def test_temperature_configuration_error_is_actionable_and_keeps_health_available(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(get_service(), "generator", Mock(side_effect=UnsupportedTemperatureError()))
+    response = client.post("/query", json={"question": "How do I choose an E3SM compset?"})
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "detail": {
+            "code": "unsupported_temperature",
+            "message": str(UnsupportedTemperatureError()),
+        }
+    }
+    assert response.headers["x-request-id"]
+    assert client.get("/health").status_code == 200

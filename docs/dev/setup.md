@@ -86,6 +86,13 @@ Common local settings are:
 - `OPENAI_COMPATIBLE_TEMPERATURE`: defaults to `0.0`. Set it to `omit` to drop
   the field from requests entirely, which some reasoning models require because
   they reject any temperature value.
+  Blank also uses `0.0`; it does not omit the field. If the provider explicitly
+  rejects temperature, `/query` returns HTTP 503 with
+  `detail.code=unsupported_temperature` instead of a deterministic fallback.
+  Compass displays the configuration error. Set
+  `OPENAI_COMPATIBLE_TEMPERATURE=omit` in `backend/.env` and restart the backend
+  to stop sending the parameter. Detection happens on a provider request, not
+  at startup; other provider failures still use the deterministic fallback.
 - The deprecated `LIVAI_*` names are read **only** when
   `INFERENCE_BACKEND=livai`, never as fallbacks for `openai_compatible`. Under
   that alias a legacy `LIVAI_BASE_URL` has `/v1` appended, matching the old

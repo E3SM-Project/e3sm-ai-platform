@@ -30,6 +30,28 @@ describe('normalizeQueryResponse', () => {
 })
 
 describe('queryAssistant', () => {
+  it('shows fixed corrective guidance for unsupported temperature without exposing provider details', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      detail: { code: 'unsupported_temperature', message: 'secret provider details' },
+    }), { status: 503, headers: { 'X-Request-ID': 'req_temperature' } })))
+
+    await expect(queryAssistant('Question')).rejects.toThrow(
+      'The configured model rejected the temperature setting. Set OPENAI_COMPATIBLE_TEMPERATURE=omit in backend/.env and restart the backend. Request ID: req_temperature.',
+    )
+  })
+
+  it.each([
+    'not JSON',
+    JSON.stringify({ detail: 'secret details' }),
+    JSON.stringify({ detail: { code: 'unknown_error', message: 'secret details' } }),
+  ])('keeps unrelated or malformed 503 errors generic: %s', async (body) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(body, { status: 503 })))
+
+    await expect(queryAssistant('Question')).rejects.toThrow(
+      'The assistant request could not be completed. Please try again.',
+    )
+  })
+
   it('sends a valid W3C traceparent and normalizes a successful response', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
       answer: 'Grounded answer.',
