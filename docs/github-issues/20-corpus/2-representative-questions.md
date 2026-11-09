@@ -5,14 +5,20 @@ answer set. Each heading gives a stable question ID and review status. Expected
 elements are evidence requirements, not verified claims. Sources are candidates;
 exact sections, revisions, and corpus coverage remain to be checked.
 
-Review wording and relevance first, then resolve context and evidence gaps.
-Mark questions reviewed only after checking their supporting evidence. Preserve
-IDs when rewording; record replacements if the underlying intent changes.
+This revision addresses task relevance and overlap. User/domain review and source
+verification remain pending, so all questions retain draft status. Context fields
+identify information to collect, not facts supplied by the question. Ask for
+missing context only when it changes the answer; do not invent commands, paths,
+support claims, or diagnoses. Mark questions reviewed only after checking their
+supporting evidence. Preserve IDs when rewording; record changed intents below.
 
 Under #21, promote reviewed cases into
 [`evaluation/fixtures/e3sm_questions.json`](../../../evaluation/fixtures/e3sm_questions.json)
 where supported by the evaluation contract. Keep held-out cases separate from
 retrieval tuning. No fixture schema or test changes belong to this draft.
+
+See [pilot source mapping](3-source-mapping.md) for six selected questions,
+proposed versions, inspected evidence, and remaining capture gates.
 
 ## Model understanding
 
@@ -36,16 +42,18 @@ retrieval tuning. No fixture schema or test changes belong to this draft.
 - **Candidate sources:** [Model docs], EAM/EAMxx guides, release notes.
 - **Evidence gaps:** Verify release-specific capability and support statements.
 
-### model-configuration-support — draft
+### model-science-configurations — draft
 
-- **Question:** Does a compset appearing in E3SM source mean that its configuration
-  is scientifically validated and supported?
-- **Context:** Release, compset, grid, and machine.
-- **Expected elements:** Distinguish configuration existence, execution testing,
-  scientific validation, and project support; qualify unsupported claims.
-- **Candidate sources:** [Model resources], [E3SM user guide], release definitions.
-- **Evidence gaps:** Find explicit validation and support evidence for the chosen
-  configuration rather than infer it from code.
+- **Question:** Which processes and configurations in a selected E3SM release
+  support water-cycle research versus carbon-cycle feedback studies?
+- **Context:** Model release, research question, and configurations being compared.
+- **Expected elements:** Identify applicable configurations and any overlap;
+  explain relevant processes, active components, prescribed versus interactive
+  behavior, and scientific limitations. Do not assume separate configuration families.
+- **Candidate sources:** [Model docs], [Model resources], campaign descriptions,
+  and model-description papers referenced by official documentation.
+- **Evidence gaps:** Select comparable released configurations and verify process
+  and validation claims rather than generalize across E3SM versions.
 
 ## Tutorials and examples
 
@@ -72,13 +80,15 @@ retrieval tuning. No fixture schema or test changes belong to this draft.
 
 ### tutorial-version-migration — draft
 
-- **Question:** Can I follow an e3sm_diags v2 tutorial unchanged with v3?
+- **Question:** I found an e3sm_diags v2 tutorial but have v3 installed. Which
+  instructions should I recheck before using it?
 - **Context:** Exact tutorial, installed version, environment, and data layout.
-- **Expected elements:** Compare documented API, dependencies, and example
-  requirements; separate verified compatibility from untested assumptions.
+- **Expected elements:** Identify version-sensitive API, dependency, and example
+  requirements; prefer a matching tutorial and distinguish verified changes from
+  items that still need checking.
 - **Candidate sources:** [Diagnostics docs], tagged tutorial files, release notes.
 - **Evidence gaps:** Identify both versions and any migration guidance; state
-  insufficient evidence if unchanged execution cannot be established.
+  insufficient evidence where compatibility cannot be established.
 
 ## Tool selection
 
@@ -103,15 +113,17 @@ retrieval tuning. No fixture schema or test changes belong to this draft.
 - **Candidate sources:** [Tool catalog], official NCO and xCDAT documentation.
 - **Evidence gaps:** Locate operation-specific guidance and grid/calendar limits.
 
-### tools-unified-role — draft
+### tools-environment-choice — draft
 
-- **Question:** What does E3SM-Unified provide for analysis and post-processing,
-  and do I still need separate instructions to build the E3SM model?
-- **Context:** Machine, E3SM-Unified version, and intended task.
-- **Expected elements:** Distinguish the analysis environment from model build
-  configuration; identify the relevant installation and build guidance.
-- **Candidate sources:** [Unified repository], [Model docs], [Running guide].
-- **Evidence gaps:** Verify environment contents and platform-specific setup.
+- **Question:** Should I use E3SM-Unified or install analysis tools individually
+  to run atmosphere and ocean diagnostics on Perlmutter?
+- **Context:** Required tools/versions, available environment, and CPU/GPU target.
+- **Expected elements:** Compare documented environment options, package
+  availability, and version constraints; do not confuse analysis setup with
+  compiling the E3SM model.
+- **Candidate sources:** [Unified repository], [Diagnostics docs], [MPAS-Analysis docs].
+- **Evidence gaps:** Confirm current platform guidance and an environment containing
+  compatible versions of the requested tools.
 
 ## Simulation configuration
 
@@ -119,25 +131,28 @@ retrieval tuning. No fixture schema or test changes belong to this draft.
 
 - **Question:** How do I choose an E3SM compset for an atmosphere and land simulation?
 - **Context:** Release, science goal, active/data components, grid, and machine.
-- **Expected elements:** Explain compset selection, supported combinations, and
-  how to query available configurations; clarify ambiguous simulation intent.
+- **Expected elements:** Clarify active versus prescribed components, select a
+  compset/grid, and explain case creation. Distinguish source-defined combinations
+  from scientifically validated and supported configurations.
 - **Candidate sources:** [E3SM user guide], [CIME docs], tagged configuration files.
 - **Evidence gaps:** Verify an appropriate configuration against the chosen release.
 
 ### running-case-setup — draft
 
-- **Question:** After creating a case, which setup and build commands should I run
-  before submitting it?
+- **Question:** After creating an E3SM case, how do I set it up, build it, submit
+  it, and check whether the run succeeded?
 - **Context:** E3SM release, bundled CIME revision, machine, compiler, and case state.
-- **Expected elements:** Ordered setup/build steps, prerequisites, and completion
-  checks; distinguish machine-specific settings from general commands.
+- **Expected elements:** Ordered setup/build/submission steps, prerequisites, and
+  run-completion checks; distinguish machine-specific settings from general commands.
 - **Candidate sources:** [Running guide], [CIME docs], release-matched run script.
 - **Evidence gaps:** Confirm command order and options for the selected revision.
 
 ### user-guide-history — draft
 
-- **Question:** How can I request additional history output fields in E3SM?
-- **Context:** E3SM v3.0.2, EAM component, required fields and frequency, and case state.
+- **Question:** In E3SM v3.0.2 using EAM, how do I add precipitation fields to
+  history output at the frequency needed for my planned diagnostics?
+- **Context:** Diagnostic set, required precipitation quantity/frequency, existing
+  history streams, and case state. This release is a draft scenario, not a support target.
 - **Expected elements:** Relevant namelist settings, field availability, output
   streams, and how to verify output; avoid inventing field names or defaults.
 - **Candidate sources:** Tagged EAM user/namelist docs and source definitions.
@@ -166,28 +181,34 @@ retrieval tuning. No fixture schema or test changes belong to this draft.
 - **Evidence gaps:** Find version-pinned variable, time-coverage, and preprocessing
   requirements rather than infer them from generic diagnostic examples.
 
-### diagnostics-undocumented-set — draft
+### diagnostics-missing-plots — draft
 
-- **Question:** Our group has a private diagnostic set. What exact zppy settings
-  will run it without any changes?
-- **Context:** No private configuration or documentation has been provided.
-- **Expected elements:** State insufficient evidence for exact settings; request
-  shareable interface/configuration details and offer only documented extension guidance.
-- **Candidate sources:** [zppy docs] and [Diagnostics docs] extension guidance only.
-- **Evidence gaps:** The private set's interface, dependencies, and compatibility
-  are unavailable; public documentation cannot establish unchanged execution.
+- **Question:** zppy completed preprocessing, but I cannot find any e3sm_diags
+  plots. What should I check before rerunning the workflow?
+- **Context:** Tool versions, enabled tasks, year ranges, output location, task
+  status, and shareable logs/configuration; none of these artifacts are supplied yet.
+- **Expected elements:** Explain documented status/log checks, task dependencies,
+  and output locations. Request relevant artifacts before diagnosing a cause or
+  recommending a targeted rerun; do not assume successful preprocessing proves diagnostics ran.
+- **Candidate sources:** [zppy docs] debugging guidance, task templates, [Diagnostics docs].
+- **Evidence gaps:** Public docs support a checklist, not an exact failure diagnosis
+  without the user's configuration and logs.
 
 ## Cross-project guidance
 
-### cross-project-workflow — draft
+### cross-project-mpas-output — draft
 
-- **Question:** How do E3SM history files become climatologies and diagnostic plots
-  through zppy, NCO, and e3sm_diags?
-- **Context:** Component, tool versions, history streams, target grid, and diagnostic set.
-- **Expected elements:** Trace data and task dependencies across projects, including
-  file conventions, variable transformations, regridding, and failure checkpoints.
-- **Candidate sources:** [Running guide], [zppy docs], [Diagnostics docs], NCO docs.
-- **Evidence gaps:** Verify interfaces against one compatible version combination.
+- **Question:** What output must I enable in an E3SM ocean and sea-ice run so
+  MPAS-Analysis can compute my chosen diagnostics?
+- **Context:** Model/tool versions, analysis tasks, component configuration, and
+  available output. Distinguish planning a new run from analyzing an existing one.
+- **Expected elements:** Connect MPAS-Analysis task inputs to component output
+  streams and analysis settings. Check whether required quantities can be derived
+  from available output or require a new run; do not promise to recover missing sampling.
+- **Candidate sources:** [MPAS-Analysis docs], MPAS-Ocean/sea-ice guides in [Model docs],
+  and release-matched stream/namelist definitions.
+- **Evidence gaps:** Select tasks and verify their output requirements across both
+  model and analysis documentation.
 
 ### cross-project-reproduce-campaign — draft
 
@@ -200,27 +221,44 @@ retrieval tuning. No fixture schema or test changes belong to this draft.
 - **Evidence gaps:** Select a simulation and check whether exact scripts, references,
   and accessible data are available; report missing artifacts explicitly.
 
-### cross-project-version-guarantee — draft
+### cross-project-result-comparability — draft
 
-- **Question:** Will installing the newest zppy and e3sm_diags guarantee that my
-  older E3SM workflow produces identical results?
-- **Context:** Original and proposed versions, environment, configuration, and data.
-- **Expected elements:** Do not guarantee identical results without evidence;
-  distinguish API compatibility, successful execution, and numerical equivalence.
-- **Candidate sources:** Tool release notes, [Unified repository], validation records.
-- **Evidence gaps:** No version pair or comparison results supplied; request them
-  and state what public compatibility evidence cannot establish.
+- **Question:** My e3sm_diags metrics changed after upgrading E3SM-Unified. How
+  should I check whether they remain comparable with my earlier results?
+- **Context:** Old/new environments, tool versions, configuration, model/reference
+  data, and changed metrics; no comparison artifacts are supplied yet.
+- **Expected elements:** Trace relevant package and method changes, compare inputs
+  and settings, and identify documented validation checks. Do not infer the cause
+  or scientific equivalence from an environment upgrade alone.
+- **Candidate sources:** [Unified repository], [Diagnostics docs], dependency release
+  notes, and validation records relevant to the changed metrics.
+- **Evidence gaps:** Request version pairs and comparison artifacts; state
+  insufficient evidence for an exact cause or comparability verdict without them.
 
 ## Review notes
 
-- Reused fixture IDs: `eam-eamxx-mixed`, `user-guide-compset`,
-  `running-case-setup`, and `user-guide-history`. Added context and expectations
-  still need review; existing fixture source IDs are not evidence of coverage.
-- `tools-unified-role` replaces the misleading model-build framing of the existing
-  `unified-build` question for this draft. The executable fixture remains unchanged.
-- First iteration: confirm task relevance, choose target releases and machines,
-  and identify missing questions. Then attach exact source sections/revisions and
-  review expected elements. Keep unresolved gaps visible rather than invent answers.
+- Retained three questions per use case. Added science-capability comparison,
+  missing-plot troubleshooting, and model-to-MPAS-Analysis output planning; removed
+  overlap between the cross-project workflow and zppy configuration questions.
+- Replaced intents/IDs: `model-configuration-support` with
+  `model-science-configurations`; `tools-unified-role` with `tools-environment-choice`;
+  `diagnostics-undocumented-set` with `diagnostics-missing-plots`;
+  `cross-project-workflow` with `cross-project-mpas-output`; and
+  `cross-project-version-guarantee` with `cross-project-result-comparability`.
+  Configuration-support checks now belong to `user-guide-compset`.
+- Retained fixture-derived IDs: `eam-eamxx-mixed`, `user-guide-compset`,
+  `running-case-setup`, and `user-guide-history`. The setup question now covers
+  submission/completion; the history question now explicitly names a release and
+  component. Review those changed expectations before #21 promotion. The earlier
+  `unified-build` framing remains excluded; executable fixtures are unchanged.
+- Version migration, missing plots, and changed metrics test useful partial
+  guidance plus clarification/insufficient evidence, not blanket refusal. #21
+  must account for those distinctions before converting them into scored cases.
+- Pending user/domain review: confirm target releases and machines, prioritize
+  science topics and diagnostic sets, and decide whether additional land/river
+  examples are needed. Perlmutter and v3.0.2 are scenarios, not approved corpus scope.
+- Next evidence pass: attach exact sections/revisions and verify expected elements.
+  No reference answers or examples have been validated by this relevance review.
 
 [Model docs]: https://docs.e3sm.org/E3SM/
 [Model resources]: https://e3sm.org/resources/model/
