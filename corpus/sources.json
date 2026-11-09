@@ -6,19 +6,30 @@
       "id": "E3SM",
       "identity": "E3SM model source and documentation",
       "owner": "E3SM Project",
-      "canonical_url": "https://docs.e3sm.org/",
+      "canonical_url": "https://docs.e3sm.org/E3SM/",
       "repository_url": "https://github.com/E3SM-Project/E3SM",
-      "license_url": "https://github.com/E3SM-Project/E3SM/blob/master/LICENSE",
+      "license_url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/LICENSE",
       "access": "Publicly accessible upstream source; acquire only through an operator-initiated capture.",
-      "redistribution": "BSD-3-Clause terms apply; retain required license and attribution notices with redistributed material.",
+      "redistribution": "BSD-3-Clause with separable-piece exceptions; retain LICENSE, file-level notices, attribution, and disclaimers. Selected documentation does not approve acquiring component implementations.",
       "refresh_cadence": "quarterly or when an approved release requires it",
       "request_interval_seconds": 1,
       "path_scope": {
-        "include": ["README.md", "docs/**"],
+        "include": ["README.md", "docs/**", "LICENSE", "run_e3sm.template.sh", "components/eam/docs/index.md", "components/elm/docs/index.md", "components/mosart/docs/index.md", "components/mpas-ocean/docs/index.md", "components/mpas-seaice/docs/index.md", "components/mpas-ocean/docs/user-guide/index.md", "components/mpas-seaice/docs/user-guide/index.md"],
         "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]
       },
-      "document_status": "pending selection and review",
-      "documents": []
+      "document_status": "selected for six-question pilot acquisition; capture and review pending",
+      "documents": [
+        {"id": "e3sm-user-guide", "path": "docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: Supported Coupled Compsets. Selection only."},
+        {"id": "e3sm-eam-introduction", "path": "components/eam/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eam/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: EAM introduction. Selection only."},
+        {"id": "e3sm-elm-introduction", "path": "components/elm/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/elm/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: ELM placeholder, not complete component evidence. Selection only."},
+        {"id": "e3sm-mosart-introduction", "path": "components/mosart/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mosart/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: MOSART introduction. Selection only."},
+        {"id": "e3sm-ocean-introduction", "path": "components/mpas-ocean/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mpas-ocean/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: MPAS-Ocean introduction. Selection only."},
+        {"id": "e3sm-seaice-introduction", "path": "components/mpas-seaice/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mpas-seaice/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: MPAS-seaice introduction. Selection only."},
+        {"id": "e3sm-ocean-user-guide", "path": "components/mpas-ocean/docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mpas-ocean/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; cross-project-mpas-output: Customizing runs. Selection only."},
+        {"id": "e3sm-seaice-user-guide", "path": "components/mpas-seaice/docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mpas-seaice/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; cross-project-mpas-output: Configuring Model Input and Output. Selection only."},
+        {"id": "e3sm-run-template", "path": "run_e3sm.template.sh", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/run_e3sm.template.sh", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; running-case-setup: case_setup, case_build, runtime_options, case_submit. Chrysalis LCRC and Perlmutter CPU proposed; no execution or compatibility validation. Do not execute default master acquisition."},
+        {"id": "e3sm-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/LICENSE", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "Required E3SM v3.1.0 license, attribution, exceptions, and disclaimers; retain complete raw companion."}
+      ]
     },
     {
       "id": "E3SM-Project.github.io",
@@ -42,19 +53,26 @@
       "id": "e3sm_diags",
       "identity": "E3SM Diagnostics source and documentation",
       "owner": "E3SM Project",
-      "canonical_url": "https://e3sm-project.github.io/e3sm_diags/",
+      "canonical_url": "https://docs.e3sm.org/e3sm_diags/",
       "repository_url": "https://github.com/E3SM-Project/e3sm_diags",
-      "license_url": "https://github.com/E3SM-Project/e3sm_diags/blob/master/LICENSE",
+      "license_url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/LICENSE",
       "access": "Publicly accessible upstream source; acquire only through an operator-initiated capture.",
       "redistribution": "BSD-3-Clause terms apply; retain required license and attribution notices with redistributed material.",
       "refresh_cadence": "quarterly or when an approved release requires it",
       "request_interval_seconds": 1,
       "path_scope": {
-        "include": ["README.md", "docs/**"],
+        "include": ["README.md", "docs/**", "LICENSE", "examples/ex5-model-vs-obs/ex5.py", "examples/ex5-model-vs-obs/diags.cfg", "e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg"],
         "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]
       },
-      "document_status": "pending selection and review",
-      "documents": []
+      "document_status": "selected for six-question pilot acquisition; capture and review pending",
+      "documents": [
+        {"id": "diags-examples", "path": "docs/source/examples.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/examples.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "Unified 1.13.0 cohort, e3sm_diags v3.2.0; tutorial-diagnostics-example: Example 5 and Running the Examples; mutable links and legacy paths require annotation. Selection only."},
+        {"id": "diags-input-requirements", "path": "docs/source/input-data-requirement.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/input-data-requirement.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-diagnostics-example, tools-atmosphere-ocean, diagnostics-zppy-climatology: input formats and preprocessing; preserve legacy-version caveats. Selection only."},
+        {"id": "diags-ex5-python", "path": "examples/ex5-model-vs-obs/ex5.py", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/examples/ex5-model-vs-obs/ex5.py", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-diagnostics-example: runner configuration, execution unverified. Selection only."},
+        {"id": "diags-ex5-config", "path": "examples/ex5-model-vs-obs/diags.cfg", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/examples/ex5-model-vs-obs/diags.cfg", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-diagnostics-example: TREFHT versus ERA-Interim. Selection only."},
+        {"id": "diags-lat-lon-defaults", "path": "e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tools-atmosphere-ocean and diagnostics-zppy-climatology: PRECT lat_lon definitions; selected sections only. Selection only."},
+        {"id": "diags-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/LICENSE", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "Required e3sm_diags license companion; retain complete raw file."}
+      ]
     },
     {
       "id": "e3sm-unified",
@@ -62,17 +80,196 @@
       "owner": "E3SM Project",
       "canonical_url": "https://github.com/E3SM-Project/e3sm-unified",
       "repository_url": "https://github.com/E3SM-Project/e3sm-unified",
-      "license_url": "https://github.com/E3SM-Project/e3sm-unified/blob/master/LICENSE",
+      "license_url": "https://github.com/E3SM-Project/e3sm-unified/blob/a07ba82ffb3860680161ead07ba7a06015b58716/LICENSE",
       "access": "Publicly accessible upstream source; acquire only through an operator-initiated capture.",
       "redistribution": "BSD-3-Clause terms apply; retain required license and attribution notices with redistributed material.",
       "refresh_cadence": "quarterly or when an approved release requires it",
       "request_interval_seconds": 1,
       "path_scope": {
-        "include": ["README.md", "docs/**"],
+        "include": ["README.md", "docs/**", "LICENSE"],
         "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]
       },
-      "document_status": "pending selection and review",
-      "documents": []
+      "document_status": "selected as pilot cohort context; capture and review pending",
+      "documents": [
+        {"id": "unified-readme", "path": "README.md", "url": "https://github.com/E3SM-Project/e3sm-unified/blob/a07ba82ffb3860680161ead07ba7a06015b58716/README.md", "revision": "a07ba82ffb3860680161ead07ba7a06015b58716", "provenance": "Unified 1.13.0 context for pilot analysis tools; dependency authority is its conda-forge feedstock submodule, not an obsolete local recipe. Selection only."},
+        {"id": "unified-quickstart", "path": "docs/quickstart.md", "url": "https://github.com/E3SM-Project/e3sm-unified/blob/a07ba82ffb3860680161ead07ba7a06015b58716/docs/quickstart.md", "revision": "a07ba82ffb3860680161ead07ba7a06015b58716", "provenance": "Unified 1.13.0 variant context only; latest activation does not establish a pinned installation on Chrysalis LCRC or Perlmutter CPU. Selection only."},
+        {"id": "unified-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/e3sm-unified/blob/a07ba82ffb3860680161ead07ba7a06015b58716/LICENSE", "revision": "a07ba82ffb3860680161ead07ba7a06015b58716", "provenance": "Required upstream Unified license companion; distinct from feedstock license."}
+      ]
+    },
+    {
+      "id": "cime",
+      "identity": "E3SM-bundled CIME case control documentation",
+      "owner": "ESMCI, UCAR and E3SM contributors",
+      "canonical_url": "https://esmci.github.io/cime/",
+      "repository_url": "https://github.com/ESMCI/cime",
+      "license_url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/LICENSE.TXT",
+      "access": "Public source; operator-initiated acquisition of selected pinned files only.",
+      "redistribution": "UCAR/Sandia permissive terms; retain LICENSE.TXT, attribution, and disclaimers.",
+      "refresh_cadence": "when an approved E3SM release changes its bundled CIME",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["doc/source/ccs/setting-up-a-case.rst", "doc/source/ccs/building-a-case.rst", "doc/source/ccs/running-a-case.rst", "LICENSE.TXT"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected for running-case-setup; capture and review pending",
+      "documents": [
+        {"id": "cime-case-setup", "path": "doc/source/ccs/setting-up-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/setting-up-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink, not standalone release; running-case-setup: generic configuration and setup sections. Exclude CESM-specific component guidance from prepared excerpts. Selection only."},
+        {"id": "cime-case-build", "path": "doc/source/ccs/building-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/building-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink; running-case-setup: build settings, logs, and rebuild cautions. Selection only."},
+        {"id": "cime-case-run", "path": "doc/source/ccs/running-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/running-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink; running-case-setup: preview, input data, PE layout, workflow, submission, Monitoring Progress and Troubleshooting Failures. Chrysalis example paths are historical, not verified site settings or Perlmutter instructions. Selection only."},
+        {"id": "cime-license", "path": "LICENSE.TXT", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/LICENSE.TXT", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "Required bundled CIME license companion; retain complete raw file."}
+      ]
+    },
+    {
+      "id": "zppy",
+      "identity": "zppy post-processing workflow documentation and templates",
+      "owner": "E3SM Project",
+      "canonical_url": "https://docs.e3sm.org/zppy/",
+      "repository_url": "https://github.com/E3SM-Project/zppy",
+      "license_url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/LICENSE",
+      "access": "Public source; operator-initiated acquisition of selected pinned files only.",
+      "redistribution": "BSD-3-Clause; retain LICENSE, NOTICE, file-level attribution, and disclaimers.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["docs/source/tutorial.rst", "docs/source/post.mysimulation.cfg", "zppy/defaults/default.ini", "zppy/templates/climo.bash", "zppy/templates/e3sm_diags.bash", "LICENSE", "NOTICE"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**", "zppy/defaults/water_cycle.cfg"]},
+      "document_status": "selected for diagnostics-zppy-climatology; capture and review pending",
+      "documents": [
+        {"id": "zppy-tutorial", "path": "docs/source/tutorial.rst", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/docs/source/tutorial.rst", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "Unified cohort zppy v3.2.0; diagnostics-zppy-climatology: Example 1 and selected include, restrict to climo and lat_lon. Historical Chrysalis paths do not verify either machine. Defer campaign ingestion."},
+        {"id": "zppy-tutorial-config", "path": "docs/source/post.mysimulation.cfg", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/docs/source/post.mysimulation.cfg", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; required literalinclude for tutorial Example 1. Preserve selected configuration verbatim; do not execute wholesale."},
+        {"id": "zppy-defaults", "path": "zppy/defaults/default.ini", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/defaults/default.ini", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-zppy-climatology: climo and e3sm_diags sections. Selection only."},
+        {"id": "zppy-climo-template", "path": "zppy/templates/climo.bash", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/templates/climo.bash", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-zppy-climatology: NCO invocation and output placement; hpc resolved NCO unverified. Template dependencies outside selection require approval before capture."},
+        {"id": "zppy-diags-template", "path": "zppy/templates/e3sm_diags.bash", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/templates/e3sm_diags.bash", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-zppy-climatology: input links, runner, results; selected lat_lon scope only. Template dependencies outside selection require approval before capture."},
+        {"id": "zppy-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/LICENSE", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "Required zppy license companion."},
+        {"id": "zppy-notice", "path": "NOTICE", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/NOTICE", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "Required zppy attribution and disclaimer companion."}
+      ]
+    },
+    {
+      "id": "MPAS-Analysis",
+      "identity": "MPAS-Analysis setup and selected task documentation",
+      "owner": "MPAS-Dev contributors",
+      "canonical_url": "https://mpas-dev.github.io/MPAS-Analysis/",
+      "repository_url": "https://github.com/MPAS-Dev/MPAS-Analysis",
+      "license_url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/LICENSE",
+      "access": "Public source; operator-initiated acquisition of selected pinned files only.",
+      "redistribution": "BSD-3 with institutional notices; retain complete LICENSE and relevant file-level attribution and disclaimers.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["docs/users_guide/mpaso.rst", "docs/users_guide/mpasseaice.rst", "docs/users_guide/tasks/climatologyMapSST.rst", "docs/users_guide/tasks/climatologyMapSeaIceConcNH.rst", "docs/users_guide/e3sm.rst", "LICENSE"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected for tools-atmosphere-ocean and cross-project-mpas-output; capture and review pending",
+      "documents": [
+        {"id": "mpas-ocean-setup", "path": "docs/users_guide/mpaso.rst", "url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/docs/users_guide/mpaso.rst", "revision": "97bf20592a4cd939957db53ac110322243ca43dd", "provenance": "Unified cohort MPAS-Analysis 1.15.0; tools-atmosphere-ocean and cross-project-mpas-output: Setting up Standalone. Selection only."},
+        {"id": "mpas-seaice-setup", "path": "docs/users_guide/mpasseaice.rst", "url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/docs/users_guide/mpasseaice.rst", "revision": "97bf20592a4cd939957db53ac110322243ca43dd", "provenance": "MPAS-Analysis 1.15.0; cross-project-mpas-output: Setting up Standalone; annotate stale public-release statement. Selection only."},
+        {"id": "mpas-sst-task", "path": "docs/users_guide/tasks/climatologyMapSST.rst", "url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/docs/users_guide/tasks/climatologyMapSST.rst", "revision": "97bf20592a4cd939957db53ac110322243ca43dd", "provenance": "MPAS-Analysis 1.15.0; tools-atmosphere-ocean and cross-project-mpas-output: selected SST task. Selection only."},
+        {"id": "mpas-seaice-task", "path": "docs/users_guide/tasks/climatologyMapSeaIceConcNH.rst", "url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/docs/users_guide/tasks/climatologyMapSeaIceConcNH.rst", "revision": "97bf20592a4cd939957db53ac110322243ca43dd", "provenance": "MPAS-Analysis 1.15.0; cross-project-mpas-output: selected NH sea-ice concentration task. Selection only."},
+        {"id": "mpas-e3sm-setup", "path": "docs/users_guide/e3sm.rst", "url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/docs/users_guide/e3sm.rst", "revision": "97bf20592a4cd939957db53ac110322243ca43dd", "provenance": "MPAS-Analysis 1.15.0; cross-project-mpas-output: general E3SM default-output claim requires generated v3.1.0 stream verification. Selection only."},
+        {"id": "mpas-license", "path": "LICENSE", "url": "https://github.com/MPAS-Dev/MPAS-Analysis/blob/97bf20592a4cd939957db53ac110322243ca43dd/LICENSE", "revision": "97bf20592a4cd939957db53ac110322243ca43dd", "provenance": "Required MPAS-Analysis institutional license, attribution, and disclaimers."}
+      ]
+    },
+    {
+      "id": "e3sm-unified-feedstock",
+      "identity": "Released Unified conda-forge recipe and variant evidence",
+      "owner": "conda-forge contributors",
+      "canonical_url": "https://github.com/conda-forge/e3sm-unified-feedstock",
+      "repository_url": "https://github.com/conda-forge/e3sm-unified-feedstock",
+      "license_url": "https://github.com/conda-forge/e3sm-unified-feedstock/blob/1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4/LICENSE.txt",
+      "access": "Public source; selected pinned recipes and license companions only, no package installation.",
+      "redistribution": "BSD-3-Clause feedstock terms; retain LICENSE.txt and separate recipe/LICENSE upstream notice.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["recipe/recipe.yaml", "recipe/conda_build_config.yaml", "recipe/LICENSE", "LICENSE.txt"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected as pilot distribution evidence; capture and review pending",
+      "documents": [
+        {"id": "unified-recipe", "path": "recipe/recipe.yaml", "url": "https://github.com/conda-forge/e3sm-unified-feedstock/blob/1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4/recipe/recipe.yaml", "revision": "1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4", "provenance": "Unified 1.13.0 released feedstock gitlink; e3sm_diags 3.2.0, zppy 3.2.0, MPAS-Analysis 1.15.0, xCDAT 0.11.2; non-hpc NCO 5.3.9, hpc has no direct NCO pin. Published dependencies rechecked 2026-11-09; builds/hashes in 3-source-mapping.md are examples, not a solved environment."},
+        {"id": "unified-variants", "path": "recipe/conda_build_config.yaml", "url": "https://github.com/conda-forge/e3sm-unified-feedstock/blob/1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4/recipe/conda_build_config.yaml", "revision": "1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4", "provenance": "Released recipe variant definitions; neither Chrysalis LCRC nor Perlmutter CPU compatibility established."},
+        {"id": "unified-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/e3sm-unified-feedstock/blob/1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4/LICENSE.txt", "revision": "1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4", "provenance": "Required conda-forge feedstock license; distinct from upstream package license."},
+        {"id": "unified-recipe-license", "path": "recipe/LICENSE", "url": "https://github.com/conda-forge/e3sm-unified-feedstock/blob/1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4/recipe/LICENSE", "revision": "1a1ec2a2cb694fe0403fdd3626ac379d5f2bd6a4", "provenance": "Required recipe-packaged upstream license companion."}
+      ]
+    },
+    {
+      "id": "e3sm_diags-feedstock",
+      "identity": "Selected e3sm_diags conda-forge recipe evidence",
+      "owner": "conda-forge contributors",
+      "canonical_url": "https://github.com/conda-forge/e3sm_diags-feedstock",
+      "repository_url": "https://github.com/conda-forge/e3sm_diags-feedstock",
+      "license_url": "https://github.com/conda-forge/e3sm_diags-feedstock/blob/c862b307312f4d744546a3827c505af7623af7bb/LICENSE.txt",
+      "access": "Public source; selected pinned recipe and license only, no package installation.",
+      "redistribution": "BSD-3-Clause feedstock terms; retain LICENSE.txt and recipe notices. Upstream license remains separate.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["recipe/recipe.yaml", "LICENSE.txt"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected as pilot distribution evidence; capture and review pending",
+      "documents": [
+        {"id": "diags-recipe", "path": "recipe/recipe.yaml", "url": "https://github.com/conda-forge/e3sm_diags-feedstock/blob/c862b307312f4d744546a3827c505af7623af7bb/recipe/recipe.yaml", "revision": "c862b307312f4d744546a3827c505af7623af7bb", "provenance": "e3sm_diags 3.2.0 recipe for Unified cohort; feedstock revision is not upstream commit or package hash. Selection only."},
+        {"id": "diags-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/e3sm_diags-feedstock/blob/c862b307312f4d744546a3827c505af7623af7bb/LICENSE.txt", "revision": "c862b307312f4d744546a3827c505af7623af7bb", "provenance": "Required conda-forge feedstock license companion."}
+      ]
+    },
+    {
+      "id": "zppy-feedstock",
+      "identity": "Selected zppy conda-forge recipe evidence",
+      "owner": "conda-forge contributors",
+      "canonical_url": "https://github.com/conda-forge/zppy-feedstock",
+      "repository_url": "https://github.com/conda-forge/zppy-feedstock",
+      "license_url": "https://github.com/conda-forge/zppy-feedstock/blob/105b7c547c5040a79bf77a1c164ebd02b60eb5d4/LICENSE.txt",
+      "access": "Public source; selected pinned recipe and license only, no package installation.",
+      "redistribution": "BSD-3-Clause feedstock terms; retain LICENSE.txt and recipe notices. Upstream LICENSE and NOTICE remain separate.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["recipe/recipe.yaml", "LICENSE.txt"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected as pilot distribution evidence; capture and review pending",
+      "documents": [
+        {"id": "zppy-recipe", "path": "recipe/recipe.yaml", "url": "https://github.com/conda-forge/zppy-feedstock/blob/105b7c547c5040a79bf77a1c164ebd02b60eb5d4/recipe/recipe.yaml", "revision": "105b7c547c5040a79bf77a1c164ebd02b60eb5d4", "provenance": "zppy 3.2.0 recipe for Unified cohort; feedstock revision is not upstream commit or package hash. Selection only."},
+        {"id": "zppy-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/zppy-feedstock/blob/105b7c547c5040a79bf77a1c164ebd02b60eb5d4/LICENSE.txt", "revision": "105b7c547c5040a79bf77a1c164ebd02b60eb5d4", "provenance": "Required conda-forge feedstock license companion."}
+      ]
+    },
+    {
+      "id": "mpas-analysis-feedstock",
+      "identity": "Selected MPAS-Analysis conda-forge recipe evidence",
+      "owner": "conda-forge contributors",
+      "canonical_url": "https://github.com/conda-forge/mpas-analysis-feedstock",
+      "repository_url": "https://github.com/conda-forge/mpas-analysis-feedstock",
+      "license_url": "https://github.com/conda-forge/mpas-analysis-feedstock/blob/ab517cdde1531d13f5c39a5edb1908bbc0c376cd/LICENSE.txt",
+      "access": "Public source; selected pinned recipe and license only, no package installation.",
+      "redistribution": "BSD-3-Clause feedstock terms; retain LICENSE.txt and recipe notices. Upstream institutional license remains separate.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["recipe/recipe.yaml", "LICENSE.txt"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected as pilot distribution evidence; capture and review pending",
+      "documents": [
+        {"id": "mpas-recipe", "path": "recipe/recipe.yaml", "url": "https://github.com/conda-forge/mpas-analysis-feedstock/blob/ab517cdde1531d13f5c39a5edb1908bbc0c376cd/recipe/recipe.yaml", "revision": "ab517cdde1531d13f5c39a5edb1908bbc0c376cd", "provenance": "MPAS-Analysis 1.15.0 recipe for Unified cohort; published package requires nco >=4.8.1,!=5.2.6,!=5.3.7, not an exact hpc NCO resolution. Selection only."},
+        {"id": "mpas-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/mpas-analysis-feedstock/blob/ab517cdde1531d13f5c39a5edb1908bbc0c376cd/LICENSE.txt", "revision": "ab517cdde1531d13f5c39a5edb1908bbc0c376cd", "provenance": "Required conda-forge feedstock license companion."}
+      ]
+    },
+    {
+      "id": "nco-feedstock",
+      "identity": "Selected non-hpc NCO conda-forge recipe evidence, not NCO manual acquisition",
+      "owner": "conda-forge contributors",
+      "canonical_url": "https://github.com/conda-forge/nco-feedstock",
+      "repository_url": "https://github.com/conda-forge/nco-feedstock",
+      "license_url": "https://github.com/conda-forge/nco-feedstock/blob/e8de94e9b88de18b3ec5aceee50b58502f10891a/LICENSE.txt",
+      "access": "Public source; selected pinned recipe and license only, no package installation or NCO manual acquisition.",
+      "redistribution": "BSD-3-Clause feedstock terms; retain LICENSE.txt and recipe notices. Does not resolve NCO manual license ambiguity.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["recipe/recipe.yaml", "LICENSE.txt"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected as pilot distribution evidence; capture and review pending",
+      "documents": [
+        {"id": "nco-recipe", "path": "recipe/recipe.yaml", "url": "https://github.com/conda-forge/nco-feedstock/blob/e8de94e9b88de18b3ec5aceee50b58502f10891a/recipe/recipe.yaml", "revision": "e8de94e9b88de18b3ec5aceee50b58502f10891a", "provenance": "NCO 5.3.9 recipe for non-hpc Unified cohort; not independently latest NCO and not hpc resolution. Example build in mapping conflicts with Unified libnetcdf pin; no compatible build set selected. Selection only."},
+        {"id": "nco-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/nco-feedstock/blob/e8de94e9b88de18b3ec5aceee50b58502f10891a/LICENSE.txt", "revision": "e8de94e9b88de18b3ec5aceee50b58502f10891a", "provenance": "Required conda-forge feedstock license companion."}
+      ]
+    },
+    {
+      "id": "xcdat-feedstock",
+      "identity": "Selected xCDAT conda-forge recipe evidence, not later-question API acquisition",
+      "owner": "conda-forge contributors",
+      "canonical_url": "https://github.com/conda-forge/xcdat-feedstock",
+      "repository_url": "https://github.com/conda-forge/xcdat-feedstock",
+      "license_url": "https://github.com/conda-forge/xcdat-feedstock/blob/b456532e473ad4bcd35fc858b3291d8bc49755d7/LICENSE.txt",
+      "access": "Public source; selected pinned recipe and license only, no package installation.",
+      "redistribution": "BSD-3-Clause feedstock terms; retain LICENSE.txt and recipe notices. Upstream Apache-2.0 with LLVM exceptions remains separate.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["recipe/meta.yaml", "LICENSE.txt"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected as pilot distribution evidence; capture and review pending",
+      "documents": [
+        {"id": "xcdat-recipe", "path": "recipe/meta.yaml", "url": "https://github.com/conda-forge/xcdat-feedstock/blob/b456532e473ad4bcd35fc858b3291d8bc49755d7/recipe/meta.yaml", "revision": "b456532e473ad4bcd35fc858b3291d8bc49755d7", "provenance": "xCDAT 0.11.2 recipe for Unified cohort, not independently latest xCDAT. Feedstock revision is not upstream commit or package hash. Selection only."},
+        {"id": "xcdat-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/xcdat-feedstock/blob/b456532e473ad4bcd35fc858b3291d8bc49755d7/LICENSE.txt", "revision": "b456532e473ad4bcd35fc858b3291d8bc49755d7", "provenance": "Required conda-forge feedstock license companion."}
+      ]
     }
   ]
 }

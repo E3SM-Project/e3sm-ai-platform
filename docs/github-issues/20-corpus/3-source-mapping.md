@@ -3,8 +3,10 @@
 Research date: 2026-11-09. All 18 [draft questions](2-representative-questions.md)
 now have source mappings. The original six remain the initial ingestion pilot;
 the other mappings identify later candidates, not approved acquisition scope.
-Mapping does not approve sources, validate execution, or establish retrieval
-coverage. No corpus capture or runtime changes have been made.
+The operator approved the six-question selection and first local capture on
+2026-11-09. Selected files now appear in `corpus/sources.json`; selection does not
+establish capture, review approval, execution validation, or retrieval coverage.
+Runtime content remains unchanged.
 
 See the [existing-corpus audit](4-corpus-audit.md) for packaged content coverage,
 metadata gaps, and priorities for the six-question pilot.
@@ -33,6 +35,13 @@ Version-specific package API responses are dated observations, not immutable
 snapshots. SHA-256 values below identify the exact example builds above; retain
 their metadata and select a compatible build set before deployment.
 
+Rechecked 2026-11-09: recorded release tags, E3SM's CIME gitlink, Unified's
+feedstock gitlink, and all six example artifact hashes match upstream evidence.
+The example NCO build requires `libnetcdf >=4.10.1,<4.10.2.0a0`, while Unified's
+recipe pins `libnetcdf ==4.10.0`. These examples cannot be treated as a compatible
+build set. MPAS-Analysis requires `nco >=4.8.1,!=5.2.6,!=5.3.7`; this does not
+resolve the `hpc` variant's NCO version. No pins were advanced.
+
 | Example package | Artifact SHA-256 |
 | --- | --- |
 | E3SM-Unified | `5bfd35636c43571c23abc00d68e94e54e578fd0263440485beaf16d99d332e7c` |
@@ -47,8 +56,9 @@ their metadata and select a compatible build set before deployment.
 - **Model:** E3SM v3.1.0, `WCYCL1850`, and `ne30pg2_r05_IcoswISC30E3r5`.
   Use its bundled CIME revision, not standalone CIME's legacy GitHub
   [latest-release endpoint][release-cime], which reports `cime5.6.4`.
-- **Machine:** Perlmutter CPU (`pm-cpu`). Account, input/reference data, mapping
-  files, installed environment, and current facility settings remain unverified.
+- **Machines:** Chrysalis LCRC and Perlmutter CPU (`pm-cpu`). Account,
+  input/reference data, mapping files, installed environment, and current facility
+  settings remain unverified for both. Keep site-specific settings separate.
 - **Candidate analysis cohort:** The conda-forge Unified [recipe] and published
   package agree on e3sm_diags 3.2.0, zppy 3.2.0, MPAS-Analysis 1.15.0, and
   **xCDAT 0.11.2**, not the latest individual xCDAT release. Non-`hpc` variants
@@ -155,7 +165,7 @@ while retaining complete raw files and provenance separately from CLI output.
 
 ### `running-case-setup` — simulation configuration
 
-- **Scope:** An already-created baseline case on Perlmutter CPU.
+- **Scope:** An already-created baseline case on Chrysalis LCRC or Perlmutter CPU.
 - **Evidence:** E3SM's [run template], functions `case_setup`, `case_build`,
   `runtime_options`, and `case_submit`; bundled CIME's [setup], [build], and [run]
   guides. In [run], use “Monitoring Progress,” “Input Data,” and
@@ -163,9 +173,11 @@ while retaining complete raw files and provenance separately from CLI output.
 - **Supported elements:** Setup/build/submission order, configuration and input
   prerequisites, `CaseStatus`, and model/component log checks.
 - **Gaps:** The run template defaults to fetching `master`; do not execute it
-  unchanged for a pinned release. CIME's machine examples are not Perlmutter
-  configuration. Verify project, compiler, queue, input paths, and generated case
-  settings before issuing executable instructions. No build or simulation ran.
+  unchanged for a pinned release. CIME's preview contains historical Chrysalis
+  paths, not verified current Chrysalis settings or Perlmutter configuration.
+  Verify project, compiler, queue, input paths, and generated case settings
+  separately for each machine before issuing executable instructions.
+  No build or simulation ran.
 
 ### `diagnostics-zppy-climatology` — diagnostics workflows
 
@@ -178,7 +190,8 @@ while retaining complete raw files and provenance separately from CLI output.
   [Input requirements] and [lat_lon defaults] supply diagnostic-side evidence.
 - **Supported elements:** Input paths, years, mapping/reference data, task
   configuration, preprocessing flow, and output/status locations.
-- **Gaps:** Tutorial paths and partition target Chrysalis, not Perlmutter. Its
+- **Gaps:** Tutorial paths and partition target Chrysalis, one proposed context,
+  but neither current Chrysalis access nor Perlmutter adaptation is verified. Its
   campaign example enables diagnostics needing more than monthly climatologies;
   explicitly restrict pilot sets instead of copying it wholesale. The tutorial's
   campaign-file path is stale: the actual file is [water_cycle.cfg] under
@@ -374,11 +387,16 @@ explicitly selected. Context fields in the question draft still apply.
   metric equality or scientific comparability. Select actual version-pair changes
   rather than assume the user's upgrade crossed the v2/v3 boundary.
 
-## Scope changes requiring approval
+## Approved pilot scope
 
-Compare with the human-owned [source scope](../../../corpus/sources.json):
+Operator approval on 2026-11-09 covers the six-question selection below,
+preparation documentation, and only the first `running-case-setup` local capture.
+The source scope records selected documents and pending capture/review status;
+it does not track local capture outcomes. Both machine contexts remain proposed.
 
-| Source | Current coverage | Requested scope for this pilot |
+Selection recorded in the human-owned [source scope](../../../corpus/sources.json):
+
+| Source | Coverage before selection | Approved additions for this pilot |
 | --- | --- | --- |
 | E3SM | `docs/**` covers the model user guide. Component docs and root template are excluded by the include list. | Add linked component introductions, `components/mpas-ocean/docs/user-guide/index.md`, `components/mpas-seaice/docs/user-guide/index.md`, and `run_e3sm.template.sh`. |
 | e3sm_diags | `docs/**` covers the linked RST guides. | Add `examples/ex5-model-vs-obs/{ex5.py,diags.cfg}` and `e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg`. |
@@ -390,8 +408,8 @@ Compare with the human-owned [source scope](../../../corpus/sources.json):
 
 Use exact selected paths, not new broad wildcards. Include license companions.
 The canonical documentation URLs above differ from the existing E3SM,
-e3sm_diags, and E3SM-Project.github.io scope entries. Treat URL reconciliation as
-an approval decision, not an automatic change to `corpus/sources.json`.
+e3sm_diags, and E3SM-Project.github.io scope entries. Approval includes reconciling
+E3SM and e3sm_diags URLs; the documentation-site source stays unchanged.
 Keep the documentation-site source unchanged; no site crawl is needed for this
 pilot subset. Mapping the remaining questions does not approve or enlarge it.
 
@@ -416,7 +434,8 @@ or broaden pilot scope merely because these questions need more evidence.
 
 ## Capture gate and validation
 
-- [ ] Human approves baseline, selected documents/revisions, licenses, and scope changes.
+- [x] Operator approves proposed baseline, selected documents/revisions, license
+  companions, and six-question scope changes; scientific and publication review remain pending.
 - [ ] Record upstream release pins separately from conda-forge artifact versions,
   builds/hashes, and feedstock commits. Resolve the target environment and check
   model/tool compatibility; latest individual releases are not a validated cohort.
