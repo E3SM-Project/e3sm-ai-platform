@@ -21,6 +21,11 @@ fixture. This audit inspects packaged text and metadata against the question
 requirements and [source mapping][mapping]. It does not test retrieval, establish
 upstream quotation fidelity, or check live URL availability.
 
+Inventory findings remain frozen to the corpus snapshot above. The question
+context now uses E3SM v3.1.0; coverage classifications remain unchanged because
+the packaged summaries still lack release-specific detail and provenance.
+Recommendations follow the refreshed source mapping, not changes to corpus content.
+
 ## Inventory and provenance readiness
 
 | Component label | Entries |
@@ -122,6 +127,26 @@ summaries. Review section identity and citation precision before any consolidati
   locate the evidence for each summary. Reacquire exact mapped sections and retain
   extraction context instead of treating these summaries as verbatim source text.
 
+## Source-selection update
+
+Selection rule checked 2026-11-09:
+
+- Use the latest E3SM-Unified release's member versions, supported by the
+  conda-forge recipe and published package metadata in the [version inventory][versions].
+  The historical E3SM-Project-local Unified 1.11.1 recipe is no longer the authority.
+- The selected Unified 1.13.0 cohort uses e3sm_diags 3.2.0, zppy 3.2.0,
+  MPAS-Analysis 1.15.0, and xCDAT 0.11.2. Non-`hpc` variants pin NCO 5.3.9;
+  verify the `hpc` environment's resolved NCO instead of inferring a direct pin.
+  Do not upgrade members independently merely because newer releases exist.
+- Use the latest stable E3SM model release, v3.1.0, for the proposed model baseline,
+  with its bundled CIME revision. Do not substitute standalone CIME's release.
+  Other non-Unified dependencies follow their owning model/tool's constraints.
+- Use the same v3.1.0 evidence for `user-guide-history` as the other model mappings;
+  the question now names that release. Do not generalize its settings to every v3 release.
+- Keep upstream commits, conda-forge artifact versions/builds/hashes, and feedstock
+  revisions distinct. Published dependency declarations do not prove a solved or
+  working Perlmutter environment, model compatibility, or scientific validation.
+
 ## Priorities for the six-question pilot
 
 The pilot has **4 partial and 2 absent** content mappings. No pilot record is
@@ -130,9 +155,9 @@ before acquisition. Existing summaries do not fill gaps in the mapped upstream s
 
 | Order | Pilot question | Proposed evidence action |
 | --- | --- | --- |
-| 1 | `running-case-setup` | Capture bundled CIME setup/build/run sections and the release run template; add completion and machine prerequisites. [Mapping][pilot-run] |
+| 1 | `running-case-setup` | Capture the selected model's bundled CIME setup/build/run sections and release run template; add completion and machine prerequisites. [Mapping][pilot-run] |
 | 2 | `tutorial-diagnostics-example` | Capture the pinned example guide, Python/configuration pair, and input requirements; keep execution unverified. [Mapping][pilot-example] |
-| 3 | `diagnostics-zppy-climatology` | Reuse diagnostic inputs; add zppy tutorial/include, defaults, and task templates for the restricted climatology workflow. [Mapping][pilot-zppy] |
+| 3 | `diagnostics-zppy-climatology` | Use Unified-cohort tool revisions; reuse diagnostic inputs and add zppy tutorial/include, defaults, and task templates. Verify the resolved NCO version. [Mapping][pilot-zppy] |
 | 4 | `tools-atmosphere-ocean` | Add precipitation definitions and the MPAS SST task; document prerequisites without claiming exclusive tool rankings. [Mapping][pilot-tools] |
 | 5 | `model-components` | Add release/component guides and resolve missing coupling evidence or explicitly retain partial answer scope. [Mapping][pilot-model] |
 | 6 | `cross-project-mpas-output` | Reuse MPAS task evidence; add model-side stream/namelist guidance and verify selected-task requirements. [Mapping][pilot-mpas] |
@@ -147,7 +172,9 @@ This is a recommendation for approval, not a schema, storage, or release change:
 
 - **Git:** Keep acquisition policy in `corpus/sources.json`. Define selected
   documents/revisions, schema/preparation/tool versions, and eventual artifact
-  locations/checksums in a reviewable corpus definition. Policy is not a capture manifest.
+  locations/checksums in a reviewable corpus definition. Record upstream source
+  commits separately from published package builds and conda-forge feedstock pins.
+  Policy is not a capture manifest.
 - **Curated snapshot:** Keep normalized Markdown, inventory, license notices, and
   hash-bound review records. Retain raw originals and byte hashes separately;
   the current CLI preserves normalized content only.
@@ -178,6 +205,7 @@ No corpus entries, acquisition policy, runtime code, or evaluation fixtures chan
 [workflow]: ../../dev/corpus-curation.md
 [questions]: 2-representative-questions.md
 [mapping]: 3-source-mapping.md
+[versions]: 3-source-mapping.md#version-selection-and-distribution-evidence
 [pilot-run]: 3-source-mapping.md#running-case-setup--simulation-configuration
 [pilot-example]: 3-source-mapping.md#tutorial-diagnostics-example--tutorials-and-examples
 [pilot-zppy]: 3-source-mapping.md#diagnostics-zppy-climatology--diagnostics-workflows

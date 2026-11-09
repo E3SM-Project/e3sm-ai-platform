@@ -150,14 +150,15 @@ ingestion pilot; mapping the others does not expand approved acquisition scope.
 
 ### user-guide-history — draft
 
-- **Question:** In E3SM v3.0.2 using EAM, how do I add precipitation fields to
+- **Question:** In E3SM v3.1.0 using EAM, how do I add precipitation fields to
   history output at the frequency needed for my planned diagnostics?
 - **Context:** Diagnostic set, required precipitation quantity/frequency, existing
-  history streams, and case state. This release is a draft scenario, not a support target.
+  history streams, and case state. Execution and diagnostic compatibility remain unverified.
 - **Expected elements:** Relevant namelist settings, field availability, output
   streams, and how to verify output; avoid inventing field names or defaults.
 - **Candidate sources:** Tagged EAM user/namelist docs and source definitions.
-- **Evidence gaps:** Locate v3.0.2 evidence for the requested fields and settings.
+- **Evidence gaps:** Verify the requested fields and settings against v3.1.0
+  definitions and actual output.
 
 ## Diagnostics workflows
 
@@ -257,7 +258,8 @@ ingestion pilot; mapping the others does not expand approved acquisition scope.
   must account for those distinctions before converting them into scored cases.
 - Pending user/domain review: confirm target releases and machines, prioritize
   science topics and diagnostic sets, and decide whether additional land/river
-  examples are needed. Perlmutter and v3.0.2 are scenarios, not approved corpus scope.
+  examples are needed. Perlmutter and v3.1.0 define the proposed pilot baseline,
+  not approved acquisition scope or verified execution compatibility.
 - Next evidence pass: attach exact sections/revisions and verify expected elements.
   No reference answers or examples have been validated by this relevance review.
 
