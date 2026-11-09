@@ -6,6 +6,9 @@ the other mappings identify later candidates, not approved acquisition scope.
 Mapping does not approve sources, validate execution, or establish retrieval
 coverage. No corpus capture or runtime changes have been made.
 
+See the [existing-corpus audit](4-corpus-audit.md) for packaged content coverage,
+metadata gaps, and priorities for the six-question pilot.
+
 ## Proposed baseline
 
 - **Model:** E3SM v3.0.2; `WCYCL1850` with
