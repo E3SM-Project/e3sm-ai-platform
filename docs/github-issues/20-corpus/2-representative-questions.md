@@ -17,8 +17,9 @@ Under #21, promote reviewed cases into
 where supported by the evaluation contract. Keep held-out cases separate from
 retrieval tuning. No fixture schema or test changes belong to this draft.
 
-See [pilot source mapping](3-source-mapping.md) for six selected questions,
-proposed versions, inspected evidence, and remaining capture gates.
+See [source mapping](3-source-mapping.md) for all 18 questions, proposed versions,
+inspected evidence, and remaining capture gates. Six questions remain the initial
+ingestion pilot; mapping the others does not expand approved acquisition scope.
 
 ## Model understanding
 
