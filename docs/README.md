@@ -16,8 +16,10 @@ prototype, focused on E3SM Compass.
 - [Roadmap](roadmap.md): planned implementation areas and known gaps.
 - [Observability](dev/observability.md): canonical observability guidance and
   local tracing workflow.
-- [Corpus curation](dev/corpus-curation.md): approved acquisition scope and
-  offline operator workflow; no runtime integration yet.
+- [Corpus curation](dev/corpus-curation.md): source scope, reproducible local
+  corpus builds, question coverage, and opt-in runtime use.
+- [Corpus review checklist](dev/corpus-review.md): steps to approve and package a
+  corpus build.
 
 ## Status and historical documents
 

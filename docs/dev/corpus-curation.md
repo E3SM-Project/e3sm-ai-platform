@@ -48,7 +48,8 @@ Run from the repository root; `make help` lists the targets.
    reports which expected documents each one retrieves and cites.
    Optionally, `make corpus-export` writes the build for the backend's
    `CORPUS_PATH` ([runtime use](#runtime-use)).
-4. **Review:** an authorized reviewer checks the build and records approval in
+4. **Review:** an authorized reviewer follows the
+   [review checklist](corpus-review.md) and records approval in
    `captured/review.json`. Never set approval as part of curation.
 5. **Package:** `make corpus-package VERSION=<label>` archives an approved build
    locally. It refuses unapproved builds and never uploads anything.

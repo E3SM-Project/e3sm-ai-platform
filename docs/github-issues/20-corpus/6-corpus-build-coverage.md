@@ -110,9 +110,19 @@ Two #20 follow-ups after these results:
   default, and the evaluation adapter always uses it because the evaluation
   fixtures cite its source IDs.
 
+## Ingestion method
+
+Pinned Git acquisition is the ingestion method for this corpus: every selected
+source is a public GitHub repository, so files are fetched at exact commits with
+byte hashes and no crawling. Evaluating crawlers such as Crawl4AI, sitemap
+discovery, and incremental updates for hosted documentation is deferred until a
+needed source is not available from Git; refresh automation belongs to #31.
+
 ## Remaining issues
 
-- [ ] Reviewer approval of the build; then `make corpus-package VERSION=<label>`.
+- [ ] Reviewer approval of the build using the
+  [review checklist](../../dev/corpus-review.md); then
+  `make corpus-package VERSION=<label>`.
 - [ ] Decide whether the reviewed build replaces the packaged corpus; that requires
   updated evaluation fixtures because their citations use packaged source IDs.
 - [ ] Structure-aware chunking that respects headings and fenced blocks (#21), and
