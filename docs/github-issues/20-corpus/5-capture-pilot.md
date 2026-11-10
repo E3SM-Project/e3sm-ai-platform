@@ -1,5 +1,9 @@
 # Issue #20: `running-case-setup` capture pilot
 
+> **Superseded:** the [reproducible corpus build](6-corpus-build-coverage.md)
+> captures these files verbatim with `make corpus-curate`. The hand-converted
+> Markdown described below is a pilot record and is not used.
+
 ## Scope and result
 
 Capture date: 2026-11-09. Repository baseline:
