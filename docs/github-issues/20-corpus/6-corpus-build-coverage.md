@@ -110,6 +110,92 @@ Two #20 follow-ups after these results:
   default, and the evaluation adapter always uses it because the evaluation
   fixtures cite its source IDs.
 
+## Expansion to documentation folders
+
+Build date: 2026-11-10. Scope commits: `fe2ec6f` (pattern support), `c6b3a85`
+(expansion), `8d39017` (explicit-entry cleanup).
+
+### What changed
+
+- **Folder patterns** now select all Markdown and RST documentation in E3SM
+  (`docs/` and component `docs/`, excluding legacy CICE and `old/` folders), CIME,
+  e3sm_diags, zppy, MPAS-Analysis, e3sm-unified, xCDAT (excluding project pages),
+  E3SM Data Docs, and the running-guide site.
+- **Four new sources** at their E3SM-Unified 1.13.0 versions: zstash, e3sm_to_cmip,
+  mache, and MPAS-Tools.
+- **Explicit additions:** the `pm-cpu` and `chrysalis` sections of E3SM's machine
+  and batch configuration, and the NCO manual's `ncremap` section.
+- **Cleanup:** 16 explicit entries already selected by patterns were removed, and
+  their IDs in `corpus/questions.json` were replaced by pattern-derived IDs.
+
+### Build
+
+| Measure | Before | After |
+| --- | ---: | ---: |
+| Files acquired | 85 | 565 |
+| Documents captured | 65 | 539 |
+| Selected by patterns | — | 488 |
+| Captured text | about 1 MB | 3.95 MB |
+| Retrieval chunks | 1,176 | 5,902 |
+| Build time | about 2 min | about 12 min |
+| RST includes outside the corpus | — | 9 |
+
+The 9 unresolved includes are zppy configuration files, MPAS-Analysis observation
+tables generated at documentation build time, and xCDAT text and changelog files
+outside the selected folders. None was added.
+
+### Coverage
+
+The comparison spans both the expansion and the ID renames; renaming does not
+change which documents are expected, so the difference comes from the expansion.
+The metric counts only documents mapped before the expansion, so it does not
+credit relevant new pages.
+
+| Build | Documents | Expected documents in top 8 | Questions citing an expected document |
+| --- | ---: | ---: | ---: |
+| Before expansion | 65 | 30 / 81 | 12 / 18 |
+| After expansion | 539 | 17 / 81 | 10 / 18 |
+| After, without developer docs | 440 | 17 / 81 | 9 / 18 |
+
+Off-target citations come mostly from E3SM component docs (16 of 51, led by
+EAMxx user and developer pages), MPAS-Analysis (7, including developer
+tutorials), and explicit documents (7). Some displaced results are relevant new
+pages, such as CIME's case-control index and multi-year example for
+`running-case-setup` and E3SM-Unified's introduction and tool guide for
+`tools-environment-choice`; others are noise, such as EAMxx developer pages for
+`user-guide-compset`.
+
+### Caveat scan
+
+An automated scan of all 539 documents found 846 risk-pattern hits in 120
+documents. Twenty of those documents already have notes; 100 do not.
+
+| Pattern | Hits | Documents without notes |
+| --- | ---: | ---: |
+| Machine paths | 504 | 52 |
+| `master`, `main`, or `load_latest` references | 279 | 75 |
+| Accounts, queues, or partitions | 36 | 15 |
+| `module` commands | 21 | 7 |
+| Disabled TLS verification | 6 | 2 |
+
+The two documents that repeat the TLS advice already flagged in `diags-install`,
+`zppy.docs.source.getting_started.rst` and
+`zstash.docs.source.getting_started.rst`, need notes before approval. The other
+hits are triaged in the [review request](7-colleague-review.md).
+
+### Conclusion
+
+Coverage numbers measure whether lexical retrieval finds the documents mapped to
+each question, not whether answers are complete; every question remains partial
+in the [source mapping][mapping]. The expansion makes the corpus cover the
+E3SM documentation sets instead of hand-picked pages, but with eight times as
+many documents, lexical retrieval ranks mapped evidence lower: expected documents
+in the top 8 fell from 30 to 17 of 81. Fixing ranking and chunking is #21 work;
+narrowing the corpus would trade breadth for this metric.
+
+**Developer docs stay.** Removing them did not improve retrieval (17/81 either
+way) and lowered questions citing expected documents from 10 to 9.
+
 ## Ingestion method
 
 Pinned Git acquisition is the ingestion method for this corpus: every selected
