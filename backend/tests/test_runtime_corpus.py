@@ -33,6 +33,22 @@ def test_corpus_path_setting_selects_runtime_corpus(tmp_path, monkeypatch):
     assert len(CompassService(settings=Settings()).entries) > 1
 
 
+def test_corpus_snapshot_id_identifies_loaded_content(tmp_path):
+    """The snapshot ID identifies loaded content, not file formatting."""
+    compact, indented, changed = (tmp_path / name for name in ("a.json", "b.json", "c.json"))
+    compact.write_text(json.dumps([ENTRY]), encoding="utf-8")
+    indented.write_text(json.dumps([ENTRY], indent=4), encoding="utf-8")
+    changed.write_text(json.dumps([{**ENTRY, "text": "Changed."}]), encoding="utf-8")
+
+    def snapshot(path):
+        return CompassService(settings=Settings(corpus_path=str(path))).corpus_snapshot_id
+
+    assert snapshot(compact).startswith("sha256:")
+    assert snapshot(compact) == snapshot(indented)
+    assert snapshot(compact) != snapshot(changed)
+    assert CompassService(settings=Settings()).corpus_snapshot_id != snapshot(compact)
+
+
 def test_evaluator_ignores_corpus_path(tmp_path, monkeypatch):
     """The evaluation adapter keeps the packaged corpus its fixtures cite."""
     corpus = tmp_path / "corpus.json"

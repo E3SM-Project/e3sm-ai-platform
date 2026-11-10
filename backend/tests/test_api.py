@@ -18,6 +18,7 @@ def test_health_reports_corpus() -> None:
     assert body["status"] == "ok"
     assert 20 <= body["corpus"]["entries"] <= 50
     assert body["chunks"] >= body["corpus"]["entries"]
+    assert body["corpus"]["snapshot_id"].startswith("sha256:")
 
 
 def test_query_returns_curated_answer_with_citations_and_evidence() -> None:

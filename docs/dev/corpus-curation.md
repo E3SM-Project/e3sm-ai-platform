@@ -164,7 +164,9 @@ another runtime corpus. `make corpus-export` verifies the build and writes
 captured document; the packaged corpus is never modified. Set `CORPUS_PATH` to
 that file's absolute path in `backend/.env` to try the build in the API and UI.
 Each entry's provenance states its pinned revision and whether review is
-approved; exporting does not approve anything.
+approved; exporting does not approve anything. `/health` reports the loaded
+corpus's `snapshot_id`, and query traces carry it as `rag.corpus_snapshot_id`,
+so answers can be tied to the corpus that produced them.
 
 The evaluation adapter always uses the packaged corpus because its fixtures cite
 packaged source IDs. Replacing the packaged corpus is a separate decision that

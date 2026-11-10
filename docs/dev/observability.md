@@ -147,7 +147,9 @@ intended durable topology is:
    Argo span also records `generation.model`.
 
 Current backend span names are implementation-oriented (`compass.query`,
-`rag.retrieve`, `rag.accept`, `compass.route`, and `generation.generate`). Treat
+`rag.retrieve`, `rag.accept`, `compass.route`, and `generation.generate`).
+`compass.query` carries `rag.corpus_snapshot_id`, which `/health` also reports as
+`corpus.snapshot_id`. Treat
 the topology above as the long-term naming/coverage goal, especially for adding
 separate frontend and provider spans.
 
@@ -163,7 +165,8 @@ Recommended low-cardinality span attributes:
 - `rag.accepted_evidence_count`: number of accepted chunks used for curated
   generation
 - `rag.candidate_count`: number of retrieved candidates considered
-- `rag.corpus_snapshot_id`: stable corpus snapshot identifier when available
+- `rag.corpus_snapshot_id`: `sha256:` digest of the loaded corpus entries'
+  canonical JSON; it changes with content or order, not file formatting
 - `rag.retrieval_policy_version`: retrieval/chunking/scoring policy version when
   available
 - `llm.provider`: `deterministic`, `openai_compatible`, or `argo`
