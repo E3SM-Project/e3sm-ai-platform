@@ -4,8 +4,9 @@ Review of the expanded corpus build from #34 in three parts: automated agent
 checks (done), author confirmation, and colleague judgment and approval. The
 agent never approves.
 
-- **Build reviewed:** scope at `ee1ea40` on `feature/20-corpus`; 565 files
-  acquired, 539 documents captured, 26 license files kept raw.
+- **Build reviewed:** current scope on `feature/20-corpus`; the snapshot is
+  unchanged since `ee1ea40`. 565 files acquired, 539 documents captured, 26
+  license files kept raw.
 - **`snapshot_sha256`:**
   `fa6a9a2d514aeda9f60306ba46024354eb2d69a23b9006cd8a299b53f7d9d626`
 - **Results:** [`6-corpus-build-coverage.md`](6-corpus-build-coverage.md),
@@ -37,7 +38,7 @@ notes, 100 do not.
 
 ## 2. Author review (before handoff)
 
-- [ ] Add notes for the two TLS documents above.
+- [x] Add notes for the two TLS documents above.
 - [ ] Decide whether to note the other unnoted groups. Notes go in
   `corpus/sources.json`; they do not change `snapshot_sha256`.
 - [ ] Open three documents (Markdown, RST, and a script or configuration) next

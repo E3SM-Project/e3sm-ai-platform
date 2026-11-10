@@ -134,7 +134,8 @@
         {"id": "zppy-diags-template", "path": "zppy/templates/e3sm_diags.bash"},
         {"id": "zppy-boilerplate", "path": "zppy/templates/inclusions/boilerplate.bash", "notes": "Do not replay generated scripts without review."},
         {"id": "zppy-license", "path": "LICENSE", "role": "license"},
-        {"id": "zppy-notice", "path": "NOTICE", "role": "license"}
+        {"id": "zppy-notice", "path": "NOTICE", "role": "license"},
+        {"id": "zppy.docs.source.getting_started.rst", "path": "docs/source/getting_started.rst", "notes": "Advises disabling SSL verification (ssl_verify false); never present that as guidance."}
       ]
     },
     {
@@ -294,7 +295,8 @@
       "include": ["docs/**/*.md", "docs/**/*.rst"],
       "documents": [
         {"id": "zstash-license", "path": "LICENSE", "role": "license"},
-        {"id": "zstash-notice", "path": "NOTICE", "role": "license"}
+        {"id": "zstash-notice", "path": "NOTICE", "role": "license"},
+        {"id": "zstash.docs.source.getting_started.rst", "path": "docs/source/getting_started.rst", "notes": "Advises disabling SSL verification (ssl_verify false); never present that as guidance."}
       ]
     },
     {
