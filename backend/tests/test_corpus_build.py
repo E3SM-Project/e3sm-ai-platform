@@ -167,7 +167,7 @@ def test_fetch_retries_transient_failures_only():
     request = httpx.Request("GET", "https://example.test/file")
     calls, pauses = [], []
 
-    def flaky(url, timeout):
+    def flaky(url, timeout, headers=None):
         calls.append(url)
         if len(calls) < 3:
             raise httpx.ConnectTimeout("timed out", request=request)
@@ -177,7 +177,7 @@ def test_fetch_retries_transient_failures_only():
     assert pauses == [2.0, 4.0]
 
     def status(code):
-        def get(url, timeout):
+        def get(url, timeout, headers=None):
             calls.append(url)
             return httpx.Response(code, request=request)
 
@@ -242,3 +242,75 @@ def test_curate_captures_only_selected_line_ranges(tmp_path):
         scope_path.write_text(json.dumps(scope), encoding="utf-8")
         with pytest.raises(CurationValidationError, match=message):
             curate(scope_path, tmp_path / "bad", fetch=FILES.__getitem__, sleep=lambda _: None)
+
+
+def test_curate_expands_include_patterns_with_explicit_precedence(tmp_path):
+    """Patterns add files from the pinned listing; explicit entries keep their IDs."""
+    files = {
+        **FILES,
+        f"{RAW}/docs/guide.md": b"# Guide\n\n.. include:: missing.rst\n.. include:: run.rst\n",
+        f"{RAW}/docs/old/legacy.md": b"# Legacy\n",
+    }
+    listing = [
+        "README.md",
+        "LICENSE",
+        "docs/run.rst",
+        "docs/guide.md",
+        "docs/old/legacy.md",
+        "docs/a.png",
+    ]
+    scope_path = _scope(tmp_path)
+    scope = json.loads(scope_path.read_text())
+    scope["sources"][0]["include"] = ["docs/**/*.md", "docs/**/*.rst"]
+    scope["sources"][0]["exclude"] = ["docs/old/**"]
+    scope_path.write_text(json.dumps(scope), encoding="utf-8")
+    listed, pauses = [], []
+    root = tmp_path / "build"
+
+    def list_files(source):
+        listed.append(source.id)
+        return listing
+
+    snapshot = curate(
+        scope_path, root, fetch=files.__getitem__, list_files=list_files, sleep=pauses.append
+    )
+
+    assert listed == ["docs"]
+    assert [record.id for record in snapshot.records] == ["docs.docs.guide.md", "guide", "run"]
+    record = json.loads((root / "acquisition.json").read_text())
+    by_id = {document["id"]: document for document in record["documents"]}
+    assert by_id["docs.docs.guide.md"]["pattern"] == "docs/**/*.md"
+    assert by_id["run"]["pattern"] is None
+    assert by_id["run"]["notes"] == "Test caveat."
+    assert record["unresolved_includes"] == ["docs.docs.guide.md: missing.rst"]
+    assert len(pauses) == 4
+    assert verify_build(root) == []
+
+
+def test_scope_patterns_are_validated(tmp_path):
+    """Unsafe patterns, orphan excludes, and pattern ID collisions are rejected."""
+    scope_path = _scope(tmp_path)
+    scope = json.loads(scope_path.read_text())
+    scope["sources"][0]["include"] = ["../secrets/*"]
+    scope["sources"][0]["exclude"] = ["docs/old/**"]
+    scope_path.write_text(json.dumps(scope), encoding="utf-8")
+    with pytest.raises(CurationValidationError, match="invalid path pattern"):
+        curate(scope_path, tmp_path / "out", fetch=FILES.__getitem__, sleep=lambda _: None)
+
+    scope["sources"][0]["include"] = []
+    scope_path.write_text(json.dumps(scope), encoding="utf-8")
+    with pytest.raises(CurationValidationError, match="exclude patterns without include"):
+        curate(scope_path, tmp_path / "out", fetch=FILES.__getitem__, sleep=lambda _: None)
+
+    scope["sources"][0]["include"] = ["docs/*.md"]
+    scope["sources"][0]["exclude"] = []
+    scope["sources"][0]["documents"].append({"id": "docs.docs.a.md", "path": "notes/a.md"})
+    scope_path.write_text(json.dumps(scope), encoding="utf-8")
+    with pytest.raises(CurationValidationError, match="duplicate document IDs"):
+        curate(
+            scope_path,
+            tmp_path / "out",
+            fetch=FILES.__getitem__,
+            list_files=lambda source: ["docs/a.md"],
+            sleep=lambda _: None,
+        )

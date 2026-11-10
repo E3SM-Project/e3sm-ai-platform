@@ -27,16 +27,17 @@ import gzip
 import hashlib
 import io
 import json
+import os
 import re
 import shutil
 import tarfile
 import time
 from collections.abc import Callable
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
 import httpx
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from e3sm_ai_platform.domain.models import CorpusEntry
 from e3sm_ai_platform.knowledge.curation import (
@@ -50,12 +51,15 @@ from e3sm_ai_platform.knowledge.curation import (
     SourceScope,
     _normalize_markdown,
     capture,
+    pattern_document_id,
     validate_corpus,
     validate_source_scope,
 )
 
 Fetcher = Callable[[str], bytes]
+FileLister = Callable[[AcquisitionSource], list[str]]
 
+_RST_INCLUDE = re.compile(r"^\s*\.\.\s+(?:literalinclude|include)::\s+(\S+)", re.MULTILINE)
 _FENCE_LANGUAGES = {
     ".bash": "bash",
     ".cfg": "ini",
@@ -87,6 +91,7 @@ class AcquiredDocument(BaseModel):
     redistribution: str
     lines: list[tuple[int, int]] | None = None
     notes: str | None = None
+    pattern: str | None = None
     raw_path: str
     byte_length: int
     sha256: str
@@ -103,6 +108,7 @@ class AcquisitionRecord(BaseModel):
     schema_version: int = SCHEMA_VERSION
     scope_sha256: str
     documents: list[AcquiredDocument]
+    unresolved_includes: list[str] = Field(default_factory=list)
 
 
 def curate(
@@ -111,6 +117,7 @@ def curate(
     *,
     overwrite: bool = False,
     fetch: Fetcher | None = None,
+    list_files: FileLister | None = None,
     sleep: Callable[[float], None] = time.sleep,
 ) -> Snapshot:
     """Build a validated local corpus from every document selected in a scope.
@@ -126,6 +133,10 @@ def curate(
         Replace an existing previous build at ``output_root``.
     fetch : callable, optional
         Function returning the bytes at a URL. Defaults to an HTTPS GET.
+    list_files : callable, optional
+        Function returning a source's repository file paths at its revision, used
+        to expand ``include`` patterns. Defaults to the GitHub tree API, which
+        sends ``GITHUB_TOKEN`` when set.
     sleep : callable, optional
         Pause between requests, honoring each source's request interval.
 
@@ -153,8 +164,12 @@ def curate(
         shutil.rmtree(partial)
 
     try:
-        record = _acquire(scope, scope_file, partial, fetch or _fetch, sleep)
-        _prepare(scope, record, partial)
+        scope, patterns = _expand_patterns(scope, list_files or _list_github_files, sleep)
+        record = _acquire(scope, scope_file, partial, fetch or _fetch, sleep, patterns)
+        record.unresolved_includes = _prepare(scope, record, partial)
+        (partial / "acquisition.json").write_text(
+            record.model_dump_json(indent=2) + "\n", encoding="utf-8"
+        )
         snapshot = capture(partial / "capture-manifest.json", partial / "captured")
         failures = verify_build(partial)
         if failures:
@@ -346,23 +361,80 @@ def _load_scope(path: Path) -> SourceScope:
         raise CurationValidationError("; ".join(failures))
     scope = SourceScope.model_validate_json(path.read_bytes())
     for source in scope.sources:
-        _raw_url(source, source.documents[0])
+        _github_repository(source)
 
     return scope
 
 
-def _raw_url(source: AcquisitionSource, document: ScopeDocument) -> str:
-    """Return the pinned raw-file URL for a GitHub-hosted document."""
+def _expand_patterns(
+    scope: SourceScope, list_files: FileLister, sleep: Callable[[float], None]
+) -> tuple[SourceScope, dict[str, str]]:
+    """Add pattern-selected files to each source and return the matching patterns."""
+    sources = []
+    patterns: dict[str, str] = {}
+    for source in scope.sources:
+        if not source.include:
+            sources.append(source)
+            continue
+        sleep(scope.request_interval_seconds)
+        explicit = {document.path for document in source.documents}
+        documents = list(source.documents)
+        for path in sorted(list_files(source)):
+            pure = PurePosixPath(path)
+            matched = next((p for p in source.include if pure.full_match(p)), None)
+            if matched is None or any(pure.full_match(p) for p in source.exclude):
+                continue
+            if path in explicit:
+                continue
+            document = ScopeDocument(id=pattern_document_id(source.id, path), path=path)
+            documents.append(document)
+            patterns[document.id] = matched
+        sources.append(source.model_copy(update={"documents": documents}))
+    expanded = scope.model_copy(update={"sources": sources})
+    failures = validate_source_scope(expanded)
+    if failures:
+        raise CurationValidationError("; ".join(failures))
+
+    return expanded, patterns
+
+
+def _github_repository(source: AcquisitionSource) -> tuple[str, str]:
+    """Return the owner and name of a GitHub-hosted source repository."""
     parsed = urlparse(source.repository_url)
     parts = parsed.path.strip("/").split("/")
     if parsed.scheme != "https" or parsed.netloc != "github.com" or len(parts) != 2:
         raise CurationValidationError(f"unsupported repository URL for {source.id}")
-    owner, repo = parts
+
+    return parts[0], parts[1]
+
+
+def _raw_url(source: AcquisitionSource, document: ScopeDocument) -> str:
+    """Return the pinned raw-file URL for a GitHub-hosted document."""
+    owner, repo = _github_repository(source)
     return f"https://raw.githubusercontent.com/{owner}/{repo}/{source.revision}/{document.path}"
 
 
+def _list_github_files(source: AcquisitionSource) -> list[str]:
+    """Return every file path in a GitHub repository at the source revision."""
+    owner, repo = _github_repository(source)
+    url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{source.revision}?recursive=1"
+    headers = {"Accept": "application/vnd.github+json"}
+    if token := os.environ.get("GITHUB_TOKEN"):
+        headers["Authorization"] = f"Bearer {token}"
+    tree = json.loads(_fetch(url, headers=headers))
+    if tree.get("truncated"):
+        raise CurationValidationError(f"truncated repository file listing for {source.id}")
+
+    return [item["path"] for item in tree["tree"] if item["type"] == "blob"]
+
+
 def _acquire(
-    scope: SourceScope, scope_file: Path, root: Path, fetch: Fetcher, sleep: Callable[[float], None]
+    scope: SourceScope,
+    scope_file: Path,
+    root: Path,
+    fetch: Fetcher,
+    sleep: Callable[[float], None],
+    patterns: dict[str, str],
 ) -> AcquisitionRecord:
     """Download every selected document unchanged and record its provenance."""
     documents = []
@@ -393,6 +465,7 @@ def _acquire(
                     redistribution=source.redistribution,
                     lines=document.lines,
                     notes=document.notes,
+                    pattern=patterns.get(document.id),
                     raw_path=raw_path.as_posix(),
                     byte_length=len(body),
                     sha256=_sha256(body),
@@ -402,17 +475,16 @@ def _acquire(
                 )
             )
     record = AcquisitionRecord(scope_sha256=_sha256(scope_file.read_bytes()), documents=documents)
-    (root / "acquisition.json").write_text(
-        record.model_dump_json(indent=2) + "\n", encoding="utf-8"
-    )
 
     return record
 
 
-def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> None:
-    """Write verbatim Markdown inputs and the strict capture manifest."""
+def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> list[str]:
+    """Write verbatim Markdown inputs and the capture manifest; return unresolved includes."""
     sources = {source.id: source for source in scope.sources}
+    acquired = {(document.source_id, document.path) for document in record.documents}
     manifest = SourceManifest()
+    unresolved = []
     for document in record.documents:
         if not document.captured:
             continue
@@ -427,6 +499,9 @@ def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> None:
         prepared.parent.mkdir(parents=True, exist_ok=True)
         excerpts = _excerpts(document, text)
         prepared.write_text(_markdown(title, document, excerpts), encoding="utf-8", newline="\n")
+        for target in _RST_INCLUDE.findall(text):
+            if not _include_acquired(document, target, acquired):
+                unresolved.append(f"{document.id}: {target}")
         manifest.sources.append(
             ApprovedSource(
                 id=document.id,
@@ -441,6 +516,32 @@ def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> None:
     (root / "capture-manifest.json").write_text(
         manifest.model_dump_json(indent=2, exclude_none=True) + "\n", encoding="utf-8"
     )
+
+    return unresolved
+
+
+def _include_acquired(
+    document: AcquiredDocument, target: str, acquired: set[tuple[str, str]]
+) -> bool:
+    """Return whether an RST include target was acquired from the same source.
+
+    Relative targets resolve against the including file; Sphinx root-relative
+    targets (leading ``/``) match any acquired path that ends with them.
+    """
+    if target.startswith("/"):
+        suffix = target.lstrip("/")
+        return any(
+            source == document.source_id and path.endswith(suffix) for source, path in acquired
+        )
+    parts: list[str] = []
+    for part in PurePosixPath(document.path).parent.joinpath(target).parts:
+        if part == "..":
+            if parts:
+                parts.pop()
+        elif part != ".":
+            parts.append(part)
+
+    return (document.source_id, "/".join(parts)) in acquired
 
 
 def _excerpts(document: AcquiredDocument, text: str) -> list[tuple[str | None, str]]:
@@ -500,6 +601,7 @@ def _markdown(
 def _fetch(
     url: str,
     *,
+    headers: dict[str, str] | None = None,
     get: Callable[..., httpx.Response] = httpx.get,
     sleep: Callable[[float], None] = time.sleep,
     attempts: int = 3,
@@ -507,7 +609,7 @@ def _fetch(
     """Return the body of a successful GET, retrying transport and server errors."""
     for attempt in range(1, attempts + 1):
         try:
-            response = get(url, timeout=60.0)
+            response = get(url, timeout=60.0, headers=headers)
             response.raise_for_status()
             return response.content
         except httpx.HTTPStatusError as error:

@@ -48,7 +48,13 @@ class ScopeDocument(BaseModel):
 
 
 class AcquisitionSource(BaseModel):
-    """An approved repository at one pinned revision, not a local capture input."""
+    """An approved repository at one pinned revision, not a local capture input.
+
+    ``include`` and ``exclude`` are repository-relative glob patterns, matched with
+    :meth:`pathlib.PurePath.full_match`, that select additional documents from the
+    repository's file listing at ``revision``. Explicit ``documents`` keep their
+    IDs, notes, and line selections when a pattern matches the same path.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -61,7 +67,9 @@ class AcquisitionSource(BaseModel):
     release: str
     redistribution: str
     license_url: str | None = None
-    documents: list[ScopeDocument]
+    include: list[str] = Field(default_factory=list)
+    exclude: list[str] = Field(default_factory=list)
+    documents: list[ScopeDocument] = Field(default_factory=list)
 
     def document_url(self, document: ScopeDocument) -> str:
         """Return the pinned repository URL of a selected document."""
@@ -72,6 +80,25 @@ class AcquisitionSource(BaseModel):
         """Return the explicit license URL or the first license document's URL."""
         licenses = [document for document in self.documents if document.role == "license"]
         return self.license_url or (self.document_url(licenses[0]) if licenses else None)
+
+
+def pattern_document_id(source_id: str, path: str) -> str:
+    """Return the stable document ID for a pattern-selected repository file.
+
+    Parameters
+    ----------
+    source_id : str
+        ID of the source that selected the file.
+    path : str
+        Repository-relative file path.
+
+    Returns
+    -------
+    str
+        ``<source_id>.<path>`` with ``/`` replaced by ``.`` and other characters
+        outside ``[A-Za-z0-9_.-]`` replaced by ``-``.
+    """
+    return re.sub(r"[^A-Za-z0-9_.-]", "-", f"{source_id}.{path.replace('/', '.')}")
 
 
 class SourceScope(BaseModel):
@@ -357,10 +384,15 @@ def _source_scope_failures(scope: SourceScope) -> list[str]:
                 failures.append(f"invalid {field} for {source.id}")
         if _is_unpinned_revision(source.revision):
             failures.append(f"unpinned revision for {source.id}")
-        if not source.documents:
+        if not source.documents and not source.include:
             failures.append(f"no selected documents for {source.id}")
-        elif source.license_reference is None:
+        if source.license_reference is None:
             failures.append(f"missing license document or license_url for {source.id}")
+        if source.exclude and not source.include:
+            failures.append(f"exclude patterns without include patterns for {source.id}")
+        for pattern in source.include + source.exclude:
+            if not _is_safe_pattern(pattern):
+                failures.append(f"invalid path pattern for {source.id}: {pattern!r}")
         paths = [document.path for document in source.documents]
         if len(paths) != len(set(paths)):
             failures.append(f"duplicate document paths for {source.id}")
@@ -392,6 +424,18 @@ def _is_safe_path(value: str) -> bool:
         and not path.is_absolute()
         and "" not in value.split("/")
         and not any(part in {"", ".", ".."} for part in path.parts)
+    )
+
+
+def _is_safe_pattern(value: str) -> bool:
+    """Accept a nonempty repository-relative glob without traversal components."""
+    path = Path(value)
+    return bool(
+        value.strip()
+        and not any(character in value for character in "\\\x00")
+        and not path.is_absolute()
+        and "" not in value.split("/")
+        and not any(part in {".", ".."} for part in path.parts)
     )
 
 

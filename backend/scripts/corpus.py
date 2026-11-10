@@ -13,6 +13,7 @@ which expected documents each representative question retrieves and cites, and
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from e3sm_ai_platform.application.corpus_coverage import measure_coverage
@@ -95,6 +96,10 @@ def main() -> int:
         if args.command == "curate":
             snapshot = curate(args.scope, args.output, overwrite=args.overwrite)
             print(f"captured {len(snapshot.records)} documents in {args.output}")
+            record = json.loads((args.output / "acquisition.json").read_text(encoding="utf-8"))
+            if unresolved := record["unresolved_includes"]:
+                print(f"{len(unresolved)} RST includes point to files outside the corpus:")
+                print("\n".join(f"  {item}" for item in unresolved))
         elif args.command == "verify-build":
             failures = verify_build(args.root)
             if failures:

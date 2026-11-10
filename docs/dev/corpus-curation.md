@@ -23,7 +23,18 @@ and a list of sources. Each source is one repository at one pinned revision:
   `notes` for caveats about misleading or unverified upstream content. `lines`
   lists ascending, non-overlapping inclusive 1-based ranges, such as
   `[[14, 21], [19685, 21956]]`, to capture only part of a very large file.
+- `include` and `exclude`: optional glob patterns, such as `docs/**/*.md`, that
+  select more files from the repository at `revision`. Patterns match with
+  `pathlib.PurePath.full_match`, so `**` spans directories.
 - `license_url`: only when no document has the `license` role.
+
+`curate` lists each patterned repository once through the GitHub tree API at the
+pinned commit, so the selection is reproducible; set `GITHUB_TOKEN` to avoid the
+unauthenticated API rate limit. Pattern-selected files get IDs of the form
+`<source>.<path>` with `/` replaced by `.`, for example
+`cime.doc.source.ccs.timers.rst`. An explicit document with the same path keeps
+its ID, `lines`, and `notes`; list a file explicitly to attach caveat notes.
+`acquisition.json` records the pattern that selected each file.
 
 Document URLs are derived as `<repository_url>/blob/<revision>/<path>`, and the
 license reference is the first `license` document's URL. Which questions use each
@@ -94,7 +105,9 @@ the upstream text; each selected range is labeled and kept verbatim:
 - Documents with the `license` role are kept as raw companions and are not
   captured as content.
 - Includes are not resolved. Select each needed file, such as an included
-  configuration, as its own document.
+  configuration, as its own document. `curate` lists RST `include` and
+  `literalinclude` targets that were not acquired from the same source, and
+  `acquisition.json` records them as `unresolved_includes`.
 
 Capture normalizes CRLF/CR to LF, removes trailing spaces and tabs on each line,
 and writes one final newline. Leading indentation and internal whitespace remain
