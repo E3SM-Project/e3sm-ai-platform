@@ -5,7 +5,8 @@
 scope at its pinned revision and builds a validated local corpus; it is the only
 command that uses the network.  ``capture`` and ``refresh`` instead require a
 separate pinned local capture manifest with local Markdown content.  ``package``
-archives an approved build locally without uploading it.
+archives an approved build locally without uploading it.  ``coverage`` reports
+which expected documents each representative question retrieves and cites.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from e3sm_ai_platform.application.corpus_coverage import measure_coverage
 from e3sm_ai_platform.knowledge.corpus_build import curate, package, verify_build
 from e3sm_ai_platform.knowledge.curation import (
     CurationValidationError,
@@ -71,6 +73,12 @@ def main() -> int:
     package_parser.add_argument("root", type=Path, help="build directory from curate")
     package_parser.add_argument("output", type=Path, help="directory for the archive")
     package_parser.add_argument("--version", required=True, help="release label")
+    coverage_parser = commands.add_parser(
+        "coverage", help="report expected documents retrieved and cited per question"
+    )
+    coverage_parser.add_argument("root", type=Path, help="build directory from curate")
+    coverage_parser.add_argument("questions", type=Path, help="question set JSON")
+    coverage_parser.add_argument("--output", type=Path, help="write the JSON report here")
     args = parser.parse_args()
     try:
         if args.command == "curate":
@@ -80,6 +88,8 @@ def main() -> int:
             failures = verify_build(args.root)
             if failures:
                 parser.error("; ".join(failures))
+        elif args.command == "coverage":
+            _print_coverage(measure_coverage(args.root, args.questions), args.output)
         elif args.command == "package":
             print(package(args.root, args.output, args.version))
         elif args.command == "capture":
@@ -97,6 +107,24 @@ def main() -> int:
     except CurationValidationError as error:
         parser.error(str(error))
     return 0
+
+
+def _print_coverage(report, output: Path | None) -> None:
+    """Print a per-question coverage table and optionally save the JSON report."""
+    print(f"{'question':38} {'expected':>8} {'retrieved':>9} {'cited':>5}  route")
+    for item in report.questions:
+        print(
+            f"{item.id:38} {len(item.expected):>8} {len(item.expected_retrieved):>9} "
+            f"{len(item.expected_cited):>5}  {item.route}"
+        )
+    print(
+        f"expected documents retrieved: {report.expected_retrieved_total}/{report.expected_total}; "
+        f"questions citing an expected document: {report.questions_citing_expected}/"
+        f"{len(report.questions)}"
+    )
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ snapshot, normalization, and reviewer approval.
 ```text
 corpus/
   sources.json          # human-owned approved scope (tracked)
+  questions.json        # representative questions and expected documents (tracked)
   local/                # git-ignored; not a backup
     corpus/             # make corpus-curate output
       acquisition.json  # provenance and hashes for every acquired file
@@ -20,6 +21,7 @@ corpus/
       prepared/         # verbatim Markdown inputs
       capture-manifest.json
       captured/         # content, snapshot, catalog, review
+    coverage.json       # make corpus-coverage report
     release/            # make corpus-package output (approved builds only)
 ```
 

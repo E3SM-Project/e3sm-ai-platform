@@ -30,17 +30,16 @@ downloads; the hand-converted Markdown is not used.
 
 ## Coverage method
 
-A local script (`corpus/local/coverage/coverage.py`, git-ignored) runs each
-question through the application's own chunking, lexical retrieval, routing, and
+`make corpus-coverage` runs each question in [`corpus/questions.json`][question-set]
+through the application's own chunking, lexical retrieval, routing, and
 deterministic generation with default settings: no model provider and no network.
-It compares two corpora:
-
-- **New:** the 65 captured documents, one corpus entry per document.
-- **Shipped:** the packaged 31-entry `curated_corpus.json`.
+It uses one corpus entry per captured document. The shipped-corpus column below
+came from a one-off local comparison against the packaged 31-entry
+`curated_corpus.json`; the command reports only the build.
 
 Expected documents for each question are the selected documents linked from that
-question's section of the [source mapping][mapping], matched by pinned URL; 81
-question–document pairs in total. “Top 8” counts distinct documents among the
+question's section of the [source mapping][mapping], matched by pinned URL and
+recorded in `corpus/questions.json`; 81 question–document pairs in total. “Top 8” counts distinct documents among the
 eight highest-ranked chunks. Citations come from the default top-4 answer.
 
 This measures whether retrieval surfaces the mapped evidence. It does not judge
@@ -101,8 +100,8 @@ more documents would not fix them and could add noise.
   renaming existing citation IDs.
 - [ ] Structure-aware chunking that respects headings and fenced blocks, and
   section selection or splitting for very large files (#30).
-- [ ] Retrieval evaluation against these questions with judged answers (#21).
-  The coverage script could become a repository command if useful.
+- [ ] Retrieval evaluation against these questions with judged answers (#21),
+  building on `corpus/questions.json` and `make corpus-coverage`.
 - [ ] Publication terms: NCO's GFDL documentation license and E3SM Data Docs'
   unstated documentation terms ([source mapping][scope-approval]).
 - [ ] Machine settings for Chrysalis LCRC and Perlmutter CPU remain unverified;
@@ -113,8 +112,7 @@ more documents would not fix them and could add noise.
 ```bash
 make corpus-curate
 make corpus-validate
-uv run --package e3sm-ai-platform-backend python -I corpus/local/coverage/coverage.py \
-    corpus/local/corpus docs/github-issues/20-corpus corpus/local/coverage
+make corpus-coverage
 ```
 
 A second independent build produced identical raw files, capture manifest,
@@ -124,5 +122,6 @@ captured content, and snapshot; only `acquisition.json` timestamps differ.
 [mapping]: 3-source-mapping.md
 [scope-approval]: 3-source-mapping.md#approved-18-question-scope
 [pilot]: 5-capture-pilot.md
+[question-set]: ../../../corpus/questions.json
 [scope]: ../../../corpus/sources.json
 [workflow]: ../../dev/corpus-curation.md

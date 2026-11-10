@@ -24,9 +24,12 @@ Run from the repository root; `make help` lists the targets.
    Timeouts and server errors are retried up to three times; other failures stop
    the build and leave the previous build unchanged.
 2. **Validate:** `make corpus-validate` rechecks the scope and the build offline.
-3. **Review:** an authorized reviewer checks the build and records approval in
+3. **Coverage:** `make corpus-coverage` runs the questions in
+   [`corpus/questions.json`](../../corpus/questions.json) against the build and
+   reports which expected documents each one retrieves and cites.
+4. **Review:** an authorized reviewer checks the build and records approval in
    `captured/review.json`. Never set approval as part of curation.
-4. **Package:** `make corpus-package VERSION=<label>` archives an approved build
+5. **Package:** `make corpus-package VERSION=<label>` archives an approved build
    locally. It refuses unapproved builds and never uploads anything.
 
 `capture` and `refresh` remain available for hand-prepared local manifests; they
@@ -112,6 +115,22 @@ the hash-bound snapshot; `validate --require-approved` rejects it until then.
 archive is deterministic for identical inputs. Publishing it requires separate
 authorization; GitHub Release automation and JSONL migration are deferred.
 
+## Question coverage
+
+`corpus/questions.json` lists each representative question and the selected
+documents that should support it, following the
+[source mapping](../github-issues/20-corpus/3-source-mapping.md). Update it with
+the mapping; tests check that every expected document is a selected,
+non-license document in the scope.
+
+`coverage` loads one corpus entry per captured document and answers each question
+with the application's chunking, lexical retrieval, routing, and deterministic
+generation, using default settings, no provider, and no network. Per question,
+it reports the expected documents among the distinct documents in the top eight
+chunks and among the top-four answer's citations. `make corpus-coverage` prints
+a table and writes `corpus/local/coverage.json`. The report has no pass/fail
+threshold and does not judge answer quality; retrieval evaluation belongs to #21.
+
 Keep the packaged runtime corpus format, a JSON array in `curated_corpus.json`,
 unchanged. The CLI does not export runtime entries; runtime integration needs
 separate work.
@@ -125,12 +144,14 @@ examples.
 # Build, validate, and (after approval) package the local corpus.
 make corpus-curate
 make corpus-validate
+make corpus-coverage
 make corpus-package VERSION=0.1.0
 
 # Underlying CLI commands.
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py validate-sources corpus/sources.json
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py curate corpus/sources.json corpus/local/corpus --overwrite
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py verify-build corpus/local/corpus
+uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py coverage corpus/local/corpus corpus/questions.json --output corpus/local/coverage.json
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py validate corpus/local/corpus/captured --require-approved
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py package corpus/local/corpus corpus/local/release --version 0.1.0
 
