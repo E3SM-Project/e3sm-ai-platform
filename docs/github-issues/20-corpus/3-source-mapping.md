@@ -447,8 +447,9 @@ not by question; this mapping records which documents each question needs.
 - **NCO** is not an E3SM project. Its manual specifies GFDL-1.3-or-later and
   `doc/LICENSE` contains a GPL notice. Local capture is approved; publication
   must comply with the applicable documentation license and retain notices.
-- **Whole files:** the NCO manual and EAM namelist definitions are selected whole,
-  not as sections. Retrieval coverage checks decide whether they need trimming.
+- **Line selections:** after the coverage check, the NCO manual captures only its
+  copyright and GFDL notice and `ncclimo` section, and the EAM namelist definitions
+  only their attribute header and history-output entries. Raw files stay whole.
 - The site's `license_url` now pins the snapshot revision instead of `master`.
 
 Selection still does not establish capture fidelity, review approval, execution

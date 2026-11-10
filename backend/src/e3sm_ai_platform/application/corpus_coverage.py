@@ -11,16 +11,16 @@ not judge answer quality or set pass/fail thresholds.
 from __future__ import annotations
 
 import hashlib
-import json
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict
 
 from e3sm_ai_platform.application.generation import generate_response
 from e3sm_ai_platform.application.service import CompassService
-from e3sm_ai_platform.domain.models import CorpusEntry, QueryRequest
+from e3sm_ai_platform.domain.models import QueryRequest
 from e3sm_ai_platform.infrastructure.settings import Settings
 from e3sm_ai_platform.knowledge.corpus import chunk_corpus
+from e3sm_ai_platform.knowledge.corpus_build import runtime_entries
 from e3sm_ai_platform.knowledge.curation import SCHEMA_VERSION, CurationValidationError
 from e3sm_ai_platform.knowledge.retrieval import InMemoryVectorStore, build_retriever
 
@@ -130,7 +130,7 @@ def measure_coverage(build_root: Path | str, questions_path: Path | str) -> Cove
     """
     root = Path(build_root)
     questions = load_questions(questions_path)
-    entries = _build_entries(root)
+    entries = runtime_entries(root)
     known = {entry.source_id for entry in entries}
     missing = sorted(
         {doc for question in questions.questions for doc in question.expected_documents} - known
@@ -152,30 +152,6 @@ def measure_coverage(build_root: Path | str, questions_path: Path | str) -> Cove
     )
 
     return report
-
-
-def _build_entries(root: Path) -> list[CorpusEntry]:
-    """Return one corpus entry per captured document in a build."""
-    try:
-        snapshot = json.loads((root / "captured" / "snapshot.json").read_text(encoding="utf-8"))
-        acquisition = json.loads((root / "acquisition.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError) as error:
-        raise CurationValidationError(f"invalid corpus build: {error}") from error
-    documents = {document["id"]: document for document in acquisition["documents"]}
-
-    return [
-        CorpusEntry(
-            source_id=record["id"],
-            title=record["title"] or record["id"],
-            url=record["url"],
-            section=documents[record["id"]]["path"],
-            component=documents[record["id"]]["source_id"],
-            version=record["revision"],
-            provenance="local corpus build; unreviewed",
-            text=(root / "captured" / record["content_path"]).read_text(encoding="utf-8"),
-        )
-        for record in snapshot["records"]
-    ]
 
 
 def _measure(

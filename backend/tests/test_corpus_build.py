@@ -7,7 +7,14 @@ import tarfile
 import httpx
 import pytest
 
-from e3sm_ai_platform.knowledge.corpus_build import _fetch, curate, package, verify_build
+from e3sm_ai_platform.knowledge.corpus import load_corpus
+from e3sm_ai_platform.knowledge.corpus_build import (
+    _fetch,
+    curate,
+    export_runtime_corpus,
+    package,
+    verify_build,
+)
 from e3sm_ai_platform.knowledge.curation import CurationValidationError, validate_corpus
 
 REVISION = "0123456789abcdef0123456789abcdef01234567"
@@ -184,3 +191,54 @@ def test_fetch_retries_transient_failures_only():
     with pytest.raises(CurationValidationError, match="503"):
         _fetch("https://example.test/file", get=status(503), sleep=lambda _: None)
     assert len(calls) == 3
+
+
+def test_export_runtime_corpus_loads_with_review_state_in_provenance(tmp_path):
+    """Exports use the runtime JSON-array format and record review approval."""
+    root = tmp_path / "build"
+    curate(_scope(tmp_path), root, fetch=FILES.__getitem__, sleep=lambda _: None)
+    output = tmp_path / "runtime" / "corpus.json"
+
+    assert export_runtime_corpus(root, output) == 2
+    entries = load_corpus(output)
+    assert [entry.source_id for entry in entries] == ["guide", "run"]
+    assert entries[1].section == "docs/run.rst"
+    assert entries[1].version == "1.0"
+    assert entries[1].provenance.endswith("review not approved.")
+    _approve(root)
+    export_runtime_corpus(root, output)
+    assert load_corpus(output)[0].provenance.endswith("review approved.")
+
+    (root / "captured/content/run.md").write_text("tampered\n", encoding="utf-8")
+    with pytest.raises(CurationValidationError, match="content hash mismatch"):
+        export_runtime_corpus(root, output)
+
+
+def test_curate_captures_only_selected_line_ranges(tmp_path):
+    """Line selections capture verbatim ranges, keep raw files whole, and are validated."""
+    scope_path = _scope(tmp_path)
+    scope = json.loads(scope_path.read_text())
+    scope["sources"][0]["documents"][1]["lines"] = [[1, 2], [6, 6]]
+    scope_path.write_text(json.dumps(scope), encoding="utf-8")
+    root = tmp_path / "build"
+
+    curate(scope_path, root, fetch=FILES.__getitem__, sleep=lambda _: None)
+
+    run = (root / "captured/content/run.md").read_text()
+    assert "Selected Lines 1–2, Lines 6–6 of the file" in run
+    assert "Lines 1–2:\n\n```rst\nRun\n===\n```" in run
+    assert "Lines 6–6:\n\n```rst\n    ./case.submit\n```" in run
+    assert "code-block" not in run
+    assert (root / "raw/docs" / REVISION / "docs/run.rst").read_bytes() == FILES[
+        f"{RAW}/docs/run.rst"
+    ]
+    assert verify_build(root) == []
+
+    for lines, message in (
+        ([[1, 99]], "line range beyond 8 lines"),
+        ([[3, 1]], "invalid line ranges"),
+    ):
+        scope["sources"][0]["documents"][1]["lines"] = lines
+        scope_path.write_text(json.dumps(scope), encoding="utf-8")
+        with pytest.raises(CurationValidationError, match=message):
+            curate(scope_path, tmp_path / "bad", fetch=FILES.__getitem__, sleep=lambda _: None)

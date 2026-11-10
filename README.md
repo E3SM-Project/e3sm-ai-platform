@@ -125,6 +125,7 @@ See [Architecture](docs/dev/architecture.md) for routing, ingestion, retrieval s
 | Build the local corpus from `corpus/sources.json` (uses the network) | `make corpus-curate`                                                 |
 | Validate the local corpus build offline                              | `make corpus-validate`                                               |
 | Report representative-question coverage of the local corpus          | `make corpus-coverage`                                               |
+| Export the local corpus for `CORPUS_PATH` in `backend/.env`          | `make corpus-export`                                                 |
 | Archive an approved local corpus build                               | `make corpus-package VERSION=<label>`                                |
 | Start the local tracing stack                                        | `make observability-up`                                              |
 | Check tracing stack status                                           | `make observability-status`                                          |

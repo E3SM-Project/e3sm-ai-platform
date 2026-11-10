@@ -6,7 +6,8 @@ scope at its pinned revision and builds a validated local corpus; it is the only
 command that uses the network.  ``capture`` and ``refresh`` instead require a
 separate pinned local capture manifest with local Markdown content.  ``package``
 archives an approved build locally without uploading it.  ``coverage`` reports
-which expected documents each representative question retrieves and cites.
+which expected documents each representative question retrieves and cites, and
+``export`` writes a build as a runtime corpus JSON array for ``CORPUS_PATH``.
 """
 
 from __future__ import annotations
@@ -15,7 +16,12 @@ import argparse
 from pathlib import Path
 
 from e3sm_ai_platform.application.corpus_coverage import measure_coverage
-from e3sm_ai_platform.knowledge.corpus_build import curate, package, verify_build
+from e3sm_ai_platform.knowledge.corpus_build import (
+    curate,
+    export_runtime_corpus,
+    package,
+    verify_build,
+)
 from e3sm_ai_platform.knowledge.curation import (
     CurationValidationError,
     capture,
@@ -73,6 +79,11 @@ def main() -> int:
     package_parser.add_argument("root", type=Path, help="build directory from curate")
     package_parser.add_argument("output", type=Path, help="directory for the archive")
     package_parser.add_argument("--version", required=True, help="release label")
+    export_parser = commands.add_parser(
+        "export", help="write a build as a runtime corpus JSON array for CORPUS_PATH"
+    )
+    export_parser.add_argument("root", type=Path, help="build directory from curate")
+    export_parser.add_argument("output", type=Path, help="runtime corpus JSON file")
     coverage_parser = commands.add_parser(
         "coverage", help="report expected documents retrieved and cited per question"
     )
@@ -88,6 +99,9 @@ def main() -> int:
             failures = verify_build(args.root)
             if failures:
                 parser.error("; ".join(failures))
+        elif args.command == "export":
+            count = export_runtime_corpus(args.root, args.output)
+            print(f"exported {count} entries; set CORPUS_PATH={args.output.resolve()}")
         elif args.command == "coverage":
             _print_coverage(measure_coverage(args.root, args.questions), args.output)
         elif args.command == "package":

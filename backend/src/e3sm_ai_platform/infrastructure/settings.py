@@ -42,6 +42,7 @@ class Settings:
     deployment_environment: str = "development"
     otlp_endpoint: str | None = None
     otlp_headers: tuple[tuple[str, str], ...] = ()
+    corpus_path: str | None = None
     retrieval_mode: str = "lexical"
     embedding_model: str = DEFAULT_EMBEDDING_MODEL
     retrieval_lexical_min_coverage: float = 0.18
@@ -185,6 +186,7 @@ def load_settings(load_dotenv_file: bool = True) -> Settings:
         deployment_environment=os.getenv("DEPLOYMENT_ENVIRONMENT", "development"),
         otlp_endpoint=os.getenv("OTLP_ENDPOINT") or None,
         otlp_headers=headers,
+        corpus_path=os.getenv("CORPUS_PATH") or None,
         retrieval_mode=os.getenv("RETRIEVAL_MODE", "lexical").lower(),
         embedding_model=os.getenv("EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL),
         retrieval_lexical_min_coverage=float(os.getenv("RETRIEVAL_LEXICAL_MIN_COVERAGE", "0.18")),

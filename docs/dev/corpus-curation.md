@@ -19,8 +19,10 @@ and a list of sources. Each source is one repository at one pinned revision:
 - `release`: a human-readable label, such as `v3.1.0` or a cohort name.
 - `redistribution`: the terms recorded as each captured document's policy.
 - `documents`: each has a unique `id`, a repository-relative `path`, an optional
-  `role` (`license` marks a raw-only companion), and optional `notes` for caveats
-  about misleading or unverified upstream content.
+  `role` (`license` marks a raw-only companion), optional `lines`, and optional
+  `notes` for caveats about misleading or unverified upstream content. `lines`
+  lists ascending, non-overlapping inclusive 1-based ranges, such as
+  `[[14, 21], [19685, 21956]]`, to capture only part of a very large file.
 - `license_url`: only when no document has the `license` role.
 
 Document URLs are derived as `<repository_url>/blob/<revision>/<path>`, and the
@@ -44,6 +46,8 @@ Run from the repository root; `make help` lists the targets.
 3. **Coverage:** `make corpus-coverage` runs the questions in
    [`corpus/questions.json`](../../corpus/questions.json) against the build and
    reports which expected documents each one retrieves and cites.
+   Optionally, `make corpus-export` writes the build for the backend's
+   `CORPUS_PATH` ([runtime use](#runtime-use)).
 4. **Review:** an authorized reviewer checks the build and records approval in
    `captured/review.json`. Never set approval as part of curation.
 5. **Package:** `make corpus-package VERSION=<label>` archives an approved build
@@ -75,10 +79,12 @@ the files. A Git blob hash is not a raw SHA-256 or a package artifact hash.
 
 ## Preparation
 
-Curation keeps upstream text verbatim; it does not convert formats or select
-sections; the whole file is captured even when only part of it answers a question.
-Each prepared document starts with a title and a provenance line
-(source URL, revision, owner, and license), followed by the upstream text:
+Curation keeps upstream text verbatim; it does not convert formats. It captures
+whole files unless a document selects `lines`; use that only for very large files
+whose unrelated content adds retrieval noise, and include any license notice the
+excerpt must carry. Each prepared document starts with a title and a provenance
+line (source URL, revision, owner, license, and any selected ranges), followed by
+the upstream text; each selected range is labeled and kept verbatim:
 
 - Markdown files are used as-is.
 - Other formats, including RST, Texinfo, XML, YAML, configuration, and scripts,
@@ -116,7 +122,8 @@ repositories. `verify-build`,
 run by `curate` and `corpus-validate`, checks offline that:
 
 - raw byte lengths and SHA-256 values match `acquisition.json`;
-- each captured document contains its normalized raw text unchanged;
+- each captured document contains its normalized raw text, or each selected
+  line range, unchanged;
 - capture artifacts pass `validate`: record metadata, safe content paths,
   normalized hashes, duplicate records, catalog consistency, and the hash-bound
   review artifact.
@@ -149,9 +156,19 @@ chunks and among the top-four answer's citations. `make corpus-coverage` prints
 a table and writes `corpus/local/coverage.json`. The report has no pass/fail
 threshold and does not judge answer quality; retrieval evaluation belongs to #21.
 
-Keep the packaged runtime corpus format, a JSON array in `curated_corpus.json`,
-unchanged. The CLI does not export runtime entries; runtime integration needs
-separate work.
+## Runtime use
+
+The backend uses the packaged `curated_corpus.json` unless `CORPUS_PATH` names
+another runtime corpus. `make corpus-export` verifies the build and writes
+`corpus/local/runtime-corpus.json` in the same JSON-array format, one entry per
+captured document; the packaged corpus is never modified. Set `CORPUS_PATH` to
+that file's absolute path in `backend/.env` to try the build in the API and UI.
+Each entry's provenance states its pinned revision and whether review is
+approved; exporting does not approve anything.
+
+The evaluation adapter always uses the packaged corpus because its fixtures cite
+packaged source IDs. Replacing the packaged corpus is a separate decision that
+requires review approval and updated evaluation fixtures.
 
 ## Commands
 
@@ -163,6 +180,7 @@ examples.
 make corpus-curate
 make corpus-validate
 make corpus-coverage
+make corpus-export
 make corpus-package VERSION=0.1.0
 
 # Underlying CLI commands.
@@ -170,6 +188,7 @@ uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py valid
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py curate corpus/sources.json corpus/local/corpus --overwrite
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py verify-build corpus/local/corpus
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py coverage corpus/local/corpus corpus/questions.json --output corpus/local/coverage.json
+uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py export corpus/local/corpus corpus/local/runtime-corpus.json
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py validate corpus/local/corpus/captured --require-approved
 uv run --package e3sm-ai-platform-backend python backend/scripts/corpus.py package corpus/local/corpus corpus/local/release --version 0.1.0
 

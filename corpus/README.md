@@ -23,6 +23,7 @@ corpus/
       capture-manifest.json
       captured/         # content, snapshot, catalog, review
     coverage.json       # make corpus-coverage report
+    runtime-corpus.json # make corpus-export output for CORPUS_PATH
     release/            # make corpus-package output (approved builds only)
 ```
 

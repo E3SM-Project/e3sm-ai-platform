@@ -28,7 +28,7 @@
         {"id": "e3sm-coupled-compsets", "path": "cime_config/allactive/config_compsets.xml", "notes": "Legacy V1 BGC aliases do not establish v3 validation or support."},
         {"id": "e3sm-eam-user-guide", "path": "components/eam/docs/user-guide/index.md", "notes": "Prose repeats A where namelist definitions specify I for instantaneous."},
         {"id": "e3sm-eam-compsets", "path": "components/eam/cime_config/config_compsets.xml", "notes": "XML entries are not scientific validation."},
-        {"id": "e3sm-eam-namelist-definitions", "path": "components/eam/bld/namelist_files/namelist_definition.xml"},
+        {"id": "e3sm-eam-namelist-definitions", "path": "components/eam/bld/namelist_files/namelist_definition.xml", "lines": [[1, 53], [1557, 2115]], "notes": "Attribute header and History and Initial Conditions Output entries only."},
         {"id": "e3sm-license", "path": "LICENSE", "role": "license"}
       ]
     },
@@ -246,7 +246,7 @@
       "release": "5.3.9, Unified non-hpc cohort",
       "redistribution": "Software BSD-3-Clause; the manual header specifies GFDL-1.3-or-later and doc/LICENSE contains a GPL notice. Not an E3SM-owned project: local capture approved 2026-11-10; publication requires compliance with the applicable documentation license and retained notices.",
       "documents": [
-        {"id": "nco-manual", "path": "doc/nco.texi", "notes": "Whole 1.4 MB manual; resolved hpc NCO unverified."},
+        {"id": "nco-manual", "path": "doc/nco.texi", "lines": [[14, 21], [19685, 21956]], "notes": "Copyright and GFDL notice plus the ncclimo section only; resolved hpc NCO unverified."},
         {"id": "nco-ncclimo", "path": "data/ncclimo", "notes": "Do not execute."},
         {"id": "nco-license", "path": "LICENSE", "role": "license"},
         {"id": "nco-doc-license", "path": "doc/LICENSE", "role": "license"}

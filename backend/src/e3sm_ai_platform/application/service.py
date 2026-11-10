@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Protocol
 
 from opentelemetry import trace
@@ -55,7 +56,8 @@ class CompassService:
         settings: Settings | None = None,
     ) -> None:
         self.settings = settings or load_settings()
-        self.entries = load_corpus()
+        corpus_path = self.settings.corpus_path
+        self.entries = load_corpus(Path(corpus_path) if corpus_path else None)
         self.chunks = chunk_corpus(self.entries)
         self.store = retriever or build_retriever(self.settings)
         if retriever is None:

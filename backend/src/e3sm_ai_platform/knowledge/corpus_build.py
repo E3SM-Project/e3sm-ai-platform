@@ -6,8 +6,9 @@ input per document, and captures and validates the result with
 :mod:`e3sm_ai_platform.knowledge.curation`. Upstream text is kept verbatim:
 Markdown files are used as-is and other formats are fenced under a provenance
 header, so fidelity is checked mechanically. Documents with the ``license`` role
-are kept as raw companions, not captured as content. :func:`package` turns an approved
-build into a deterministic archive and checksum; it never uploads anything.
+are kept as raw companions, not captured as content. :func:`export_runtime_corpus`
+writes a build in the runtime JSON-array format, and :func:`package` turns an
+approved build into a deterministic archive and checksum; neither uploads anything.
 
 Build layout::
 
@@ -25,6 +26,7 @@ import datetime
 import gzip
 import hashlib
 import io
+import json
 import re
 import shutil
 import tarfile
@@ -36,6 +38,7 @@ from urllib.parse import urlparse
 import httpx
 from pydantic import BaseModel, ConfigDict
 
+from e3sm_ai_platform.domain.models import CorpusEntry
 from e3sm_ai_platform.knowledge.curation import (
     SCHEMA_VERSION,
     AcquisitionSource,
@@ -82,6 +85,7 @@ class AcquiredDocument(BaseModel):
     raw_url: str
     license_url: str
     redistribution: str
+    lines: list[tuple[int, int]] | None = None
     notes: str | None = None
     raw_path: str
     byte_length: int
@@ -204,10 +208,87 @@ def verify_build(root: Path | str) -> list[str]:
         captured = root / "captured" / "content" / f"{document.id}.md"
         if not captured.is_file():
             failures.append(f"missing captured content for {document.id}")
-        elif _normalize_markdown(body).rstrip("\n") not in captured.read_text(encoding="utf-8"):
+            continue
+        content = captured.read_text(encoding="utf-8")
+        try:
+            excerpts = _excerpts(document, body.decode("utf-8"))
+        except (UnicodeDecodeError, CurationValidationError):
+            excerpts = [(None, "\x00")]
+        if any(_normalize_markdown(text).rstrip("\n") not in content for _, text in excerpts):
             failures.append(f"captured content differs from raw text for {document.id}")
 
     return failures
+
+
+def runtime_entries(root: Path | str) -> list[CorpusEntry]:
+    """Return one runtime corpus entry per captured document in a build.
+
+    Parameters
+    ----------
+    root : Path or str
+        Build directory written by :func:`curate`.
+
+    Returns
+    -------
+    list of CorpusEntry
+        Entries in snapshot order. Each entry's provenance states the pinned
+        revision and whether the build's review is approved.
+
+    Raises
+    ------
+    CurationValidationError
+        If the build fails :func:`verify_build`.
+    """
+    root = Path(root)
+    failures = verify_build(root)
+    if failures:
+        raise CurationValidationError("; ".join(failures))
+    record = AcquisitionRecord.model_validate_json((root / "acquisition.json").read_bytes())
+    documents = {document.id: document for document in record.documents}
+    snapshot = Snapshot.model_validate_json((root / "captured" / "snapshot.json").read_bytes())
+    approved = not validate_corpus(root / "captured", require_approved=True)
+    review = "review approved" if approved else "review not approved"
+    entries = []
+    for item in snapshot.records:
+        document = documents[item.id]
+        entries.append(
+            CorpusEntry(
+                source_id=item.id,
+                title=item.title or item.id,
+                url=item.url,
+                section=document.path,
+                component=document.source_id,
+                version=document.release,
+                provenance=f"Verbatim upstream file at revision {item.revision}; {review}.",
+                text=(root / "captured" / item.content_path).read_text(encoding="utf-8"),
+            )
+        )
+
+    return entries
+
+
+def export_runtime_corpus(root: Path | str, output: Path | str) -> int:
+    """Write a build's captured documents as a runtime corpus JSON array.
+
+    Parameters
+    ----------
+    root : Path or str
+        Build directory written by :func:`curate`.
+    output : Path or str
+        JSON file for ``CORPUS_PATH``; the packaged corpus is never modified.
+
+    Returns
+    -------
+    int
+        Number of exported entries.
+    """
+    entries = runtime_entries(root)
+    path = Path(output)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = [entry.model_dump(mode="json") for entry in entries]
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    return len(entries)
 
 
 def package(root: Path | str, output_dir: Path | str, version: str) -> Path:
@@ -310,6 +391,7 @@ def _acquire(
                     raw_url=raw_url,
                     license_url=source.license_reference or "",
                     redistribution=source.redistribution,
+                    lines=document.lines,
                     notes=document.notes,
                     raw_path=raw_path.as_posix(),
                     byte_length=len(body),
@@ -343,7 +425,8 @@ def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> None:
         content_path = f"prepared/{document.id}.md"
         prepared = root / content_path
         prepared.parent.mkdir(parents=True, exist_ok=True)
-        prepared.write_text(_markdown(title, document, text), encoding="utf-8", newline="\n")
+        excerpts = _excerpts(document, text)
+        prepared.write_text(_markdown(title, document, excerpts), encoding="utf-8", newline="\n")
         manifest.sources.append(
             ApprovedSource(
                 id=document.id,
@@ -360,17 +443,37 @@ def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> None:
     )
 
 
-def _markdown(title: str, document: AcquiredDocument, text: str) -> str:
+def _excerpts(document: AcquiredDocument, text: str) -> list[tuple[str | None, str]]:
+    """Return the whole text, or each selected line range with its label."""
+    if document.lines is None:
+        return [(None, text)]
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    if document.lines[-1][1] > len(lines):
+        raise CurationValidationError(f"line range beyond {len(lines)} lines for {document.id}")
+
+    return [
+        (f"Lines {start}–{end}", "\n".join(lines[start - 1 : end]) + "\n")
+        for start, end in document.lines
+    ]
+
+
+def _markdown(
+    title: str, document: AcquiredDocument, excerpts: list[tuple[str | None, str]]
+) -> str:
     """Wrap upstream text under a provenance header, fencing non-Markdown formats."""
+    selection = ""
+    if document.lines is not None:
+        ranges = ", ".join(label for label, _ in excerpts if label)
+        selection = f" Selected {ranges} of the file; the raw file is kept whole."
     header = (
         f"# {title}\n\n"
         f"> Source: <{document.url}> at revision `{document.revision}`. Owner: "
         f"{document.owner}. License: <{document.license_url}>. Verbatim upstream "
-        "text; not reviewed.\n\n"
+        f"text; not reviewed.{selection}\n\n"
     )
     suffixes = Path(document.path).suffixes
-    if suffixes and suffixes[-1].lower() == ".md":
-        return header + text
     language = next(
         (
             _FENCE_LANGUAGES[suffix.lower()]
@@ -379,11 +482,19 @@ def _markdown(title: str, document: AcquiredDocument, text: str) -> str:
         ),
         "text",
     )
-    longest = max((len(run) for run in re.findall(r"`+", text)), default=0)
-    fence = "`" * max(3, longest + 1)
-    body = text.rstrip("\n")
+    is_markdown = bool(suffixes) and suffixes[-1].lower() == ".md"
+    blocks = []
+    for label, text in excerpts:
+        prefix = f"{label}:\n\n" if label else ""
+        if is_markdown:
+            blocks.append(prefix + text)
+            continue
+        longest = max((len(run) for run in re.findall(r"`+", text)), default=0)
+        fence = "`" * max(3, longest + 1)
+        body = text.rstrip("\n")
+        blocks.append(f"{prefix}{fence}{language}\n{body}\n{fence}\n")
 
-    return f"{header}{fence}{language}\n{body}\n{fence}\n"
+    return header + "\n".join(blocks)
 
 
 def _fetch(

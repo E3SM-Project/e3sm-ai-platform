@@ -32,13 +32,18 @@ class CurationValidationError(ValueError):
 
 
 class ScopeDocument(BaseModel):
-    """A selected repository file; license companions are kept raw, not captured."""
+    """A selected repository file; license companions are kept raw, not captured.
+
+    ``lines`` optionally selects inclusive 1-based line ranges to capture from a
+    large file; the raw file is still acquired and kept whole.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     id: str
     path: str
     role: Literal["content", "license"] = "content"
+    lines: list[tuple[int, int]] | None = None
     notes: str | None = None
 
 
@@ -366,6 +371,8 @@ def _source_scope_failures(scope: SourceScope) -> list[str]:
                 failures.append(f"invalid document path for {source.id}: {document.path!r}")
             if document.notes is not None and not document.notes.strip():
                 failures.append(f"blank notes for {source.id}: {document.id}")
+            if document.lines is not None and not _are_ordered_ranges(document.lines):
+                failures.append(f"invalid line ranges for {source.id}: {document.id}")
 
     return failures
 
@@ -386,6 +393,16 @@ def _is_safe_path(value: str) -> bool:
         and "" not in value.split("/")
         and not any(part in {"", ".", ".."} for part in path.parts)
     )
+
+
+def _are_ordered_ranges(ranges: list[tuple[int, int]]) -> bool:
+    """Accept nonempty, positive, ascending, non-overlapping inclusive ranges."""
+    previous_end = 0
+    for start, end in ranges:
+        if start <= previous_end or end < start:
+            return False
+        previous_end = end
+    return bool(ranges)
 
 
 def _is_unpinned_revision(revision: str) -> bool:

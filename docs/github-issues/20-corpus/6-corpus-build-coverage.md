@@ -93,13 +93,30 @@ answer correctness, and the expected sets include some context-only documents.
 These are retrieval and chunking results, not missing-source results. Adding
 more documents would not fix them and could add noise.
 
+## Follow-up: trimming and runtime use
+
+Two #20 follow-ups after these results:
+
+- **Trimmed oversized files.** Scope documents can now select verbatim line ranges.
+  The NCO manual captures its copyright and GFDL notice and the `ncclimo` section
+  (1.4 MB to 106 KB); the EAM namelist definitions capture their attribute header
+  and the history-output group (293 KB to 26 KB). Retrieval chunks fell from 4,060
+  to 1,176. The manual now appears off-target for one question instead of four.
+  Expected documents in the top 8 rose only from 29 to 30 of 81, and 12 of 18
+  questions still cite an expected document. The remaining misses are retrieval
+  and chunking problems, not corpus size.
+- **Opt-in runtime use.** `make corpus-export` writes the build as a runtime corpus,
+  and `CORPUS_PATH` makes the backend serve it. The packaged corpus stays the
+  default, and the evaluation adapter always uses it because the evaluation
+  fixtures cite its source IDs.
+
 ## Remaining issues
 
 - [ ] Reviewer approval of the build; then `make corpus-package VERSION=<label>`.
-- [ ] Runtime integration: convert captured records to runtime entries without
-  renaming existing citation IDs.
-- [ ] Structure-aware chunking that respects headings and fenced blocks, and
-  section selection or splitting for very large files (#30).
+- [ ] Decide whether the reviewed build replaces the packaged corpus; that requires
+  updated evaluation fixtures because their citations use packaged source IDs.
+- [ ] Structure-aware chunking that respects headings and fenced blocks (#21), and
+  shared indexes built from exported or packaged builds (#30).
 - [ ] Retrieval evaluation against these questions with judged answers (#21),
   building on `corpus/questions.json` and `make corpus-coverage`.
 - [ ] Publication terms: NCO's GFDL documentation license and E3SM Data Docs'

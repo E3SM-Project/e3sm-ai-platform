@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help sync check clean backend-env backend-sync backend-start backend-test backend-lint backend-typecheck evaluation-test evaluation-lint evaluation-typecheck corpus-curate corpus-validate corpus-coverage corpus-package frontend-sync frontend-start frontend-test frontend-lint frontend-typecheck frontend-build observability-up observability-down observability-status observability-logs
+.PHONY: help sync check clean backend-env backend-sync backend-start backend-test backend-lint backend-typecheck evaluation-test evaluation-lint evaluation-typecheck corpus-curate corpus-validate corpus-coverage corpus-export corpus-package frontend-sync frontend-start frontend-test frontend-lint frontend-typecheck frontend-build observability-up observability-down observability-status observability-logs
 
 # =============================================================================
 # Help
@@ -33,6 +33,7 @@ help:
 	  '  corpus-curate                 Download selected sources and build the local corpus' \
 	  '  corpus-validate               Validate the local corpus build offline' \
 	  '  corpus-coverage               Report representative-question coverage of the build' \
+	  '  corpus-export                 Write the build as a runtime corpus for CORPUS_PATH' \
 	  '  corpus-package VERSION=x      Archive an approved local corpus build' '' \
 	  'Observability:' \
 	  '  observability-up              Start the local Collector and Jaeger stack' \
@@ -129,6 +130,9 @@ corpus-validate:
 
 corpus-coverage:
 	$(CORPUS_CLI) coverage $(CORPUS_BUILD) corpus/questions.json --output corpus/local/coverage.json
+
+corpus-export:
+	$(CORPUS_CLI) export $(CORPUS_BUILD) corpus/local/runtime-corpus.json
 
 corpus-package:
 	@test -n "$(VERSION)" || { printf '%s\n' 'Set VERSION, e.g. make corpus-package VERSION=0.1.0'; exit 2; }
