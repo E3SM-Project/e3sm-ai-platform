@@ -14,19 +14,11 @@
       "include": ["docs/**/*.md", "docs/**/*.rst", "components/*/docs/**/*.md", "components/*/docs/**/*.rst"],
       "exclude": ["components/cice/**", "**/old/**"],
       "documents": [
-        {"id": "e3sm-user-guide", "path": "docs/user-guide/index.md"},
-        {"id": "e3sm-eam-introduction", "path": "components/eam/docs/index.md"},
         {"id": "e3sm-elm-introduction", "path": "components/elm/docs/index.md", "notes": "Placeholder introduction; not complete component evidence."},
-        {"id": "e3sm-mosart-introduction", "path": "components/mosart/docs/index.md"},
-        {"id": "e3sm-ocean-introduction", "path": "components/mpas-ocean/docs/index.md"},
-        {"id": "e3sm-seaice-introduction", "path": "components/mpas-seaice/docs/index.md"},
-        {"id": "e3sm-ocean-user-guide", "path": "components/mpas-ocean/docs/user-guide/index.md"},
-        {"id": "e3sm-seaice-user-guide", "path": "components/mpas-seaice/docs/user-guide/index.md"},
         {"id": "e3sm-run-template", "path": "run_e3sm.template.sh", "notes": "Defaults to cloning master; not pinned executable guidance. Not executed on Chrysalis LCRC or Perlmutter CPU."},
         {"id": "e3sm-model-overview", "path": "docs/index.md", "notes": "Marks EAMxx as not yet supported in this release."},
         {"id": "e3sm-eamxx-introduction", "path": "components/eamxx/docs/index.md", "notes": "Source presence does not establish support."},
         {"id": "e3sm-eamxx-cases", "path": "components/eamxx/docs/user/eamxx_cases.md", "notes": "Only a heading and one introductory sentence."},
-        {"id": "e3sm-elm-user-guide", "path": "components/elm/docs/user-guide/index.md"},
         {"id": "e3sm-coupled-compsets", "path": "cime_config/allactive/config_compsets.xml", "notes": "Legacy V1 BGC aliases do not establish v3 validation or support."},
         {"id": "e3sm-eam-user-guide", "path": "components/eam/docs/user-guide/index.md", "notes": "Prose repeats A where namelist definitions specify I for instantaneous."},
         {"id": "e3sm-eam-compsets", "path": "components/eam/cime_config/config_compsets.xml", "notes": "XML entries are not scientific validation."},
@@ -68,7 +60,6 @@
         {"id": "diags-ex5-python", "path": "examples/ex5-model-vs-obs/ex5.py", "notes": "Execution unverified."},
         {"id": "diags-ex5-config", "path": "examples/ex5-model-vs-obs/diags.cfg"},
         {"id": "diags-lat-lon-defaults", "path": "e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg"},
-        {"id": "diags-config-run", "path": "docs/source/config-run.rst"},
         {"id": "diags-overview", "path": "docs/source/index.rst", "notes": "API compatibility is not numerical equivalence."},
         {"id": "diags-install", "path": "docs/source/install.rst", "notes": "Contains advice to disable TLS verification; never present it as guidance."},
         {"id": "diags-perlmutter-guide", "path": "docs/source/quickguides/quick-guide-perlmutter.rst", "notes": "Shared paths and module commands may have changed."},
@@ -120,7 +111,6 @@
       "include": ["doc/source/**/*.rst"],
       "documents": [
         {"id": "cime-case-setup", "path": "doc/source/ccs/setting-up-a-case.rst", "notes": "Contains CESM-specific component sections."},
-        {"id": "cime-case-build", "path": "doc/source/ccs/building-a-case.rst"},
         {"id": "cime-case-run", "path": "doc/source/ccs/running-a-case.rst", "notes": "Preview example shows historical Chrysalis paths, not current settings or Perlmutter guidance."},
         {"id": "cime-case-create", "path": "doc/source/ccs/creating-a-case.rst", "notes": "Use E3SM guidance, not CESM example compsets, for scientific support."},
         {"id": "cime-license", "path": "LICENSE.TXT", "role": "license"}
@@ -158,10 +148,7 @@
       "redistribution": "BSD-3 with institutional notices; retain complete LICENSE and relevant file-level attribution and disclaimers.",
       "include": ["docs/**/*.md", "docs/**/*.rst"],
       "documents": [
-        {"id": "mpas-ocean-setup", "path": "docs/users_guide/mpaso.rst"},
         {"id": "mpas-seaice-setup", "path": "docs/users_guide/mpasseaice.rst", "notes": "Contains a stale statement that the model is not yet publicly released."},
-        {"id": "mpas-sst-task", "path": "docs/users_guide/tasks/climatologyMapSST.rst"},
-        {"id": "mpas-seaice-task", "path": "docs/users_guide/tasks/climatologyMapSeaIceConcNH.rst"},
         {"id": "mpas-e3sm-setup", "path": "docs/users_guide/e3sm.rst", "notes": "Default-output claim needs verification against generated v3.1.0 streams."},
         {"id": "mpas-license", "path": "LICENSE", "role": "license"}
       ]
@@ -274,7 +261,6 @@
       "include": ["docs/**/*.rst"],
       "exclude": ["docs/code-of-conduct.rst", "docs/contributing.rst", "docs/team.rst", "docs/project-maintenance.rst"],
       "documents": [
-        {"id": "xcdat-overview", "path": "docs/getting-started-guide/overview.rst"},
         {"id": "xcdat-temporal-api", "path": "xcdat/temporal.py"},
         {"id": "xcdat-license", "path": "LICENSE", "role": "license"},
         {"id": "xcdat-notice", "path": "NOTICE", "role": "license"}
@@ -292,9 +278,7 @@
       "license_url": "https://github.com/E3SM-Project/e3sm_data_docs/blob/f3d177dbfcf38af1b540b51f194f2d87b3cbaf85/docs/source/index.rst",
       "include": ["docs/source/**/*.rst", "docs/source/**/*.rst.inc"],
       "documents": [
-        {"id": "data-docs-index", "path": "docs/source/index.rst"},
         {"id": "data-docs-access", "path": "docs/source/data_access.rst", "notes": "Archived scripts need adaptation."},
-        {"id": "data-docs-v3-simulations", "path": "docs/source/v3/CoupledSystem/simulation_data/simulation_table.rst"},
         {"id": "data-docs-v3-overview", "path": "docs/source/v3/CoupledSystem/simulation_data/overview.rst.inc", "notes": "v3 run scripts are not archived here."}
       ]
     },

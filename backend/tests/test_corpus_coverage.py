@@ -1,6 +1,7 @@
 """Tests for representative-question coverage of local corpus builds."""
 
 import json
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 import pytest
@@ -90,16 +91,31 @@ def test_measure_coverage_rejects_unknown_documents_and_bad_question_sets(tmp_pa
 
 
 def test_checked_in_questions_reference_selected_content_documents():
-    """Every expected document is a selected, captured (non-license) scope document."""
+    """Expected documents are explicit content documents or pattern-selected files."""
     questions = load_questions(REPOSITORY / "corpus" / "questions.json")
     scope = json.loads((REPOSITORY / "corpus" / "sources.json").read_text())
-    selected = {
+    explicit = {
         document["id"]
         for source in scope["sources"]
         for document in source["documents"]
         if document.get("role", "content") == "content"
     }
 
+    def pattern_selected(doc_id):
+        return any(
+            any(fnmatchcase(doc_id, _id_glob(source["id"], p)) for p in source.get("include", []))
+            and not any(
+                fnmatchcase(doc_id, _id_glob(source["id"], p)) for p in source.get("exclude", [])
+            )
+            for source in scope["sources"]
+        )
+
     assert len(questions.questions) == 18
     for question in questions.questions:
-        assert set(question.expected_documents) <= selected, question.id
+        for doc_id in question.expected_documents:
+            assert doc_id in explicit or pattern_selected(doc_id), (question.id, doc_id)
+
+
+def _id_glob(source_id, pattern):
+    """Translate a path pattern into a glob over pattern-derived document IDs."""
+    return f"{source_id}." + pattern.replace("**/", "*").replace("/", ".")
