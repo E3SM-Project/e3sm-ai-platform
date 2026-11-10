@@ -1,0 +1,167 @@
+"""Tests for reproducible corpus builds; downloads use an in-memory fetcher."""
+
+import hashlib
+import json
+import tarfile
+
+import pytest
+
+from e3sm_ai_platform.knowledge.corpus_build import curate, package, verify_build
+from e3sm_ai_platform.knowledge.curation import CurationValidationError, validate_corpus
+
+REVISION = "0123456789abcdef0123456789abcdef01234567"
+RAW = f"https://raw.githubusercontent.com/example/docs/{REVISION}"
+FILES = {
+    f"{RAW}/README.md": b"# Guide\n\nRun `./case.setup`.  \r\n",
+    f"{RAW}/docs/run.rst": b"Run\n===\n\n.. code-block:: bash\n\n    ./case.submit\n\nUse ``````.\n",
+    f"{RAW}/LICENSE": b"BSD-3-Clause\n",
+}
+
+
+def _scope(tmp_path, *, repository="https://github.com/example/docs"):
+    """Write a one-source scope selecting Markdown, RST, and a license companion."""
+    documents = [
+        {
+            "id": doc_id,
+            "path": path,
+            "url": f"{repository}/blob/{REVISION}/{path}",
+            "revision": REVISION,
+            "provenance": "test selection",
+        }
+        for doc_id, path in (
+            ("guide", "README.md"),
+            ("run", "docs/run.rst"),
+            ("license", "LICENSE"),
+        )
+    ]
+    scope = {
+        "manifest_version": 1,
+        "status": "test",
+        "sources": [
+            {
+                "id": "docs",
+                "identity": "Example docs",
+                "owner": "Example owner",
+                "canonical_url": "https://example.test/",
+                "repository_url": repository,
+                "license_url": f"{repository}/blob/{REVISION}/LICENSE",
+                "access": "public",
+                "redistribution": "BSD-3-Clause",
+                "refresh_cadence": "never",
+                "request_interval_seconds": 2,
+                "path_scope": {
+                    "include": ["README.md", "docs/**", "LICENSE"],
+                    "exclude": ["**/build/**"],
+                },
+                "document_status": "selected",
+                "documents": documents,
+            }
+        ],
+    }
+    path = tmp_path / "sources.json"
+    path.write_text(json.dumps(scope), encoding="utf-8")
+    return path
+
+
+def _approve(root):
+    """Mark a build's hash-bound review as approved."""
+    review_path = root / "captured" / "review.json"
+    review = json.loads(review_path.read_text())
+    review["approved"] = True
+    review_path.write_text(json.dumps(review), encoding="utf-8")
+
+
+def test_curate_keeps_raw_bytes_and_captures_verbatim_text(tmp_path):
+    """Curate retains raw files, fences non-Markdown text, and skips license capture."""
+    pauses = []
+    root = tmp_path / "build"
+    snapshot = curate(_scope(tmp_path), root, fetch=FILES.__getitem__, sleep=pauses.append)
+
+    assert [record.id for record in snapshot.records] == ["guide", "run"]
+    assert pauses == [2, 2]
+    record = json.loads((root / "acquisition.json").read_text())
+    by_id = {document["id"]: document for document in record["documents"]}
+    assert by_id["license"]["captured"] is False
+    raw = (root / by_id["guide"]["raw_path"]).read_bytes()
+    assert raw == FILES[f"{RAW}/README.md"]
+    assert by_id["guide"]["sha256"] == hashlib.sha256(raw).hexdigest()
+    run = (root / "captured/content/run.md").read_text()
+    assert "```````rst\nRun\n===\n\n.. code-block:: bash\n\n    ./case.submit\n" in run
+    assert f"<https://github.com/example/docs/blob/{REVISION}/docs/run.rst>" in run
+    assert (root / "captured/content/guide.md").read_text().endswith("Run `./case.setup`.\n")
+    assert verify_build(root) == []
+    assert validate_corpus(root / "captured", require_approved=True) == ["review is not approved"]
+
+
+def test_curate_is_reproducible_and_atomic(tmp_path):
+    """Rebuilds match; existing builds need overwrite; failures leave no output."""
+    scope = _scope(tmp_path)
+    first, second = tmp_path / "first", tmp_path / "second"
+    curate(scope, first, fetch=FILES.__getitem__, sleep=lambda _: None)
+    curate(scope, second, fetch=FILES.__getitem__, sleep=lambda _: None)
+    assert (first / "captured/snapshot.json").read_bytes() == (
+        second / "captured/snapshot.json"
+    ).read_bytes()
+
+    with pytest.raises(CurationValidationError, match="already exists"):
+        curate(scope, first, fetch=FILES.__getitem__, sleep=lambda _: None)
+    curate(scope, first, overwrite=True, fetch=FILES.__getitem__, sleep=lambda _: None)
+
+    def failing(url):
+        raise CurationValidationError(f"failed to fetch {url}")
+
+    with pytest.raises(CurationValidationError, match="failed to fetch"):
+        curate(scope, tmp_path / "failed", fetch=failing, sleep=lambda _: None)
+    assert not (tmp_path / "failed").exists()
+    assert not (tmp_path / "failed.partial").exists()
+
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir()
+    (unrelated / "keep.txt").write_text("keep", encoding="utf-8")
+    with pytest.raises(CurationValidationError, match="not a corpus build"):
+        curate(scope, unrelated, overwrite=True, fetch=FILES.__getitem__, sleep=lambda _: None)
+    assert (unrelated / "keep.txt").is_file()
+
+
+def test_curate_rejects_unsupported_or_out_of_scope_documents(tmp_path):
+    """Only GitHub-hosted documents inside the source path scope are acquired."""
+    with pytest.raises(CurationValidationError, match="unsupported repository URL"):
+        curate(_scope(tmp_path, repository="https://gitlab.example/docs"), tmp_path / "out")
+    scope_path = _scope(tmp_path)
+    scope = json.loads(scope_path.read_text())
+    scope["sources"][0]["path_scope"]["include"] = ["README.md", "LICENSE"]
+    scope_path.write_text(json.dumps(scope), encoding="utf-8")
+    with pytest.raises(CurationValidationError, match="document outside path scope: run"):
+        curate(scope_path, tmp_path / "out")
+
+
+def test_verify_build_detects_raw_and_captured_tampering(tmp_path):
+    """Verification binds captured content to the raw bytes it came from."""
+    root = tmp_path / "build"
+    curate(_scope(tmp_path), root, fetch=FILES.__getitem__, sleep=lambda _: None)
+    raw = root / "raw/docs" / REVISION / "docs/run.rst"
+    raw.write_bytes(raw.read_bytes() + b"changed\n")
+    assert verify_build(root) == ["raw hash mismatch for run"]
+
+
+def test_package_requires_approval_and_is_deterministic(tmp_path):
+    """Packaging refuses unapproved builds and archives licenses with captured content."""
+    root = tmp_path / "build"
+    curate(_scope(tmp_path), root, fetch=FILES.__getitem__, sleep=lambda _: None)
+    with pytest.raises(CurationValidationError, match="review is not approved"):
+        package(root, tmp_path / "release", "1.0.0")
+    with pytest.raises(CurationValidationError, match="unsafe package version"):
+        package(root, tmp_path / "release", "../1")
+
+    _approve(root)
+    archive = package(root, tmp_path / "release", "1.0.0")
+    first = archive.read_bytes()
+    assert package(root, tmp_path / "release", "1.0.0").read_bytes() == first
+    checksum = archive.with_name("e3sm-corpus-1.0.0.tar.gz.sha256").read_text()
+    assert checksum == f"{hashlib.sha256(first).hexdigest()}  e3sm-corpus-1.0.0.tar.gz\n"
+    with tarfile.open(archive) as contents:
+        names = contents.getnames()
+    assert f"e3sm-corpus-1.0.0/raw/docs/{REVISION}/LICENSE" in names
+    assert "e3sm-corpus-1.0.0/captured/content/run.md" in names
+    assert "e3sm-corpus-1.0.0/acquisition.json" in names
+    assert not any("/prepared/" in name for name in names)

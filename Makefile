@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help sync check clean backend-env backend-sync backend-start backend-test backend-lint backend-typecheck evaluation-test evaluation-lint evaluation-typecheck frontend-sync frontend-start frontend-test frontend-lint frontend-typecheck frontend-build observability-up observability-down observability-status observability-logs
+.PHONY: help sync check clean backend-env backend-sync backend-start backend-test backend-lint backend-typecheck evaluation-test evaluation-lint evaluation-typecheck corpus-curate corpus-validate corpus-package frontend-sync frontend-start frontend-test frontend-lint frontend-typecheck frontend-build observability-up observability-down observability-status observability-logs
 
 # =============================================================================
 # Help
@@ -29,6 +29,10 @@ help:
 	  '  evaluation-test               Run E3SM Compass contract evaluation' \
 	  '  evaluation-lint               Run Ruff on evaluation code' \
 	  '  evaluation-typecheck          Run ty on evaluation code' '' \
+	  'Corpus:' \
+	  '  corpus-curate                 Download selected sources and build the local corpus' \
+	  '  corpus-validate               Validate the local corpus build offline' \
+	  '  corpus-package VERSION=x      Archive an approved local corpus build' '' \
 	  'Observability:' \
 	  '  observability-up              Start the local Collector and Jaeger stack' \
 	  '  observability-down            Stop the local observability stack' \
@@ -106,6 +110,25 @@ evaluation-lint:
 
 evaluation-typecheck:
 	uv run --all-packages ty check evaluation
+
+# =============================================================================
+# Corpus
+# =============================================================================
+
+CORPUS_BUILD ?= corpus/local/corpus
+CORPUS_RELEASE ?= corpus/local/release
+CORPUS_CLI = uv run --all-packages python backend/scripts/corpus.py
+
+corpus-curate:
+	$(CORPUS_CLI) curate corpus/sources.json $(CORPUS_BUILD) --overwrite
+
+corpus-validate:
+	$(CORPUS_CLI) validate-sources corpus/sources.json
+	$(CORPUS_CLI) verify-build $(CORPUS_BUILD)
+
+corpus-package:
+	@test -n "$(VERSION)" || { printf '%s\n' 'Set VERSION, e.g. make corpus-package VERSION=0.1.0'; exit 2; }
+	$(CORPUS_CLI) package $(CORPUS_BUILD) $(CORPUS_RELEASE) --version $(VERSION)
 
 # =============================================================================
 # Maintenance
