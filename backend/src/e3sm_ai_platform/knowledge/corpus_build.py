@@ -406,15 +406,28 @@ def _markdown(title: str, document: AcquiredDocument, text: str) -> str:
     return f"{header}{fence}{language}\n{body}\n{fence}\n"
 
 
-def _fetch(url: str) -> bytes:
-    """Return the body of a successful HTTPS GET request."""
-    try:
-        response = httpx.get(url, timeout=60.0)
-        response.raise_for_status()
-    except httpx.HTTPError as error:
-        raise CurationValidationError(f"failed to fetch {url}: {error}") from error
+def _fetch(
+    url: str,
+    *,
+    get: Callable[..., httpx.Response] = httpx.get,
+    sleep: Callable[[float], None] = time.sleep,
+    attempts: int = 3,
+) -> bytes:
+    """Return the body of a successful GET, retrying transport and server errors."""
+    for attempt in range(1, attempts + 1):
+        try:
+            response = get(url, timeout=60.0)
+            response.raise_for_status()
+            return response.content
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code < 500 or attempt == attempts:
+                raise CurationValidationError(f"failed to fetch {url}: {error}") from error
+        except httpx.TransportError as error:
+            if attempt == attempts:
+                raise CurationValidationError(f"failed to fetch {url}: {error}") from error
+        sleep(2.0**attempt)
 
-    return response.content
+    raise AssertionError("unreachable")
 
 
 def _deterministic_tar_gz(root: Path, prefix: str, members: list[Path]) -> bytes:

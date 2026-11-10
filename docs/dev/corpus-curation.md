@@ -21,6 +21,8 @@ Run from the repository root; `make help` lists the targets.
 1. **Curate:** `make corpus-curate` validates the scope, downloads every selected
    document at its pinned revision, prepares Markdown, captures, and verifies the
    build in `corpus/local/corpus/`. It replaces a previous build only on success.
+   Timeouts and server errors are retried up to three times; other failures stop
+   the build and leave the previous build unchanged.
 2. **Validate:** `make corpus-validate` rechecks the scope and the build offline.
 3. **Review:** an authorized reviewer checks the build and records approval in
    `captured/review.json`. Never set approval as part of curation.

@@ -4,9 +4,10 @@ import hashlib
 import json
 import tarfile
 
+import httpx
 import pytest
 
-from e3sm_ai_platform.knowledge.corpus_build import curate, package, verify_build
+from e3sm_ai_platform.knowledge.corpus_build import _fetch, curate, package, verify_build
 from e3sm_ai_platform.knowledge.curation import CurationValidationError, validate_corpus
 
 REVISION = "0123456789abcdef0123456789abcdef01234567"
@@ -165,3 +166,34 @@ def test_package_requires_approval_and_is_deterministic(tmp_path):
     assert "e3sm-corpus-1.0.0/captured/content/run.md" in names
     assert "e3sm-corpus-1.0.0/acquisition.json" in names
     assert not any("/prepared/" in name for name in names)
+
+
+def test_fetch_retries_transient_failures_only():
+    """Timeouts and server errors are retried; client errors fail immediately."""
+    request = httpx.Request("GET", "https://example.test/file")
+    calls, pauses = [], []
+
+    def flaky(url, timeout):
+        calls.append(url)
+        if len(calls) < 3:
+            raise httpx.ConnectTimeout("timed out", request=request)
+        return httpx.Response(200, content=b"ok", request=request)
+
+    assert _fetch("https://example.test/file", get=flaky, sleep=pauses.append) == b"ok"
+    assert pauses == [2.0, 4.0]
+
+    def status(code):
+        def get(url, timeout):
+            calls.append(url)
+            return httpx.Response(code, request=request)
+
+        return get
+
+    calls.clear()
+    with pytest.raises(CurationValidationError, match="404"):
+        _fetch("https://example.test/file", get=status(404), sleep=pauses.append)
+    assert len(calls) == 1
+    calls.clear()
+    with pytest.raises(CurationValidationError, match="503"):
+        _fetch("https://example.test/file", get=status(503), sleep=lambda _: None)
+    assert len(calls) == 3
