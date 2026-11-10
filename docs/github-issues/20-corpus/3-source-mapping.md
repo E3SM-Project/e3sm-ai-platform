@@ -1,11 +1,11 @@
 # Issue #20: Source mapping
 
 Research date: 2026-11-09. All 18 [draft questions](2-representative-questions.md)
-now have source mappings. The original six remain the initial ingestion pilot;
-the other mappings identify later candidates, not approved acquisition scope.
-The operator approved the six-question selection and first local capture on
-2026-11-09. Selected files now appear in `corpus/sources.json`; selection does not
-establish capture, review approval, execution validation, or retrieval coverage.
+now have source mappings. The operator approved the six-question selection and
+first local capture on 2026-11-09, and the remaining twelve questions' candidates
+on 2026-11-10 ([approved 18-question scope](#approved-18-question-scope)).
+Selected files appear in `corpus/sources.json`; selection does not establish
+capture, review approval, execution validation, or retrieval coverage.
 Runtime content remains unchanged.
 
 See the [existing-corpus audit](4-corpus-audit.md) for packaged content coverage,
@@ -411,7 +411,8 @@ The canonical documentation URLs above differ from the existing E3SM,
 e3sm_diags, and E3SM-Project.github.io scope entries. Approval includes reconciling
 E3SM and e3sm_diags URLs; the documentation-site source stays unchanged.
 Keep the documentation-site source unchanged; no site crawl is needed for this
-pilot subset. Mapping the remaining questions does not approve or enlarge it.
+pilot subset. The [approved 18-question scope](#approved-18-question-scope)
+later extended it.
 
 ### Additional candidates for the remaining questions
 
@@ -431,6 +432,27 @@ selection/review even where a path already matches its include list.
 
 Do not crawl/download linked datasets, execute examples, ingest whole repositories,
 or broaden pilot scope merely because these questions need more evidence.
+
+### Approved 18-question scope
+
+On 2026-11-10 the operator approved every candidate above for local acquisition,
+including the license-flagged NCO manual and E3SM Data Docs pages. The source scope
+now selects 85 documents across 16 sources, including license companions. All
+paths were rechecked at their pins. Captures are organized by source document,
+not by question; this mapping records which documents each question needs.
+
+- **E3SM Data Docs** is E3SM-owned but has no repository license file; its index
+  licenses model output, not explicitly these pages. The operator approved reuse
+  within this E3SM project. Confirm documentation terms before external publication.
+- **NCO** is not an E3SM project. Its manual specifies GFDL-1.3-or-later and
+  `doc/LICENSE` contains a GPL notice. Local capture is approved; publication
+  must comply with the applicable documentation license and retain notices.
+- **Whole files:** the NCO manual and EAM namelist definitions are selected whole,
+  not as sections. Retrieval coverage checks decide whether they need trimming.
+- The site's `license_url` now pins the snapshot revision instead of `master`.
+
+Selection still does not establish capture fidelity, review approval, execution
+validation, or retrieval coverage.
 
 ## Capture gate and validation
 

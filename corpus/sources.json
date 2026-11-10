@@ -14,10 +14,10 @@
       "refresh_cadence": "quarterly or when an approved release requires it",
       "request_interval_seconds": 1,
       "path_scope": {
-        "include": ["README.md", "docs/**", "LICENSE", "run_e3sm.template.sh", "components/eam/docs/index.md", "components/elm/docs/index.md", "components/mosart/docs/index.md", "components/mpas-ocean/docs/index.md", "components/mpas-seaice/docs/index.md", "components/mpas-ocean/docs/user-guide/index.md", "components/mpas-seaice/docs/user-guide/index.md"],
+        "include": ["README.md", "docs/**", "LICENSE", "run_e3sm.template.sh", "components/eam/docs/index.md", "components/elm/docs/index.md", "components/mosart/docs/index.md", "components/mpas-ocean/docs/index.md", "components/mpas-seaice/docs/index.md", "components/mpas-ocean/docs/user-guide/index.md", "components/mpas-seaice/docs/user-guide/index.md", "components/eamxx/docs/index.md", "components/eamxx/docs/user/eamxx_cases.md", "components/elm/docs/user-guide/index.md", "components/eam/docs/user-guide/index.md", "cime_config/allactive/config_compsets.xml", "components/eam/cime_config/config_compsets.xml", "components/eam/bld/namelist_files/namelist_definition.xml"],
         "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]
       },
-      "document_status": "selected for six-question pilot acquisition; capture and review pending",
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
       "documents": [
         {"id": "e3sm-user-guide", "path": "docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: Supported Coupled Compsets. Selection only."},
         {"id": "e3sm-eam-introduction", "path": "components/eam/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eam/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-components: EAM introduction. Selection only."},
@@ -28,6 +28,14 @@
         {"id": "e3sm-ocean-user-guide", "path": "components/mpas-ocean/docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mpas-ocean/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; cross-project-mpas-output: Customizing runs. Selection only."},
         {"id": "e3sm-seaice-user-guide", "path": "components/mpas-seaice/docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/mpas-seaice/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; cross-project-mpas-output: Configuring Model Input and Output. Selection only."},
         {"id": "e3sm-run-template", "path": "run_e3sm.template.sh", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/run_e3sm.template.sh", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; running-case-setup: case_setup, case_build, runtime_options, case_submit. Chrysalis LCRC and Perlmutter CPU proposed; no execution or compatibility validation. Do not execute default master acquisition."},
+        {"id": "e3sm-model-overview", "path": "docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; eam-eamxx-mixed: model overview marks EAMxx not yet supported in this release. Selection only."},
+        {"id": "e3sm-eamxx-introduction", "path": "components/eamxx/docs/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eamxx/docs/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; eam-eamxx-mixed: EAMxx architecture and SCREAM configuration. Source presence does not establish support. Selection only."},
+        {"id": "e3sm-eamxx-cases", "path": "components/eamxx/docs/user/eamxx_cases.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eamxx/docs/user/eamxx_cases.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; eam-eamxx-mixed: case guide is a heading and introductory sentence only. Selection only."},
+        {"id": "e3sm-elm-user-guide", "path": "components/elm/docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/elm/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-science-configurations: Steps to build and run ELM. Selection only."},
+        {"id": "e3sm-coupled-compsets", "path": "cime_config/allactive/config_compsets.xml", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/cime_config/allactive/config_compsets.xml", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; model-science-configurations: WCYCL1850 and legacy V1 BGC compsets. Legacy aliases do not establish v3 validation or support. Selection only."},
+        {"id": "e3sm-eam-user-guide", "path": "components/eam/docs/user-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eam/docs/user-guide/index.md", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; user-guide-compset and user-guide-history: supported compsets and History File Namelist Parameters. Prose repeats A where definitions specify I for instantaneous. Selection only."},
+        {"id": "e3sm-eam-compsets", "path": "components/eam/cime_config/config_compsets.xml", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eam/cime_config/config_compsets.xml", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; user-guide-compset: F1850, F2010, and F20TR component long names. XML entries are not scientific validation. Selection only."},
+        {"id": "e3sm-eam-namelist-definitions", "path": "components/eam/bld/namelist_files/namelist_definition.xml", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/components/eam/bld/namelist_files/namelist_definition.xml", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "E3SM v3.1.0; user-guide-history: fincl1, avgflag_pertape, nhtfrq, and mfilt definitions. Selection only."},
         {"id": "e3sm-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/E3SM/blob/4d2e509b20d3189dcfd76631257b1240ae72bbea/LICENSE", "revision": "4d2e509b20d3189dcfd76631257b1240ae72bbea", "provenance": "Required E3SM v3.1.0 license, attribution, exceptions, and disclaimers; retain complete raw companion."}
       ]
     },
@@ -37,17 +45,21 @@
       "owner": "E3SM Project",
       "canonical_url": "https://e3sm-project.github.io/",
       "repository_url": "https://github.com/E3SM-Project/E3SM-Project.github.io",
-      "license_url": "https://github.com/E3SM-Project/E3SM-Project.github.io/blob/master/LICENSE",
+      "license_url": "https://github.com/E3SM-Project/E3SM-Project.github.io/blob/4b8776b015bf7d193a6e35f2c6a3b60476d52e3d/LICENSE",
       "access": "Publicly accessible upstream source; acquire only through an operator-initiated capture.",
       "redistribution": "BSD-3-Clause terms apply; retain required license and attribution notices with redistributed material.",
       "refresh_cadence": "quarterly or when an approved site update requires it",
       "request_interval_seconds": 1,
       "path_scope": {
-        "include": ["README.md", "docs/**", "**/*.md"],
+        "include": ["README.md", "docs/**", "**/*.md", "LICENSE"],
         "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]
       },
-      "document_status": "pending selection and review",
-      "documents": []
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
+      "documents": [
+        {"id": "site-running-guide-index", "path": "docs/running-e3sm-guide/index.md", "url": "https://github.com/E3SM-Project/E3SM-Project.github.io/blob/4b8776b015bf7d193a6e35f2c6a3b60476d52e3d/docs/running-e3sm-guide/index.md", "revision": "4b8776b015bf7d193a6e35f2c6a3b60476d52e3d", "provenance": "Site snapshot, not a model release; tutorial-first-run: running-guide learning path. Page links to master, not a release pin. Selection only."},
+        {"id": "site-pre-production", "path": "docs/running-e3sm-guide/guide-prior-to-production.md", "url": "https://github.com/E3SM-Project/E3SM-Project.github.io/blob/4b8776b015bf7d193a6e35f2c6a3b60476d52e3d/docs/running-e3sm-guide/guide-prior-to-production.md", "revision": "4b8776b015bf7d193a6e35f2c6a3b60476d52e3d", "provenance": "Site snapshot; tutorial-first-run: Configuring the Model Run and Testing the model. Machine, account, and queue prerequisites unverified. Selection only."},
+        {"id": "site-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/E3SM-Project.github.io/blob/4b8776b015bf7d193a6e35f2c6a3b60476d52e3d/LICENSE", "revision": "4b8776b015bf7d193a6e35f2c6a3b60476d52e3d", "provenance": "Required site BSD-3-Clause license companion; retain complete raw file."}
+      ]
     },
     {
       "id": "e3sm_diags",
@@ -61,16 +73,26 @@
       "refresh_cadence": "quarterly or when an approved release requires it",
       "request_interval_seconds": 1,
       "path_scope": {
-        "include": ["README.md", "docs/**", "LICENSE", "examples/ex5-model-vs-obs/ex5.py", "examples/ex5-model-vs-obs/diags.cfg", "e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg"],
+        "include": ["README.md", "docs/**", "LICENSE", "examples/ex5-model-vs-obs/ex5.py", "examples/ex5-model-vs-obs/diags.cfg", "e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg", "e3sm_diags/driver/default_diags/qbo_model_vs_obs.cfg", "e3sm_diags/parameter/qbo_parameter.py", "e3sm_diags/driver/qbo_driver.py"],
         "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]
       },
-      "document_status": "selected for six-question pilot acquisition; capture and review pending",
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
       "documents": [
         {"id": "diags-examples", "path": "docs/source/examples.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/examples.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "Unified 1.13.0 cohort, e3sm_diags v3.2.0; tutorial-diagnostics-example: Example 5 and Running the Examples; mutable links and legacy paths require annotation. Selection only."},
         {"id": "diags-input-requirements", "path": "docs/source/input-data-requirement.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/input-data-requirement.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-diagnostics-example, tools-atmosphere-ocean, diagnostics-zppy-climatology: input formats and preprocessing; preserve legacy-version caveats. Selection only."},
         {"id": "diags-ex5-python", "path": "examples/ex5-model-vs-obs/ex5.py", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/examples/ex5-model-vs-obs/ex5.py", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-diagnostics-example: runner configuration, execution unverified. Selection only."},
         {"id": "diags-ex5-config", "path": "examples/ex5-model-vs-obs/diags.cfg", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/examples/ex5-model-vs-obs/diags.cfg", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-diagnostics-example: TREFHT versus ERA-Interim. Selection only."},
         {"id": "diags-lat-lon-defaults", "path": "e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/e3sm_diags/driver/default_diags/lat_lon_model_vs_obs.cfg", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tools-atmosphere-ocean and diagnostics-zppy-climatology: PRECT lat_lon definitions; selected sections only. Selection only."},
+        {"id": "diags-config-run", "path": "docs/source/config-run.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/config-run.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-version-migration: v3 CoreParameter, runner, and -d configuration. Selection only."},
+        {"id": "diags-overview", "path": "docs/source/index.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/index.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tutorial-version-migration and cross-project-result-comparability: Current State backend transition. API compatibility is not numerical equivalence. Selection only."},
+        {"id": "diags-install", "path": "docs/source/install.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/install.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tools-environment-choice and tutorial-version-migration: environment options. Contains advice to disable TLS verification; never present it as assistant guidance. Selection only."},
+        {"id": "diags-perlmutter-guide", "path": "docs/source/quickguides/quick-guide-perlmutter.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/quickguides/quick-guide-perlmutter.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; tools-environment-choice: 1. Installation. Shared paths and module commands may have changed. Selection only."},
+        {"id": "diags-testing", "path": "docs/source/dev_guide/testing.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/docs/source/dev_guide/testing.rst", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; cross-project-result-comparability: unit, integration, and complete run tests. Image tests do not establish metric equality. Selection only."},
+        {"id": "diags-qbo-defaults", "path": "e3sm_diags/driver/default_diags/qbo_model_vs_obs.cfg", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/e3sm_diags/driver/default_diags/qbo_model_vs_obs.cfg", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; diagnostics-qbo-inputs: U variable and ERA-Interim reference. Selection only."},
+        {"id": "diags-qbo-parameter", "path": "e3sm_diags/parameter/qbo_parameter.py", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/e3sm_diags/parameter/qbo_parameter.py", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; diagnostics-qbo-inputs: time-series input parameter. Selection only."},
+        {"id": "diags-qbo-driver", "path": "e3sm_diags/driver/qbo_driver.py", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/e3sm_diags/driver/qbo_driver.py", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "e3sm_diags v3.2.0; diagnostics-qbo-inputs: run_diag and _unify_plev spatial reduction and pressure units. No QBO run tested. Selection only."},
+        {"id": "diags-v2-config-run", "path": "docs/source/config-run.rst", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ca41b0e5d913610c88410928951f1ed11c75663f/docs/source/config-run.rst", "revision": "ca41b0e5d913610c88410928951f1ed11c75663f", "provenance": "e3sm_diags v2.12.1 comparison revision, not the Unified cohort; tutorial-version-migration only. A v2.12.1 sample does not represent every v2 tutorial. Selection only."},
+        {"id": "diags-v2-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ca41b0e5d913610c88410928951f1ed11c75663f/LICENSE", "revision": "ca41b0e5d913610c88410928951f1ed11c75663f", "provenance": "Required e3sm_diags v2.12.1 license companion for the comparison revision."},
         {"id": "diags-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/e3sm_diags/blob/ff3ef00dad47d305859db40335d1020ea5dfaee4/LICENSE", "revision": "ff3ef00dad47d305859db40335d1020ea5dfaee4", "provenance": "Required e3sm_diags license companion; retain complete raw file."}
       ]
     },
@@ -107,12 +129,13 @@
       "redistribution": "UCAR/Sandia permissive terms; retain LICENSE.TXT, attribution, and disclaimers.",
       "refresh_cadence": "when an approved E3SM release changes its bundled CIME",
       "request_interval_seconds": 1,
-      "path_scope": {"include": ["doc/source/ccs/setting-up-a-case.rst", "doc/source/ccs/building-a-case.rst", "doc/source/ccs/running-a-case.rst", "LICENSE.TXT"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
-      "document_status": "selected for running-case-setup; capture and review pending",
+      "path_scope": {"include": ["doc/source/ccs/setting-up-a-case.rst", "doc/source/ccs/building-a-case.rst", "doc/source/ccs/running-a-case.rst", "doc/source/ccs/creating-a-case.rst", "LICENSE.TXT"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
       "documents": [
         {"id": "cime-case-setup", "path": "doc/source/ccs/setting-up-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/setting-up-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink, not standalone release; running-case-setup: generic configuration and setup sections. Exclude CESM-specific component guidance from prepared excerpts. Selection only."},
         {"id": "cime-case-build", "path": "doc/source/ccs/building-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/building-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink; running-case-setup: build settings, logs, and rebuild cautions. Selection only."},
         {"id": "cime-case-run", "path": "doc/source/ccs/running-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/running-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink; running-case-setup: preview, input data, PE layout, workflow, submission, Monitoring Progress and Troubleshooting Failures. Chrysalis example paths are historical, not verified site settings or Perlmutter instructions. Selection only."},
+        {"id": "cime-case-create", "path": "doc/source/ccs/creating-a-case.rst", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/doc/source/ccs/creating-a-case.rst", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "E3SM v3.1.0 cime gitlink; user-guide-compset: Creating a new Case arguments. Use E3SM guidance, not CESM example compsets, for scientific support. Selection only."},
         {"id": "cime-license", "path": "LICENSE.TXT", "url": "https://github.com/ESMCI/cime/blob/025f09aba0b72177df7e22705f0eadbe351b5add/LICENSE.TXT", "revision": "025f09aba0b72177df7e22705f0eadbe351b5add", "provenance": "Required bundled CIME license companion; retain complete raw file."}
       ]
     },
@@ -127,14 +150,15 @@
       "redistribution": "BSD-3-Clause; retain LICENSE, NOTICE, file-level attribution, and disclaimers.",
       "refresh_cadence": "when an approved Unified cohort changes",
       "request_interval_seconds": 1,
-      "path_scope": {"include": ["docs/source/tutorial.rst", "docs/source/post.mysimulation.cfg", "zppy/defaults/default.ini", "zppy/templates/climo.bash", "zppy/templates/e3sm_diags.bash", "LICENSE", "NOTICE"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**", "zppy/defaults/water_cycle.cfg"]},
-      "document_status": "selected for diagnostics-zppy-climatology; capture and review pending",
+      "path_scope": {"include": ["docs/source/tutorial.rst", "docs/source/post.mysimulation.cfg", "zppy/defaults/default.ini", "zppy/templates/climo.bash", "zppy/templates/e3sm_diags.bash", "zppy/templates/inclusions/boilerplate.bash", "LICENSE", "NOTICE"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**", "zppy/defaults/water_cycle.cfg"]},
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
       "documents": [
         {"id": "zppy-tutorial", "path": "docs/source/tutorial.rst", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/docs/source/tutorial.rst", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "Unified cohort zppy v3.2.0; diagnostics-zppy-climatology: Example 1 and selected include, restrict to climo and lat_lon. Historical Chrysalis paths do not verify either machine. Defer campaign ingestion."},
         {"id": "zppy-tutorial-config", "path": "docs/source/post.mysimulation.cfg", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/docs/source/post.mysimulation.cfg", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; required literalinclude for tutorial Example 1. Preserve selected configuration verbatim; do not execute wholesale."},
         {"id": "zppy-defaults", "path": "zppy/defaults/default.ini", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/defaults/default.ini", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-zppy-climatology: climo and e3sm_diags sections. Selection only."},
         {"id": "zppy-climo-template", "path": "zppy/templates/climo.bash", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/templates/climo.bash", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-zppy-climatology: NCO invocation and output placement; hpc resolved NCO unverified. Template dependencies outside selection require approval before capture."},
         {"id": "zppy-diags-template", "path": "zppy/templates/e3sm_diags.bash", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/templates/e3sm_diags.bash", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-zppy-climatology: input links, runner, results; selected lat_lon scope only. Template dependencies outside selection require approval before capture."},
+        {"id": "zppy-boilerplate", "path": "zppy/templates/inclusions/boilerplate.bash", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/zppy/templates/inclusions/boilerplate.bash", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "zppy v3.2.0; diagnostics-missing-plots: task running-status recording. Do not replay generated scripts without review. Selection only."},
         {"id": "zppy-license", "path": "LICENSE", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/LICENSE", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "Required zppy license companion."},
         {"id": "zppy-notice", "path": "NOTICE", "url": "https://github.com/E3SM-Project/zppy/blob/17ce9335fe2c828a13992df4d2f3a5631edcba2d/NOTICE", "revision": "17ce9335fe2c828a13992df4d2f3a5631edcba2d", "provenance": "Required zppy attribution and disclaimer companion."}
       ]
@@ -269,6 +293,66 @@
       "documents": [
         {"id": "xcdat-recipe", "path": "recipe/meta.yaml", "url": "https://github.com/conda-forge/xcdat-feedstock/blob/b456532e473ad4bcd35fc858b3291d8bc49755d7/recipe/meta.yaml", "revision": "b456532e473ad4bcd35fc858b3291d8bc49755d7", "provenance": "xCDAT 0.11.2 recipe for Unified cohort, not independently latest xCDAT. Feedstock revision is not upstream commit or package hash. Selection only."},
         {"id": "xcdat-feedstock-license", "path": "LICENSE.txt", "url": "https://github.com/conda-forge/xcdat-feedstock/blob/b456532e473ad4bcd35fc858b3291d8bc49755d7/LICENSE.txt", "revision": "b456532e473ad4bcd35fc858b3291d8bc49755d7", "provenance": "Required conda-forge feedstock license companion."}
+      ]
+    },
+    {
+      "id": "nco",
+      "identity": "NCO manual and ncclimo climatology script",
+      "owner": "NCO project, Charlie Zender and contributors",
+      "canonical_url": "https://nco.sourceforge.net/nco.html",
+      "repository_url": "https://github.com/nco/nco",
+      "license_url": "https://github.com/nco/nco/blob/b0de4bb1a14d085bbba811a95435919501a974f2/LICENSE",
+      "access": "Public source; operator-initiated acquisition of selected pinned files only.",
+      "redistribution": "Software BSD-3-Clause; the manual header specifies GFDL-1.3-or-later and doc/LICENSE contains a GPL notice. Not an E3SM-owned project: local capture approved 2026-11-10; publication requires compliance with the applicable documentation license and retained notices.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["doc/nco.texi", "data/ncclimo", "LICENSE", "doc/LICENSE"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
+      "documents": [
+        {"id": "nco-manual", "path": "doc/nco.texi", "url": "https://github.com/nco/nco/blob/b0de4bb1a14d085bbba811a95435919501a974f2/doc/nco.texi", "revision": "b0de4bb1a14d085bbba811a95435919501a974f2", "provenance": "NCO 5.3.9, Unified non-hpc cohort; tools-nco-xcdat: ncclimo netCDF Climatology Generator. Whole manual selected; hpc resolved NCO unverified. Selection only."},
+        {"id": "nco-ncclimo", "path": "data/ncclimo", "url": "https://github.com/nco/nco/blob/b0de4bb1a14d085bbba811a95435919501a974f2/data/ncclimo", "revision": "b0de4bb1a14d085bbba811a95435919501a974f2", "provenance": "NCO 5.3.9; tools-nco-xcdat: ncclimo implementation invoked by zppy climo.bash. Do not execute. Selection only."},
+        {"id": "nco-license", "path": "LICENSE", "url": "https://github.com/nco/nco/blob/b0de4bb1a14d085bbba811a95435919501a974f2/LICENSE", "revision": "b0de4bb1a14d085bbba811a95435919501a974f2", "provenance": "Required NCO software license companion."},
+        {"id": "nco-doc-license", "path": "doc/LICENSE", "url": "https://github.com/nco/nco/blob/b0de4bb1a14d085bbba811a95435919501a974f2/doc/LICENSE", "revision": "b0de4bb1a14d085bbba811a95435919501a974f2", "provenance": "Required NCO documentation license notice companion."}
+      ]
+    },
+    {
+      "id": "xcdat",
+      "identity": "xCDAT overview and temporal API documentation",
+      "owner": "xCDAT contributors",
+      "canonical_url": "https://xcdat.readthedocs.io/",
+      "repository_url": "https://github.com/xCDAT/xcdat",
+      "license_url": "https://github.com/xCDAT/xcdat/blob/8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc/LICENSE",
+      "access": "Public source; operator-initiated acquisition of selected pinned files only.",
+      "redistribution": "Apache-2.0 with LLVM exceptions; retain LICENSE and NOTICE.",
+      "refresh_cadence": "when an approved Unified cohort changes",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["docs/getting-started-guide/overview.rst", "xcdat/temporal.py", "LICENSE", "NOTICE"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
+      "documents": [
+        {"id": "xcdat-overview", "path": "docs/getting-started-guide/overview.rst", "url": "https://github.com/xCDAT/xcdat/blob/8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc/docs/getting-started-guide/overview.rst", "revision": "8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc", "provenance": "xCDAT v0.11.2, Unified cohort; tools-nco-xcdat: Features. Selection only."},
+        {"id": "xcdat-temporal-api", "path": "xcdat/temporal.py", "url": "https://github.com/xCDAT/xcdat/blob/8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc/xcdat/temporal.py", "revision": "8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc", "provenance": "xCDAT v0.11.2; tools-nco-xcdat: TemporalAccessor.climatology docstrings. Selection only."},
+        {"id": "xcdat-license", "path": "LICENSE", "url": "https://github.com/xCDAT/xcdat/blob/8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc/LICENSE", "revision": "8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc", "provenance": "Required xCDAT Apache-2.0 with LLVM exceptions license companion."},
+        {"id": "xcdat-notice", "path": "NOTICE", "url": "https://github.com/xCDAT/xcdat/blob/8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc/NOTICE", "revision": "8238fab6bbcbcc25f8dc67b4cbe753ab6ba7edfc", "provenance": "Required xCDAT NOTICE companion."}
+      ]
+    },
+    {
+      "id": "e3sm_data_docs",
+      "identity": "E3SM Data Docs simulation data documentation",
+      "owner": "E3SM Project",
+      "canonical_url": "https://docs.e3sm.org/e3sm_data_docs/",
+      "repository_url": "https://github.com/E3SM-Project/e3sm_data_docs",
+      "license_url": "https://github.com/E3SM-Project/e3sm_data_docs/blob/f3d177dbfcf38af1b540b51f194f2d87b3cbaf85/docs/source/index.rst",
+      "access": "Public source; operator-initiated acquisition of selected pinned files only.",
+      "redistribution": "No repository license file at this revision; the index's CC BY 4.0 statement covers model output, not explicitly these pages. E3SM-owned documentation: reuse within this E3SM project approved by the operator on 2026-11-10. Confirm documentation terms before external publication.",
+      "refresh_cadence": "when an approved data documentation update requires it",
+      "request_interval_seconds": 1,
+      "path_scope": {"include": ["docs/source/index.rst", "docs/source/data_access.rst", "docs/source/v3/CoupledSystem/simulation_data/simulation_table.rst", "docs/source/v3/CoupledSystem/simulation_data/overview.rst.inc"], "exclude": ["**/build/**", "**/_build/**", "**/.git/**"]},
+      "document_status": "selected for 18-question corpus acquisition; capture and review pending",
+      "documents": [
+        {"id": "data-docs-index", "path": "docs/source/index.rst", "url": "https://github.com/E3SM-Project/e3sm_data_docs/blob/f3d177dbfcf38af1b540b51f194f2d87b3cbaf85/docs/source/index.rst", "revision": "f3d177dbfcf38af1b540b51f194f2d87b3cbaf85", "provenance": "Data Docs snapshot, not a model release; cross-project-reproduce-campaign: index and model-output license statement. Selection only."},
+        {"id": "data-docs-access", "path": "docs/source/data_access.rst", "url": "https://github.com/E3SM-Project/e3sm_data_docs/blob/f3d177dbfcf38af1b540b51f194f2d87b3cbaf85/docs/source/data_access.rst", "revision": "f3d177dbfcf38af1b540b51f194f2d87b3cbaf85", "provenance": "Data Docs snapshot; cross-project-reproduce-campaign: native versus processed data; archived scripts need adaptation. Selection only."},
+        {"id": "data-docs-v3-simulations", "path": "docs/source/v3/CoupledSystem/simulation_data/simulation_table.rst", "url": "https://github.com/E3SM-Project/e3sm_data_docs/blob/f3d177dbfcf38af1b540b51f194f2d87b3cbaf85/docs/source/v3/CoupledSystem/simulation_data/simulation_table.rst", "revision": "f3d177dbfcf38af1b540b51f194f2d87b3cbaf85", "provenance": "Data Docs snapshot; cross-project-reproduce-campaign: v3.LR.piControl ESGF/HPSS links. Selection only."},
+        {"id": "data-docs-v3-overview", "path": "docs/source/v3/CoupledSystem/simulation_data/overview.rst.inc", "url": "https://github.com/E3SM-Project/e3sm_data_docs/blob/f3d177dbfcf38af1b540b51f194f2d87b3cbaf85/docs/source/v3/CoupledSystem/simulation_data/overview.rst.inc", "revision": "f3d177dbfcf38af1b540b51f194f2d87b3cbaf85", "provenance": "Data Docs snapshot; cross-project-reproduce-campaign: v3 overview papers; v3 run scripts are not archived there. Selection only."}
       ]
     }
   ]
