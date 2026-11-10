@@ -106,7 +106,7 @@
       "repository_url": "https://github.com/ESMCI/cime",
       "canonical_url": "https://esmci.github.io/cime/",
       "revision": "025f09aba0b72177df7e22705f0eadbe351b5add",
-      "release": "gitlink bundled with E3SM v3.1.0",
+      "release": "cime6.1.173, gitlink bundled with E3SM v3.1.0",
       "redistribution": "UCAR/Sandia permissive terms; retain LICENSE.TXT, attribution, and disclaimers.",
       "include": ["doc/source/**/*.rst"],
       "documents": [
