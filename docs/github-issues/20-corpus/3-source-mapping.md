@@ -437,7 +437,7 @@ or broaden pilot scope merely because these questions need more evidence.
 
 On 2026-11-10 the operator approved every candidate above for local acquisition,
 including the license-flagged NCO manual and E3SM Data Docs pages. The source scope
-now selects 85 documents across 16 sources, including license companions. All
+now selects 85 documents from 16 repositories, including license companions. All
 paths were rechecked at their pins. Captures are organized by source document,
 not by question; this mapping records which documents each question needs.
 

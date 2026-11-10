@@ -5,8 +5,8 @@ revision, keeps the unchanged bytes with their provenance, prepares one Markdown
 input per document, and captures and validates the result with
 :mod:`e3sm_ai_platform.knowledge.curation`. Upstream text is kept verbatim:
 Markdown files are used as-is and other formats are fenced under a provenance
-header, so fidelity is checked mechanically. License and notice files are kept
-as raw companions, not captured as content. :func:`package` turns an approved
+header, so fidelity is checked mechanically. Documents with the ``license`` role
+are kept as raw companions, not captured as content. :func:`package` turns an approved
 build into a deterministic archive and checksum; it never uploads anything.
 
 Build layout::
@@ -53,7 +53,6 @@ from e3sm_ai_platform.knowledge.curation import (
 
 Fetcher = Callable[[str], bytes]
 
-_COMPANION_PREFIXES = ("LICENSE", "NOTICE", "COPYING")
 _FENCE_LANGUAGES = {
     ".bash": "bash",
     ".cfg": "ini",
@@ -78,12 +77,12 @@ class AcquiredDocument(BaseModel):
     owner: str
     path: str
     revision: str
+    release: str
     url: str
     raw_url: str
     license_url: str
-    access: str
     redistribution: str
-    provenance: str
+    notes: str | None = None
     raw_path: str
     byte_length: int
     sha256: str
@@ -260,34 +259,15 @@ def package(root: Path | str, output_dir: Path | str, version: str) -> Path:
 
 
 def _load_scope(path: Path) -> SourceScope:
-    """Load a scope and reject policy failures or documents outside its paths."""
+    """Load a valid scope whose sources are all GitHub-hosted."""
     failures = validate_source_scope(path)
     if failures:
         raise CurationValidationError("; ".join(failures))
     scope = SourceScope.model_validate_json(path.read_bytes())
-    ids = [document.id for source in scope.sources for document in source.documents]
-    if len(ids) != len(set(ids)):
-        failures.append("document IDs must be unique across sources")
     for source in scope.sources:
-        for document in source.documents:
-            if not _in_path_scope(document.path, source):
-                failures.append(f"document outside path scope: {document.id}")
-            if not document.url.startswith(f"{source.repository_url}/blob/{document.revision}/"):
-                failures.append(
-                    f"document URL does not match repository and revision: {document.id}"
-                )
-            _raw_url(source, document)
-    if failures:
-        raise CurationValidationError("; ".join(failures))
+        _raw_url(source, source.documents[0])
 
     return scope
-
-
-def _in_path_scope(path: str, source: AcquisitionSource) -> bool:
-    """Return whether a path matches an include pattern and no exclude pattern."""
-    included = any(Path(path).full_match(pattern) for pattern in source.path_scope.include)
-    excluded = any(Path(path).full_match(pattern) for pattern in source.path_scope.exclude)
-    return included and not excluded
 
 
 def _raw_url(source: AcquisitionSource, document: ScopeDocument) -> str:
@@ -297,7 +277,7 @@ def _raw_url(source: AcquisitionSource, document: ScopeDocument) -> str:
     if parsed.scheme != "https" or parsed.netloc != "github.com" or len(parts) != 2:
         raise CurationValidationError(f"unsupported repository URL for {source.id}")
     owner, repo = parts
-    return f"https://raw.githubusercontent.com/{owner}/{repo}/{document.revision}/{document.path}"
+    return f"https://raw.githubusercontent.com/{owner}/{repo}/{source.revision}/{document.path}"
 
 
 def _acquire(
@@ -309,12 +289,12 @@ def _acquire(
     for source in scope.sources:
         for document in source.documents:
             if not first:
-                sleep(source.request_interval_seconds)
+                sleep(scope.request_interval_seconds)
             first = False
             raw_url = _raw_url(source, document)
             acquired_at = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
             body = fetch(raw_url)
-            raw_path = Path("raw", source.id, document.revision, document.path)
+            raw_path = Path("raw", source.id, source.revision, document.path)
             destination = root / raw_path
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(body)
@@ -324,19 +304,19 @@ def _acquire(
                     source_id=source.id,
                     owner=source.owner,
                     path=document.path,
-                    revision=document.revision,
-                    url=document.url,
+                    revision=source.revision,
+                    release=source.release,
+                    url=source.document_url(document),
                     raw_url=raw_url,
-                    license_url=source.license_url,
-                    access=source.access,
+                    license_url=source.license_reference or "",
                     redistribution=source.redistribution,
-                    provenance=document.provenance,
+                    notes=document.notes,
                     raw_path=raw_path.as_posix(),
                     byte_length=len(body),
                     sha256=_sha256(body),
                     git_blob_sha1=hashlib.sha1(b"blob %d\0" % len(body) + body).hexdigest(),
                     acquired_at=acquired_at,
-                    captured=not Path(document.path).name.upper().startswith(_COMPANION_PREFIXES),
+                    captured=document.role != "license",
                 )
             )
     record = AcquisitionRecord(scope_sha256=_sha256(scope_file.read_bytes()), documents=documents)
@@ -370,7 +350,7 @@ def _prepare(scope: SourceScope, record: AcquisitionRecord, root: Path) -> None:
                 url=document.url,
                 revision=document.revision,
                 license=document.license_url,
-                policy=f"{document.access} {document.redistribution}",
+                policy=document.redistribution,
                 content_path=content_path,
                 title=title,
             )

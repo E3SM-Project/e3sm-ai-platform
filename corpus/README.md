@@ -1,9 +1,10 @@
 # Corpus curation scope
 
 `sources.json` is the human-owned, approved acquisition scope for official E3SM
-documentation. Selected documents approve acquisition only, not capture fidelity,
-scientific correctness, or publication; an empty document list means no
-selection for that source.
+documentation: one entry per repository at a pinned revision, listing the selected
+files. Selected documents approve acquisition only, not capture fidelity,
+scientific correctness, or publication. See the
+[scope format](../docs/dev/corpus-curation.md#source-scope-format).
 
 `make corpus-curate` builds a local corpus from every selected document. It
 derives its own pinned capture manifest; `sources.json` is never passed to

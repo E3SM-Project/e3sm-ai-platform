@@ -112,27 +112,29 @@ def test_acquisition_scope_rejects_invalid_policy_and_documents(tmp_path):
     source = json.loads((Path(__file__).parents[2] / "corpus" / "sources.json").read_text())
     bad = deepcopy(source)
     first = bad["sources"][0]
+    bad["request_interval_seconds"] = 0
     first["identity"] = " "
     first["canonical_url"] = "file:///local"
-    first["request_interval_seconds"] = 0
-    first["path_scope"]["include"] = ["../private"]
+    first["revision"] = "main"
+    first["license_url"] = None
     first["documents"] = [
-        {
-            "id": "unsafe/id",
-            "path": "docs/[broken",
-            "url": "not-a-url",
-            "revision": "main",
-            "provenance": "",
-        }
+        {"id": "unsafe/id", "path": "docs/*.md", "notes": " "},
+        {"id": "plain", "path": "../private"},
     ]
     bad["sources"].append(deepcopy(first))
     path = tmp_path / "bad-sources.json"
     path.write_text(json.dumps(bad), encoding="utf-8")
-    failures = validate_source_scope(path)
-    assert any("duplicate source IDs" in failure for failure in failures)
-    assert any("missing identity" in failure for failure in failures)
-    assert any("invalid canonical_url" in failure for failure in failures)
-    assert any("request_interval_seconds" in failure for failure in failures)
-    assert any("invalid path pattern" in failure for failure in failures)
-    assert any("unpinned document revision" in failure for failure in failures)
-    assert any("missing document provenance" in failure for failure in failures)
+    failures = "; ".join(validate_source_scope(path))
+    for expected in (
+        "request_interval_seconds must be positive",
+        "duplicate source IDs",
+        "duplicate document IDs",
+        "missing identity",
+        "invalid canonical_url",
+        "unpinned revision",
+        "missing license document or license_url",
+        "unsafe document id",
+        "blank notes",
+    ):
+        assert expected in failures
+    assert failures.count("invalid document path") == 4

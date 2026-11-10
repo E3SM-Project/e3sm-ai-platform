@@ -20,34 +20,20 @@ FILES = {
 
 def _build(tmp_path):
     """Curate a two-document build with an in-memory fetcher."""
-    documents = [
-        {
-            "id": doc_id,
-            "path": f"{doc_id}.md",
-            "url": f"https://github.com/example/docs/blob/{REVISION}/{doc_id}.md",
-            "revision": REVISION,
-            "provenance": "test selection",
-        }
-        for doc_id in ("setup", "submit")
-    ]
     source = {
         "id": "docs",
         "identity": "Example docs",
         "owner": "Example owner",
-        "canonical_url": "https://example.test/",
         "repository_url": "https://github.com/example/docs",
-        "license_url": "https://example.test/license",
-        "access": "public",
+        "revision": REVISION,
+        "release": "1.0",
         "redistribution": "BSD-3-Clause",
-        "refresh_cadence": "never",
-        "request_interval_seconds": 1,
-        "path_scope": {"include": ["*.md"], "exclude": ["**/build/**"]},
-        "document_status": "selected",
-        "documents": documents,
+        "license_url": "https://example.test/license",
+        "documents": [{"id": "setup", "path": "setup.md"}, {"id": "submit", "path": "submit.md"}],
     }
     scope = tmp_path / "sources.json"
     scope.write_text(
-        json.dumps({"manifest_version": 1, "status": "test", "sources": [source]}),
+        json.dumps({"manifest_version": 2, "request_interval_seconds": 1, "sources": [source]}),
         encoding="utf-8",
     )
     root = tmp_path / "build"
@@ -111,7 +97,7 @@ def test_checked_in_questions_reference_selected_content_documents():
         document["id"]
         for source in scope["sources"]
         for document in source["documents"]
-        if not Path(document["path"]).name.upper().startswith(("LICENSE", "NOTICE", "COPYING"))
+        if document.get("role", "content") == "content"
     }
 
     assert len(questions.questions) == 18

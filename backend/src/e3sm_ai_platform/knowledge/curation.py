@@ -1,8 +1,8 @@
 """Offline, deterministic corpus curation artifacts.
 
 This module deliberately supports two distinct JSON manifests.  An acquisition
-*source scope* records approved upstream identity, access, and path policy; it
-does not contain captured content and may have no selected documents.  A local
+*source scope* records approved upstream identity, revision, redistribution
+terms, and selected documents; it does not contain captured content.  A local
 *capture manifest* contains separately approved, pinned local Markdown inputs
 (``id``, ``url``, ``revision``, ``license``, ``policy``, ``content_path``).
 Capture writes normalized Markdown to ``content/<id>.md`` plus ``snapshot``,
@@ -16,12 +16,13 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 SCHEMA_VERSION = 1
+SCOPE_VERSION = 2
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 _FLOATING_REVISIONS = {"head", "main", "master", "latest", "default", "stable"}
 
@@ -30,45 +31,42 @@ class CurationValidationError(ValueError):
     """Raised when a manifest or a corpus artifact fails curation validation."""
 
 
-class PathScope(BaseModel):
-    """Allowed and excluded repository-relative glob patterns for acquisition."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    include: list[str]
-    exclude: list[str]
-
-
 class ScopeDocument(BaseModel):
-    """A selected scope document with pinned revision and acquisition provenance."""
+    """A selected repository file; license companions are kept raw, not captured."""
 
     model_config = ConfigDict(extra="forbid")
 
     id: str
     path: str
-    url: str
-    revision: str
-    provenance: str
+    role: Literal["content", "license"] = "content"
+    notes: str | None = None
 
 
 class AcquisitionSource(BaseModel):
-    """Approved upstream acquisition policy, not a local capture input."""
+    """An approved repository at one pinned revision, not a local capture input."""
 
     model_config = ConfigDict(extra="forbid")
 
     id: str
     identity: str
     owner: str
-    canonical_url: str
     repository_url: str
-    license_url: str
-    access: str
+    canonical_url: str | None = None
+    revision: str
+    release: str
     redistribution: str
-    refresh_cadence: str
-    request_interval_seconds: float
-    path_scope: PathScope
-    document_status: str
+    license_url: str | None = None
     documents: list[ScopeDocument]
+
+    def document_url(self, document: ScopeDocument) -> str:
+        """Return the pinned repository URL of a selected document."""
+        return f"{self.repository_url}/blob/{self.revision}/{document.path}"
+
+    @property
+    def license_reference(self) -> str | None:
+        """Return the explicit license URL or the first license document's URL."""
+        licenses = [document for document in self.documents if document.role == "license"]
+        return self.license_url or (self.document_url(licenses[0]) if licenses else None)
 
 
 class SourceScope(BaseModel):
@@ -77,7 +75,7 @@ class SourceScope(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     manifest_version: int
-    status: str
+    request_interval_seconds: float
     sources: list[AcquisitionSource]
 
 
@@ -330,54 +328,44 @@ def _write_artifacts(root: Path, snapshot: Snapshot) -> None:
 
 def _source_scope_failures(scope: SourceScope) -> list[str]:
     failures: list[str] = []
-    if scope.manifest_version <= 0:
-        failures.append("manifest_version must be positive")
-    if not scope.status.strip():
-        failures.append("missing status")
+    if scope.manifest_version != SCOPE_VERSION:
+        failures.append(f"manifest_version must be {SCOPE_VERSION}")
+    if scope.request_interval_seconds <= 0:
+        failures.append("request_interval_seconds must be positive")
     if not scope.sources:
         failures.append("empty source scope")
     source_ids = [source.id for source in scope.sources]
     if len(source_ids) != len(set(source_ids)):
         failures.append("duplicate source IDs")
+    document_ids = [document.id for source in scope.sources for document in source.documents]
+    if len(document_ids) != len(set(document_ids)):
+        failures.append("duplicate document IDs")
     for source in scope.sources:
         if not _SAFE_ID.fullmatch(source.id):
             failures.append(f"unsafe source id: {source.id}")
-        for field in (
-            "identity",
-            "owner",
-            "access",
-            "redistribution",
-            "refresh_cadence",
-            "document_status",
-        ):
-            if not str(getattr(source, field)).strip():
+        for field in ("identity", "owner", "release", "redistribution"):
+            if not getattr(source, field).strip():
                 failures.append(f"missing {field} for {source.id}")
-        for field in ("canonical_url", "repository_url", "license_url"):
-            if not _is_http_url(getattr(source, field)):
+        for field in ("repository_url", "canonical_url", "license_url"):
+            value = getattr(source, field)
+            if value is not None and not _is_http_url(value):
                 failures.append(f"invalid {field} for {source.id}")
-        if source.request_interval_seconds <= 0:
-            failures.append(f"request_interval_seconds must be positive for {source.id}")
-        if not source.path_scope.include:
-            failures.append(f"empty include path scope for {source.id}")
-        if not source.path_scope.exclude:
-            failures.append(f"empty exclude path scope for {source.id}")
-        for pattern in source.path_scope.include + source.path_scope.exclude:
-            if not _is_safe_glob(pattern):
-                failures.append(f"invalid path pattern for {source.id}: {pattern!r}")
-        document_ids = [document.id for document in source.documents]
-        if len(document_ids) != len(set(document_ids)):
-            failures.append(f"duplicate document IDs for {source.id}")
+        if _is_unpinned_revision(source.revision):
+            failures.append(f"unpinned revision for {source.id}")
+        if not source.documents:
+            failures.append(f"no selected documents for {source.id}")
+        elif source.license_reference is None:
+            failures.append(f"missing license document or license_url for {source.id}")
+        paths = [document.path for document in source.documents]
+        if len(paths) != len(set(paths)):
+            failures.append(f"duplicate document paths for {source.id}")
         for document in source.documents:
             if not _SAFE_ID.fullmatch(document.id):
                 failures.append(f"unsafe document id for {source.id}: {document.id}")
-            if not _is_safe_glob(document.path):
+            if not _is_safe_path(document.path):
                 failures.append(f"invalid document path for {source.id}: {document.path!r}")
-            if not _is_http_url(document.url):
-                failures.append(f"invalid document URL for {source.id}: {document.id}")
-            if not document.provenance.strip():
-                failures.append(f"missing document provenance for {source.id}: {document.id}")
-            if _is_unpinned_revision(document.revision):
-                failures.append(f"unpinned document revision for {source.id}: {document.id}")
+            if document.notes is not None and not document.notes.strip():
+                failures.append(f"blank notes for {source.id}: {document.id}")
 
     return failures
 
@@ -388,17 +376,15 @@ def _is_http_url(value: str) -> bool:
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
 
 
-def _is_safe_glob(pattern: str) -> bool:
-    """Accept a nonempty repository-relative glob without traversal components."""
-    path = Path(pattern)
+def _is_safe_path(value: str) -> bool:
+    """Accept a nonempty repository-relative file path without traversal or globs."""
+    path = Path(value)
     return bool(
-        pattern.strip()
-        and "\\" not in pattern
-        and "\x00" not in pattern
+        value.strip()
+        and not any(character in value for character in "\\\x00*?[]")
         and not path.is_absolute()
-        and "" not in pattern.split("/")
+        and "" not in value.split("/")
         and not any(part in {"", ".", ".."} for part in path.parts)
-        and pattern.count("[") == pattern.count("]")
     )
 
 

@@ -21,41 +21,23 @@ FILES = {
 
 def _scope(tmp_path, *, repository="https://github.com/example/docs"):
     """Write a one-source scope selecting Markdown, RST, and a license companion."""
-    documents = [
-        {
-            "id": doc_id,
-            "path": path,
-            "url": f"{repository}/blob/{REVISION}/{path}",
-            "revision": REVISION,
-            "provenance": "test selection",
-        }
-        for doc_id, path in (
-            ("guide", "README.md"),
-            ("run", "docs/run.rst"),
-            ("license", "LICENSE"),
-        )
-    ]
     scope = {
-        "manifest_version": 1,
-        "status": "test",
+        "manifest_version": 2,
+        "request_interval_seconds": 2,
         "sources": [
             {
                 "id": "docs",
                 "identity": "Example docs",
                 "owner": "Example owner",
-                "canonical_url": "https://example.test/",
                 "repository_url": repository,
-                "license_url": f"{repository}/blob/{REVISION}/LICENSE",
-                "access": "public",
+                "revision": REVISION,
+                "release": "1.0",
                 "redistribution": "BSD-3-Clause",
-                "refresh_cadence": "never",
-                "request_interval_seconds": 2,
-                "path_scope": {
-                    "include": ["README.md", "docs/**", "LICENSE"],
-                    "exclude": ["**/build/**"],
-                },
-                "document_status": "selected",
-                "documents": documents,
+                "documents": [
+                    {"id": "guide", "path": "README.md"},
+                    {"id": "run", "path": "docs/run.rst", "notes": "Test caveat."},
+                    {"id": "license", "path": "LICENSE", "role": "license"},
+                ],
             }
         ],
     }
@@ -83,6 +65,11 @@ def test_curate_keeps_raw_bytes_and_captures_verbatim_text(tmp_path):
     record = json.loads((root / "acquisition.json").read_text())
     by_id = {document["id"]: document for document in record["documents"]}
     assert by_id["license"]["captured"] is False
+    assert by_id["run"]["notes"] == "Test caveat."
+    assert by_id["run"]["url"] == f"https://github.com/example/docs/blob/{REVISION}/docs/run.rst"
+    assert (
+        by_id["guide"]["license_url"] == f"https://github.com/example/docs/blob/{REVISION}/LICENSE"
+    )
     raw = (root / by_id["guide"]["raw_path"]).read_bytes()
     assert raw == FILES[f"{RAW}/README.md"]
     assert by_id["guide"]["sha256"] == hashlib.sha256(raw).hexdigest()
@@ -124,15 +111,15 @@ def test_curate_is_reproducible_and_atomic(tmp_path):
     assert (unrelated / "keep.txt").is_file()
 
 
-def test_curate_rejects_unsupported_or_out_of_scope_documents(tmp_path):
-    """Only GitHub-hosted documents inside the source path scope are acquired."""
+def test_curate_rejects_invalid_or_unsupported_scopes(tmp_path):
+    """Invalid scopes and non-GitHub repositories fail before any download."""
     with pytest.raises(CurationValidationError, match="unsupported repository URL"):
         curate(_scope(tmp_path, repository="https://gitlab.example/docs"), tmp_path / "out")
     scope_path = _scope(tmp_path)
     scope = json.loads(scope_path.read_text())
-    scope["sources"][0]["path_scope"]["include"] = ["README.md", "LICENSE"]
+    scope["sources"][0]["revision"] = "main"
     scope_path.write_text(json.dumps(scope), encoding="utf-8")
-    with pytest.raises(CurationValidationError, match="document outside path scope: run"):
+    with pytest.raises(CurationValidationError, match="unpinned revision for docs"):
         curate(scope_path, tmp_path / "out")
 
 

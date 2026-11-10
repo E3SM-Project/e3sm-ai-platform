@@ -11,7 +11,7 @@ local corpus from every selected document in [`corpus/sources.json`][scope]:
 
 | Measure | Result |
 | --- | ---: |
-| Sources | 16 |
+| Repositories | 16 |
 | Files acquired at pinned revisions | 85 |
 | Documents captured | 65 |
 | License and notice companions kept raw only | 20 |

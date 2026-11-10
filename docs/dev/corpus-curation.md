@@ -4,11 +4,28 @@ Curation and local builds have no runtime impact. Only `curate` uses the network
 tests and CI perform no live source checks.
 
 The human-owned approved scope is
-[`corpus/sources.json`](../../corpus/sources.json). It records approved sources,
-license references, rate limits, path scopes, and selected documents. An empty
-document list means no selection for that source. A selected document approves
+[`corpus/sources.json`](../../corpus/sources.json). A selected document approves
 acquisition only, not capture fidelity, scientific correctness, or publication.
-Keep local build outcomes separate from this policy.
+Keep review and build state out of the scope.
+
+## Source scope format
+
+The scope (`manifest_version` 2) records one shared `request_interval_seconds`
+and a list of sources. Each source is one repository at one pinned revision:
+
+- `id`, `identity`, `owner`, `repository_url`, and optional `canonical_url`.
+- `revision`: a pinned commit; floating names such as `main` are rejected.
+  Select another revision of the same repository as a separate source.
+- `release`: a human-readable label, such as `v3.1.0` or a cohort name.
+- `redistribution`: the terms recorded as each captured document's policy.
+- `documents`: each has a unique `id`, a repository-relative `path`, an optional
+  `role` (`license` marks a raw-only companion), and optional `notes` for caveats
+  about misleading or unverified upstream content.
+- `license_url`: only when no document has the `license` role.
+
+Document URLs are derived as `<repository_url>/blob/<revision>/<path>`, and the
+license reference is the first `license` document's URL. Which questions use each
+document is recorded in `corpus/questions.json`, not in the scope.
 
 This source scope is not the capture manifest accepted by `capture` and `refresh`.
 `curate` derives a separate pinned capture manifest from the scope for each build.
@@ -51,24 +68,24 @@ corpus/local/corpus/
 ```
 
 `acquisition.json` records, for each file, the document and source IDs, owner,
-repository path, pinned revision and URL, raw URL, license URL, access and
-redistribution terms, selection provenance, byte length, SHA-256, Git blob SHA-1,
+repository path, pinned revision, release label, derived and raw URLs, license
+URL, redistribution terms, notes, byte length, SHA-256, Git blob SHA-1,
 and UTC acquisition time. It also records the SHA-256 of the scope that selected
 the files. A Git blob hash is not a raw SHA-256 or a package artifact hash.
 
 ## Preparation
 
 Curation keeps upstream text verbatim; it does not convert formats or select
-sections. Section notes in a document's scope `provenance` describe which parts
-answer a question; the whole file is still captured. Each prepared document starts with a title and a provenance line
+sections; the whole file is captured even when only part of it answers a question.
+Each prepared document starts with a title and a provenance line
 (source URL, revision, owner, and license), followed by the upstream text:
 
 - Markdown files are used as-is.
 - Other formats, including RST, Texinfo, XML, YAML, configuration, and scripts,
   are fenced with a language tag. The fence is longer than any backtick run in
   the text, so the upstream text is never altered.
-- Files named `LICENSE*`, `NOTICE*`, or `COPYING*` are kept as raw companions and
-  are not captured as content.
+- Documents with the `license` role are kept as raw companions and are not
+  captured as content.
 - Includes are not resolved. Select each needed file, such as an included
   configuration, as its own document.
 
@@ -80,8 +97,8 @@ Keep release content distinct from development content. Record upstream commits,
 feedstock revisions, and package versions/builds/hashes separately. Declared
 dependencies do not establish a solved environment or machine compatibility.
 Never execute upstream examples, install environments, or submit HPC jobs during
-curation. Record caveats about misleading upstream content in the selected
-document's `provenance` in the scope.
+curation. Record caveats about misleading upstream content in the document's
+`notes` in the scope.
 
 The capture manifest contains `schema_version` and `sources`; each source has
 `id`, `url`, `revision`, `license`, `policy`, `content_path`, and optional
@@ -93,8 +110,9 @@ runtime citation IDs as part of capture.
 
 ## Integrity, review, and publication
 
-`curate` rejects documents outside their source's path scope, URLs that do not
-match the repository and revision, and non-GitHub repositories. `verify-build`,
+`validate-sources` rejects unpinned revisions, unsafe IDs and paths, duplicate
+IDs, and sources without a license reference; `curate` also rejects non-GitHub
+repositories. `verify-build`,
 run by `curate` and `corpus-validate`, checks offline that:
 
 - raw byte lengths and SHA-256 values match `acquisition.json`;
