@@ -22,7 +22,8 @@ Do not pass `corpus/sources.json` to `capture` or `refresh`.
    scope, respecting request intervals. Retain raw originals and prepare Markdown
    as described below. Stop for approval if a required include is outside selection.
 2. **Capture:** derive a separate pinned local capture manifest from the scope
-   and prepared inputs. Save inputs, provenance, and resulting artifacts outside Git.
+   and prepared inputs. Save inputs, provenance, and resulting artifacts under
+   the git-ignored `corpus/local/` directory; never commit them.
 3. **Offline refresh:** use the saved snapshot and another local, pinned capture
    manifest to write a separate candidate corpus; do not fetch live URLs.
 4. **Reviewer approval:** verify source identity, pinned revision, license and
@@ -36,11 +37,12 @@ copy, and reviewer approval.
 
 ## Raw retention and preparation
 
-Use an operator-local directory outside the repository with `raw/`, `prepared/`,
-`capture-manifest.json`, `provenance.json`, and a separate captured corpus root.
-Retain acquisition/preparation scripts there when needed for reproduction. Record
-the exact location and commands in the capture report; temporary storage is not
-a durable archive.
+Use an operator-local capture directory under the git-ignored `corpus/local/`
+with `raw/`, `prepared/`, `capture-manifest.json`, `provenance.json`, and a
+separate captured corpus root. Retain acquisition/preparation scripts there when
+needed for reproduction. Record the location and commands in the capture report.
+This directory is not a backup; `git clean -x` or removing the clone deletes it,
+so copy it to durable storage before relying on it.
 
 Save complete upstream response bodies unchanged, including license/notice
 companions. Record byte length, SHA-256, repository/owner, repository-relative

@@ -39,10 +39,11 @@ are retained raw companions and are not captured as content records.
 
 ## Local artifact location
 
-Pilot root (operator-local, outside Git, temporary storage, not a durable archive):
+Pilot root, relative to the repository root. `corpus/local/` is git-ignored, so
+these files are operator-local and never committed:
 
 ```text
-/var/folders/_h/t3wvkks5643fxnv07_kx9cx8000zpt/T/opencode/issue-20-pilot-running-case-setup
+corpus/local/running-case-setup/
 ├── README.md               # layout and reproduction notes
 ├── raw/                    # unchanged response bodies, acquisition.json, upstream-blob-check.txt
 ├── prepared/               # curator-prepared Markdown inputs
@@ -53,7 +54,10 @@ Pilot root (operator-local, outside Git, temporary storage, not a durable archiv
 └── verify-report.txt       # last integrity/fidelity verification output
 ```
 
-Copy the root to durable storage before relying on it beyond this pilot.
+The pilot was first written to a temporary system directory and moved here
+unchanged; validation and verification were rerun at this location. This
+directory is not a backup: `git clean -x` or removing the clone deletes it.
+Copy it to durable storage before relying on it beyond this pilot.
 
 ## Preparation and provenance
 
@@ -208,7 +212,7 @@ Network access is needed only for acquisition and blob checks. Run the
 repository commands from the repository root with the existing environment.
 
 ```bash
-R=/var/folders/_h/t3wvkks5643fxnv07_kx9cx8000zpt/T/opencode/issue-20-pilot-running-case-setup
+R="$PWD/corpus/local/running-case-setup"
 
 # Acquire, then compare with GitHub blob SHAs (see the pilot README).
 python3 -I "$R/scripts/acquire.py" "$R"
