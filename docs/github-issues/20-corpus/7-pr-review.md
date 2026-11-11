@@ -12,6 +12,32 @@ agent never approves.
 - **Results:** [`6-corpus-build-coverage.md`](6-corpus-build-coverage.md),
   section "Expansion to documentation folders".
 
+## Scope of PR #34
+
+Done:
+
+- Ingest all Markdown and RST documentation of the selected repositories
+  through folder patterns.
+- Add four sources: zstash, e3sm_to_cmip, mache, and MPAS-Tools.
+- Add the `pm-cpu` and `chrysalis` machine and batch configuration and the NCO
+  `ncremap` section.
+- Replace 16 explicit entries already selected by patterns with pattern-derived
+  IDs.
+- State in the coverage report that coverage measures whether retrieval finds
+  documents, not whether answers are complete; per-question evidence gaps are in
+  the [source mapping](3-source-mapping.md).
+- Add warning notes to pages that advise disabling SSL verification.
+
+Deferred:
+
+- Sources zppy-interfaces and chemdyg, and external projects such as
+  pcmdi_metrics, LIVVkit, TempestRemap, ESMF, and MOAB.
+- Content not in Git: NERSC Perlmutter and LCRC Chrysalis user documentation,
+  E3SM papers, and campaign run scripts. These need new approval and a web
+  acquisition method; no issue is open yet.
+- Gaps documents cannot fill: user logs and data, generated output, and
+  execution checks.
+
 ## 1. Agent pre-review (done 2026-11-10)
 
 | Check | Result |
@@ -25,8 +51,10 @@ agent never approves.
 | Unresolved includes | 9: zppy `post.rrm_simulation.cfg`, `post.mpas_analysis_model_vs_model.cfg`, and `testing_e3sm_unified.cfg`; MPAS-Analysis generated observation tables (`ocean_obs_table.rst`, `seaice_obs_table.rst`, `all_obs.rst`); xCDAT `demos.txt`, `notebook-examples.txt`, and `../HISTORY.rst`. None added. |
 | Coverage | 17 of 81 expected documents in the top 8; 10 of 18 questions cite one. No expected document retrieved for `tutorial-version-migration`, `tools-atmosphere-ocean`, `user-guide-compset`, `diagnostics-qbo-inputs`, or `cross-project-mpas-output`. |
 
-**Risk-pattern scan:** 846 hits in 120 documents; 20 documents already have
-notes, 100 do not.
+**Caveat scan:** 846 hits in 120 documents for content that may be outdated or
+apply only to specific sites; 20 documents already have notes, 100 do not. The
+content is public, so the concern is answer accuracy; only the disabled-TLS
+advice is unsafe.
 
 | Pattern | Hits | Unnoted documents | Examples needing a decision |
 | --- | ---: | ---: | --- |
@@ -39,10 +67,12 @@ notes, 100 do not.
 ## 2. Author review (before handoff)
 
 - [x] Add notes for the two TLS documents above.
-- [ ] Decide whether to note the other unnoted groups. Notes go in
-  `corpus/sources.json`; they do not change `snapshot_sha256`.
+- [ ] Triage the other caveat-scan groups: note, accept, or exclude. Notes go
+  in `corpus/sources.json`; they do not change `snapshot_sha256`.
 - [ ] Open three documents (Markdown, RST, and a script or configuration) next
   to their header link on GitHub: the text matches.
+- [ ] Optional: an agent pass recording whether each question's captured
+  documents contain its key facts. Skip unless the colleague wants it.
 - [ ] Fill in the review record below: snapshot, coverage, gaps.
 
 ## 3. Colleague review (about 1 hour)
@@ -87,7 +117,7 @@ python3 -c "import json; [print(f\"{d['id']}: {d['notes']}\") for s in json.load
 ```
 
 - [ ] Existing notes are accurate.
-- [ ] Agent risk hits (section 1) are resolved: noted, accepted, or excluded.
+- [ ] Caveat-scan hits (section 1) are resolved: noted, accepted, or excluded.
 
 ### Licenses (about 3 minutes)
 
