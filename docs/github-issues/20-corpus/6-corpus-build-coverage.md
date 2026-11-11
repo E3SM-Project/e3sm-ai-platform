@@ -181,7 +181,7 @@ documents. Twenty of those documents already have notes; 100 do not.
 The two documents that repeat the TLS advice already flagged in `diags-install`,
 `zppy.docs.source.getting_started.rst` and
 `zstash.docs.source.getting_started.rst`, need notes before approval. The other
-hits are triaged in the [review request](7-colleague-review.md).
+hits are triaged in the [review request](7-pr-review.md).
 
 ### Conclusion
 

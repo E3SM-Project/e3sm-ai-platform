@@ -28,7 +28,7 @@ coverage and record evidence gaps" item:
 - [x] Clarify in the coverage report that 30/81 measures whether retrieval finds
       documents, not answer completeness; link the per-question gaps in the source
       mapping.
-- [x] Commit the [colleague review request](7-colleague-review.md).
+- [x] Commit the [PR review request](7-pr-review.md).
 - [ ] Add notes for the documents flagged by the agent caveat scan, then complete
       the author and colleague reviews.
 - [ ] Optional: an agent pass recording whether each question's captured

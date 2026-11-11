@@ -9,7 +9,7 @@ Work from the repository root. You need GitHub access to open the source links.
 ## 1. Build and check
 
 ```bash
-make corpus-curate     # downloads pinned files; about 2 minutes
+make corpus-curate     # downloads pinned files; about 12 minutes
 make corpus-validate   # must finish without errors
 make corpus-coverage   # prints the per-question table
 ```
@@ -34,8 +34,9 @@ For each source in `sources.json`:
       `git ls-remote --tags <repository_url> | grep <revision>` lists the tag.
       Snapshots, feedstock recipes, and the CIME submodule have no tag; confirm
       the `release` label explains the choice.
-- [ ] Each document helps answer at least one question in `questions.json`;
-      remove documents that do not.
+- [ ] Each source's `include` and `exclude` patterns select its user-facing
+      documentation without unrelated content; explicit documents help answer
+      at least one question in `questions.json`.
 - [ ] Nothing important is missing for a question; list gaps in the review record
       instead of approving with silent gaps.
 

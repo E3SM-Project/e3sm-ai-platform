@@ -1,8 +1,8 @@
 # Corpus curation scope
 
 `sources.json` is the human-owned, approved acquisition scope for official E3SM
-documentation: one entry per repository at a pinned revision, listing the selected
-files. Selected documents approve acquisition only, not capture fidelity,
+documentation: one entry per repository at a pinned revision, selecting files by
+folder pattern or explicit path. Selected documents approve acquisition only, not capture fidelity,
 scientific correctness, or publication. See the
 [scope format](../docs/dev/corpus-curation.md#source-scope-format).
 
