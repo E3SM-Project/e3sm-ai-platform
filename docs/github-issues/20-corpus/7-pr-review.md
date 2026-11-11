@@ -91,8 +91,10 @@ make corpus-coverage                    # per-question table, about 1 minute
 python3 -c "import json; print(json.load(open('corpus/local/corpus/captured/review.json'))['snapshot_sha256'])"
 ```
 
-- [ ] Your `snapshot_sha256` equals the author's (above). A mismatch means the
-  build is not reproducible: stop and report it.
+- [ ] Your `snapshot_sha256` equals the author's (above). The hash is a
+  fingerprint of the whole corpus: change one character in any document and it
+  changes. A match means your build is identical to the author's; a mismatch
+  means the build is not reproducible: stop and report it.
 
 ### Sources and selection (about 20 minutes)
 
@@ -107,7 +109,7 @@ python3 -c "import json, sys; [print(d['path']) for d in json.load(open('corpus/
 - [ ] Each source is the authoritative project at a sensible version, and its
   `include`/`exclude` patterns in `corpus/sources.json` select the right files.
 - [ ] Expected documents in `corpus/questions.json` are relevant; missing
-  evidence is listed in your reply.
+  evidence is listed in the review record.
 - [ ] The contents table in `corpus/README.md` and "Corpus contents" in the PR
   description match `corpus/sources.json` and the output above: sources,
   folders, specific files, and the PR's document counts.
@@ -132,10 +134,15 @@ Publishing NCO or Data Docs content outside the project is not part of this revi
 
 ### Decide
 
-**Request changes:** reply with the list; changes go into #34, and the build is
-reviewed again.
+1. Fill in the colleague fields of the [review record](#review-record) below and
+   commit it to `feature/20-corpus`; GitHub's web editor works.
+2. Submit a GitHub review on #34:
+   - **Request changes:** list them in the review; changes go into #34, and the
+     build is reviewed again.
+   - **Approve:** the GitHub approval is the decision of record.
 
-**Approve:**
+Optional, after approving: package the build locally and add its SHA-256 to the
+record.
 
 ```bash
 python3 -c "import json, pathlib; p = pathlib.Path('corpus/local/corpus/captured/review.json'); d = json.loads(p.read_text()); d['approved'] = True; p.write_text(json.dumps(d, indent=2, sort_keys=True) + '\n')"
@@ -155,5 +162,5 @@ This creates a local archive only. Nothing is published.
 | Colleague (approver) / date | |
 | `snapshot_sha256` (author / colleague) | `fa6a9a2d…` / |
 | Coverage totals | 17 / 81 retrieved; 10 / 18 cite an expected document |
-| Archive SHA-256 | |
+| Archive SHA-256 (optional) | |
 | Gaps or requested changes | |
