@@ -12,7 +12,8 @@ Versions follow E3SM v3.1.0, its bundled CIME (`cime6.1.173`), and the
 E3SM-Unified 1.13.0 release. Each source contributes its documentation folders
 (Markdown and RST) plus specific files that answer the representative questions.
 License files are kept with the build but not searched. `sources.json` is the
-authoritative list.
+authoritative list. The current scope builds 539 documents; `acquisition.json`
+in the build lists each one by source.
 
 | Source | Documentation folders | Specific files |
 | --- | --- | --- |
