@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Protocol
 
 from opentelemetry import trace
@@ -14,7 +15,12 @@ from e3sm_ai_platform.integrations.argo import build_generator as build_argo_gen
 from e3sm_ai_platform.integrations.openai_compatible import (
     build_generator as build_openai_compatible_generator,
 )
-from e3sm_ai_platform.knowledge.corpus import chunk_corpus, corpus_summary, load_corpus
+from e3sm_ai_platform.knowledge.corpus import (
+    chunk_corpus,
+    corpus_snapshot_id,
+    corpus_summary,
+    load_corpus,
+)
 from e3sm_ai_platform.knowledge.interfaces import VectorStore
 from e3sm_ai_platform.knowledge.retrieval import build_retriever
 
@@ -55,7 +61,9 @@ class CompassService:
         settings: Settings | None = None,
     ) -> None:
         self.settings = settings or load_settings()
-        self.entries = load_corpus()
+        corpus_path = self.settings.corpus_path
+        self.entries = load_corpus(Path(corpus_path) if corpus_path else None)
+        self.corpus_snapshot_id = corpus_snapshot_id(self.entries)
         self.chunks = chunk_corpus(self.entries)
         self.store = retriever or build_retriever(self.settings)
         if retriever is None:
@@ -68,6 +76,7 @@ class CompassService:
         tracer = trace.get_tracer(__name__)
         with tracer.start_as_current_span("compass.query") as query_span:
             query_span.set_attribute("compass.top_k", request.top_k)
+            query_span.set_attribute("rag.corpus_snapshot_id", self.corpus_snapshot_id)
             query_span.set_attribute("compass.include_evidence", request.include_evidence)
             with tracer.start_as_current_span("rag.retrieve") as retrieve_span:
                 candidates = self.store.search(request.question, max(request.top_k, 8))
@@ -108,8 +117,9 @@ class CompassService:
             return response
 
     def health(self) -> dict[str, object]:
-        """Return service health and loaded corpus statistics."""
-        return {"status": "ok", "corpus": corpus_summary(self.entries), "chunks": len(self.chunks)}
+        """Return service health and loaded corpus statistics and snapshot ID."""
+        corpus = {**corpus_summary(self.entries), "snapshot_id": self.corpus_snapshot_id}
+        return {"status": "ok", "corpus": corpus, "chunks": len(self.chunks)}
 
     def _accepted_evidence(
         self,

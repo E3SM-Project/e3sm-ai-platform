@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from importlib.resources import files
@@ -80,6 +81,29 @@ def chunk_corpus(
         for entry in entries
         for chunk in chunk_entry(entry, max_words=max_words, overlap_words=overlap_words)
     ]
+
+
+def corpus_snapshot_id(entries: list[CorpusEntry]) -> str:
+    """Return a stable identifier for the content of loaded corpus entries.
+
+    Parameters
+    ----------
+    entries : list of CorpusEntry
+        Entries as loaded, in corpus order.
+
+    Returns
+    -------
+    str
+        ``sha256:`` followed by the digest of the entries' canonical JSON, so the
+        identifier changes with content or order but not with file formatting.
+    """
+    canonical = json.dumps(
+        [entry.model_dump(mode="json") for entry in entries],
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return f"sha256:{hashlib.sha256(canonical.encode('utf-8')).hexdigest()}"
 
 
 def corpus_summary(entries: list[CorpusEntry]) -> dict[str, Any]:
