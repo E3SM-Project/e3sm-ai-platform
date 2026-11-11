@@ -55,8 +55,8 @@ Deferred:
 apply only to specific sites; 20 documents already have notes, 100 do not. The
 content is public, so the concern is answer accuracy; only the disabled-TLS
 advice is unsafe and is noted. The other hits are accepted as-is: they are
-pinned upstream documentation, answers cite them, and refreshing sources is
-#31's work.
+pinned upstream documentation, answers cite them, and source refresh is tracked
+in #31.
 
 | Pattern | Hits | Unnoted documents | Examples needing a decision |
 | --- | ---: | ---: | --- |
