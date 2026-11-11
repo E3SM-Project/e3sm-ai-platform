@@ -71,6 +71,9 @@ pinned upstream documentation, answers cite them, and refreshing sources is
 - [x] Add notes for the two TLS documents above.
 - [ ] Open three documents (Markdown, RST, and a script or configuration) next
   to their header link on GitHub: the text matches.
+- [ ] The contents table in `corpus/README.md` matches `corpus/sources.json`:
+  every source, folder pattern, and specific file. The PR description repeats
+  it; update both together.
 - [ ] Optional: an agent pass recording whether each question's captured
   documents contain its key facts. Skip unless the colleague wants it.
 - [ ] Fill in the review record below: snapshot, coverage, gaps.
