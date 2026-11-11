@@ -25,6 +25,7 @@ SCHEMA_VERSION = 1
 SCOPE_VERSION = 2
 _SAFE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 _FLOATING_REVISIONS = {"head", "main", "master", "latest", "default", "stable"}
+_COMMIT_SHA = re.compile(r"[0-9a-f]{40}\Z")
 
 
 class CurationValidationError(ValueError):
@@ -382,8 +383,8 @@ def _source_scope_failures(scope: SourceScope) -> list[str]:
             value = getattr(source, field)
             if value is not None and not _is_http_url(value):
                 failures.append(f"invalid {field} for {source.id}")
-        if _is_unpinned_revision(source.revision):
-            failures.append(f"unpinned revision for {source.id}")
+        if not _COMMIT_SHA.fullmatch(source.revision):
+            failures.append(f"unpinned revision for {source.id}: use a full 40-character commit SHA")
         if not source.documents and not source.include:
             failures.append(f"no selected documents for {source.id}")
         if source.license_reference is None:

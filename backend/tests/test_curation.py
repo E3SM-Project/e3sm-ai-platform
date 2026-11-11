@@ -108,7 +108,7 @@ def test_checked_in_acquisition_scope_validates_offline():
 
 
 def test_acquisition_scope_rejects_invalid_policy_and_documents(tmp_path):
-    """Scope validation rejects unsafe policy values and unpinned selected documents."""
+    """Scope validation rejects unsafe policy values and non-commit or unsafe revisions."""
     source = json.loads((Path(__file__).parents[2] / "corpus" / "sources.json").read_text())
     bad = deepcopy(source)
     first = bad["sources"][0]
@@ -122,6 +122,8 @@ def test_acquisition_scope_rejects_invalid_policy_and_documents(tmp_path):
         {"id": "plain", "path": "../private"},
     ]
     bad["sources"].append(deepcopy(first))
+    bad["sources"][-1]["revision"] = "../../outside"
+    bad["sources"].append({**deepcopy(first), "id": "develop-branch", "revision": "develop"})
     path = tmp_path / "bad-sources.json"
     path.write_text(json.dumps(bad), encoding="utf-8")
     failures = "; ".join(validate_source_scope(path))
@@ -131,10 +133,10 @@ def test_acquisition_scope_rejects_invalid_policy_and_documents(tmp_path):
         "duplicate document IDs",
         "missing identity",
         "invalid canonical_url",
-        "unpinned revision",
         "missing license document or license_url",
         "unsafe document id",
         "blank notes",
     ):
         assert expected in failures
-    assert failures.count("invalid document path") == 4
+    assert failures.count("invalid document path") == 6
+    assert failures.count("unpinned revision") == 3
