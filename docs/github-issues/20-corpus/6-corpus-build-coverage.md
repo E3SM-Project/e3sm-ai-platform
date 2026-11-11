@@ -167,8 +167,9 @@ pages, such as CIME's case-control index and multi-year example for
 
 ### Caveat scan
 
-An automated scan of all 539 documents found 846 risk-pattern hits in 120
-documents. Twenty of those documents already have notes; 100 do not.
+An automated scan of all 539 documents found 846 hits in 120 documents for
+content that may be outdated or apply only to specific sites. Twenty of those
+documents already have notes; 100 do not.
 
 | Pattern | Hits | Documents without notes |
 | --- | ---: | ---: |
@@ -178,10 +179,11 @@ documents. Twenty of those documents already have notes; 100 do not.
 | `module` commands | 21 | 7 |
 | Disabled TLS verification | 6 | 2 |
 
-The two documents that repeat the TLS advice already flagged in `diags-install`,
-`zppy.docs.source.getting_started.rst` and
-`zstash.docs.source.getting_started.rst`, need notes before approval. The other
-hits are triaged in the [review request](7-pr-review.md).
+Only the disabled-TLS advice is unsafe. The two documents that repeat the advice
+already flagged in `diags-install`, `zppy.docs.source.getting_started.rst` and
+`zstash.docs.source.getting_started.rst`, now carry notes. The other hits are
+accepted as-is: the content is public upstream documentation at pinned
+revisions, answers cite it, and refreshing sources is #31's work.
 
 ### Conclusion
 

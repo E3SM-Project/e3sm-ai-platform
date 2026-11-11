@@ -54,7 +54,9 @@ Deferred:
 **Caveat scan:** 846 hits in 120 documents for content that may be outdated or
 apply only to specific sites; 20 documents already have notes, 100 do not. The
 content is public, so the concern is answer accuracy; only the disabled-TLS
-advice is unsafe.
+advice is unsafe and is noted. The other hits are accepted as-is: they are
+pinned upstream documentation, answers cite them, and refreshing sources is
+#31's work.
 
 | Pattern | Hits | Unnoted documents | Examples needing a decision |
 | --- | ---: | ---: | --- |
@@ -67,15 +69,13 @@ advice is unsafe.
 ## 2. Author review (before handoff)
 
 - [x] Add notes for the two TLS documents above.
-- [ ] Triage the other caveat-scan groups: note, accept, or exclude. Notes go
-  in `corpus/sources.json`; they do not change `snapshot_sha256`.
 - [ ] Open three documents (Markdown, RST, and a script or configuration) next
   to their header link on GitHub: the text matches.
 - [ ] Optional: an agent pass recording whether each question's captured
   documents contain its key facts. Skip unless the colleague wants it.
 - [ ] Fill in the review record below: snapshot, coverage, gaps.
 
-## 3. Colleague review (about 1 hour)
+## 3. Colleague review (about 45 minutes)
 
 Judgment and approval. Do not approve if anything is unclear; request changes.
 
@@ -109,7 +109,7 @@ python3 -c "import json, sys; [print(d['path']) for d in json.load(open('corpus/
 - [ ] Expected documents in `corpus/questions.json` are relevant; missing
   evidence is listed in your reply.
 
-### Caveats (about 20 minutes)
+### Caveats (about 5 minutes)
 
 ```bash
 # Documents that already have notes
@@ -117,7 +117,6 @@ python3 -c "import json; [print(f\"{d['id']}: {d['notes']}\") for s in json.load
 ```
 
 - [ ] Existing notes are accurate.
-- [ ] Caveat-scan hits (section 1) are resolved: noted, accepted, or excluded.
 
 ### Licenses (about 3 minutes)
 
