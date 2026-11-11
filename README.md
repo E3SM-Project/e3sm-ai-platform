@@ -151,6 +151,7 @@ The optional tracing stack uses Docker Compose. See [Observability](docs/dev/obs
 - [Documentation index](docs/README.md)
 - [Usage guide](docs/user/usage.md)
 - [Developer setup](docs/dev/setup.md)
+- [ALCF Inference Service setup](docs/dev/alcf-inference.md)
 - [Architecture](docs/dev/architecture.md)
 - [Evaluation](docs/dev/evaluation.md)
 - [Observability](docs/dev/observability.md)
