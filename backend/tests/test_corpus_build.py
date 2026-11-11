@@ -89,7 +89,7 @@ def test_curate_keeps_raw_bytes_and_captures_verbatim_text(tmp_path):
 
 
 def test_curate_is_reproducible_and_atomic(tmp_path):
-    """Rebuilds match; existing builds need overwrite; failures leave no output."""
+    """Rebuilds match; overwrite replaces builds safely; failures leave no output."""
     scope = _scope(tmp_path)
     first, second = tmp_path / "first", tmp_path / "second"
     curate(scope, first, fetch=FILES.__getitem__, sleep=lambda _: None)
@@ -101,6 +101,8 @@ def test_curate_is_reproducible_and_atomic(tmp_path):
     with pytest.raises(CurationValidationError, match="already exists"):
         curate(scope, first, fetch=FILES.__getitem__, sleep=lambda _: None)
     curate(scope, first, overwrite=True, fetch=FILES.__getitem__, sleep=lambda _: None)
+    assert verify_build(first, scope) == []
+    assert not (tmp_path / "first.previous").exists()
 
     def failing(url):
         raise CurationValidationError(f"failed to fetch {url}")
@@ -139,8 +141,19 @@ def test_verify_build_detects_raw_and_captured_tampering(tmp_path):
     assert verify_build(root) == ["raw hash mismatch for run"]
 
 
+def test_verify_build_reports_builds_from_another_scope(tmp_path):
+    """A build is out of date once its scope file changes."""
+    scope = _scope(tmp_path)
+    root = tmp_path / "build"
+    curate(scope, root, fetch=FILES.__getitem__, sleep=lambda _: None)
+    assert verify_build(root, scope) == []
+
+    scope.write_text(scope.read_text().replace("Test caveat.", "Changed caveat."), encoding="utf-8")
+    assert verify_build(root, scope) == [f"build is out of date with {scope}; rerun curate"]
+
+
 def test_package_requires_approval_and_is_deterministic(tmp_path):
-    """Packaging refuses unapproved builds and archives licenses with captured content."""
+    """Packaging refuses unapproved builds and archives a build that verifies unpacked."""
     root = tmp_path / "build"
     curate(_scope(tmp_path), root, fetch=FILES.__getitem__, sleep=lambda _: None)
     with pytest.raises(CurationValidationError, match="review is not approved"):
@@ -159,7 +172,11 @@ def test_package_requires_approval_and_is_deterministic(tmp_path):
     assert f"e3sm-corpus-1.0.0/raw/docs/{REVISION}/LICENSE" in names
     assert "e3sm-corpus-1.0.0/captured/content/run.md" in names
     assert "e3sm-corpus-1.0.0/acquisition.json" in names
+    assert f"e3sm-corpus-1.0.0/raw/docs/{REVISION}/docs/run.rst" in names
     assert not any("/prepared/" in name for name in names)
+    with tarfile.open(archive) as contents:
+        contents.extractall(tmp_path / "unpacked", filter="data")
+    assert verify_build(tmp_path / "unpacked" / "e3sm-corpus-1.0.0") == []
 
 
 def test_fetch_retries_transient_failures_only():
@@ -204,7 +221,8 @@ def test_export_runtime_corpus_loads_with_review_state_in_provenance(tmp_path):
     assert [entry.source_id for entry in entries] == ["guide", "run"]
     assert entries[1].section == "docs/run.rst"
     assert entries[1].version == "1.0"
-    assert entries[1].provenance.endswith("review not approved.")
+    assert entries[0].provenance.endswith("review not approved.")
+    assert entries[1].provenance.endswith("review not approved. Curator note: Test caveat.")
     _approve(root)
     export_runtime_corpus(root, output)
     assert load_corpus(output)[0].provenance.endswith("review approved.")

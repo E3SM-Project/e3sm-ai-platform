@@ -384,7 +384,9 @@ def _source_scope_failures(scope: SourceScope) -> list[str]:
             if value is not None and not _is_http_url(value):
                 failures.append(f"invalid {field} for {source.id}")
         if not _COMMIT_SHA.fullmatch(source.revision):
-            failures.append(f"unpinned revision for {source.id}: use a full 40-character commit SHA")
+            failures.append(
+                f"unpinned revision for {source.id}: use a full 40-character commit SHA"
+            )
         if not source.documents and not source.include:
             failures.append(f"no selected documents for {source.id}")
         if source.license_reference is None:

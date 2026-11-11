@@ -74,6 +74,9 @@ def main() -> int:
         "verify-build", help="check a curate build's raw hashes, fidelity, and artifacts offline"
     )
     verify_parser.add_argument("root", type=Path, help="build directory from curate")
+    verify_parser.add_argument(
+        "--scope", type=Path, help="current source scope; fail if the build is out of date"
+    )
     package_parser = commands.add_parser(
         "package", help="archive an approved build with a checksum; never uploads"
     )
@@ -101,7 +104,7 @@ def main() -> int:
                 print(f"{len(unresolved)} RST includes point to files outside the corpus:")
                 print("\n".join(f"  {item}" for item in unresolved))
         elif args.command == "verify-build":
-            failures = verify_build(args.root)
+            failures = verify_build(args.root, args.scope)
             if failures:
                 parser.error("; ".join(failures))
         elif args.command == "export":

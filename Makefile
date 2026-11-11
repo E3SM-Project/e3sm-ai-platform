@@ -126,7 +126,7 @@ corpus-curate:
 
 corpus-validate:
 	$(CORPUS_CLI) validate-sources corpus/sources.json
-	$(CORPUS_CLI) verify-build $(CORPUS_BUILD)
+	$(CORPUS_CLI) verify-build $(CORPUS_BUILD) --scope corpus/sources.json
 
 corpus-coverage:
 	$(CORPUS_CLI) coverage $(CORPUS_BUILD) corpus/questions.json --output corpus/local/coverage.json

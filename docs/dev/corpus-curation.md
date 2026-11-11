@@ -15,10 +15,10 @@ Run from the repository root.
 | Step | Command | Result |
 | --- | --- | --- |
 | 1. Curate | `make corpus-curate` | Downloads every selected file at its pinned revision and builds `corpus/local/corpus/`. Set `GITHUB_TOKEN` to avoid GitHub API rate limits. |
-| 2. Validate | `make corpus-validate` | Rechecks the scope and the build offline. |
+| 2. Validate | `make corpus-validate` | Rechecks the scope and the build offline, and fails if the build is out of date with `sources.json`. |
 | 3. Coverage | `make corpus-coverage` | Reports which expected documents each [representative question](../../corpus/questions.json) retrieves and cites. |
 | 4. Review | [Review checklist](corpus-review.md) | An authorized reviewer sets `approved` in `captured/review.json`. Curation never approves. |
-| 5. Package | `make corpus-package VERSION=<label>` | Writes a deterministic local archive and `.sha256` for an approved build. Never uploads. |
+| 5. Package | `make corpus-package VERSION=<label>` | Writes a deterministic local archive and `.sha256` for an approved build; the unpacked archive passes validation. Never uploads. |
 
 Optional: `make corpus-export` writes the build for the backend
 ([runtime use](#runtime-use)).
@@ -36,7 +36,7 @@ and lists sources. Each source is one GitHub repository at one pinned commit:
 | Field | Meaning |
 | --- | --- |
 | `id`, `identity`, `owner`, `repository_url`, `canonical_url` | Source identity; `canonical_url` is optional. |
-| `revision` | Pinned commit. Branch names such as `main` are rejected. Use a separate source for another revision. |
+| `revision` | Full 40-character commit SHA; branch and tag names are rejected. Use a separate source for another revision. |
 | `release` | Human-readable version label, such as `v3.1.0`. |
 | `redistribution` | Terms recorded on every captured document. |
 | `include`, `exclude` | Optional glob patterns, such as `docs/**/*.md`; `**` spans folders. |
@@ -53,6 +53,7 @@ and lists sources. Each source is one GitHub repository at one pinned commit:
   `[[14, 21], [19685, 21956]]`, from very large files. Include any license
   notice the excerpt must carry.
 - **`notes`** record caveats about misleading or unverified upstream content.
+  Exported builds pass them to the model with each retrieved chunk.
 
 Which questions use each document is recorded in `corpus/questions.json`, not
 in the scope.
@@ -76,8 +77,10 @@ curation.
 
 `make corpus-validate` checks, offline, that:
 
-- the scope has pinned revisions, safe IDs and paths, no duplicate IDs, and a
-  license reference for every source;
+- the scope has full commit SHAs as revisions, safe IDs and paths, no
+  duplicate IDs, and a license reference for every source;
+- the build was curated from the current `sources.json`; any scope edit,
+  including `notes`, requires `make corpus-curate`;
 - every raw file matches the byte length and SHA-256 in `acquisition.json`;
 - every captured document contains its raw text, or each selected line range,
   unchanged;

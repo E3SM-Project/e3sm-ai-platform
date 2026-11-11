@@ -179,13 +179,19 @@ def curate(
         raise
 
     if root.exists():
-        shutil.rmtree(root)
-    partial.rename(root)
+        previous = root.with_name(f"{root.name}.previous")
+        if previous.exists():
+            shutil.rmtree(previous)
+        root.rename(previous)
+        partial.rename(root)
+        shutil.rmtree(previous)
+    else:
+        partial.rename(root)
 
     return snapshot
 
 
-def verify_build(root: Path | str) -> list[str]:
+def verify_build(root: Path | str, scope_path: Path | str | None = None) -> list[str]:
     """Return integrity and fidelity failures for a corpus build, offline.
 
     Checks raw byte lengths and hashes against ``acquisition.json``, that each
@@ -196,6 +202,9 @@ def verify_build(root: Path | str) -> list[str]:
     ----------
     root : Path or str
         Build directory written by :func:`curate`.
+    scope_path : Path or str, optional
+        Current source scope. When given, the build must have been curated from
+        this exact scope file; otherwise it is reported as out of date.
 
     Returns
     -------
@@ -209,6 +218,8 @@ def verify_build(root: Path | str) -> list[str]:
         return [f"invalid acquisition record: {error}"]
 
     failures = validate_corpus(root / "captured")
+    if scope_path is not None and _sha256(Path(scope_path).read_bytes()) != record.scope_sha256:
+        failures.append(f"build is out of date with {scope_path}; rerun curate")
     for document in record.documents:
         try:
             body = (root / document.raw_path).read_bytes()
@@ -247,7 +258,7 @@ def runtime_entries(root: Path | str) -> list[CorpusEntry]:
     -------
     list of CorpusEntry
         Entries in snapshot order. Each entry's provenance states the pinned
-        revision and whether the build's review is approved.
+        revision, whether the build's review is approved, and any curator notes.
 
     Raises
     ------
@@ -266,6 +277,9 @@ def runtime_entries(root: Path | str) -> list[CorpusEntry]:
     entries = []
     for item in snapshot.records:
         document = documents[item.id]
+        provenance = f"Verbatim upstream file at revision {item.revision}; {review}."
+        if document.notes:
+            provenance += f" Curator note: {document.notes}"
         entries.append(
             CorpusEntry(
                 source_id=item.id,
@@ -274,7 +288,7 @@ def runtime_entries(root: Path | str) -> list[CorpusEntry]:
                 section=document.path,
                 component=document.source_id,
                 version=document.release,
-                provenance=f"Verbatim upstream file at revision {item.revision}; {review}.",
+                provenance=provenance,
                 text=(root / "captured" / item.content_path).read_text(encoding="utf-8"),
             )
         )
@@ -309,8 +323,8 @@ def export_runtime_corpus(root: Path | str, output: Path | str) -> int:
 def package(root: Path | str, output_dir: Path | str, version: str) -> Path:
     """Write a deterministic archive and checksum for an approved build.
 
-    The archive contains ``captured/``, ``acquisition.json``, and the raw
-    license and notice companions. Nothing is uploaded.
+    The archive contains ``acquisition.json``, ``captured/``, and every raw
+    file, so an unpacked archive passes :func:`verify_build`. Nothing is uploaded.
 
     Parameters
     ----------
@@ -342,7 +356,7 @@ def package(root: Path | str, output_dir: Path | str, version: str) -> Path:
     record = AcquisitionRecord.model_validate_json((root / "acquisition.json").read_bytes())
     members = [root / "acquisition.json"]
     members += sorted(path for path in (root / "captured").rglob("*") if path.is_file())
-    members += [root / document.raw_path for document in record.documents if not document.captured]
+    members += [root / document.raw_path for document in record.documents]
     name = f"e3sm-corpus-{version}"
     archive = Path(output_dir) / f"{name}.tar.gz"
     archive.parent.mkdir(parents=True, exist_ok=True)
