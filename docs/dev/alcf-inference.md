@@ -2,6 +2,9 @@
 
 The [ALCF Inference Service](https://docs.alcf.anl.gov/services/inference-endpoints/) speaks the standard OpenAI chat completions API and works out of the box with E3SM Compass using the `openai_compatible` backend.
 
+> [!IMPORTANT]
+> **This is not a free or public service: an active [ALCF user account](https://accounts.alcf.anl.gov/), an authorized ALCF project allocation, and Globus authentication are required to access these endpoints.**
+
 ## 1. Setup and Quickstart
 
 ### Step 1: Install dependencies and initialize local config
@@ -13,9 +16,9 @@ make sync
 make backend-env
 ```
 
-### Step 2: Obtain an ALCF access token
+### Step 2: Authenticate with Globus and obtain an ALCF access token
 
-You need an active [ALCF user account](https://accounts.alcf.anl.gov/). Download the official ALCF authentication helper, authenticate once in your browser via Globus, and print your access token:
+**An active ALCF account linked with Globus is required.** Download the official ALCF authentication helper, authenticate once in your browser via Globus, and print your access token:
 
 ```bash
 curl -sO https://raw.githubusercontent.com/argonne-lcf/inference-endpoints/main/inference_auth_token.py
@@ -43,6 +46,12 @@ Start the backend API in one terminal:
 
 ```bash
 make backend-start
+```
+
+*(Alternatively, instead of pasting the token into `backend/.env` every 48 hours, you can inject a fresh token inline when starting the backend:)*
+
+```bash
+OPENAI_COMPATIBLE_API_KEY=$(uv run --with globus-sdk python inference_auth_token.py get_access_token) make backend-start
 ```
 
 Start the frontend UI in a second terminal:
