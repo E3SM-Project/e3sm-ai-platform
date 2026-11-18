@@ -102,8 +102,8 @@ chunking, lexical retrieval, and deterministic generation (no LLM, no network):
 - **Cited:** an expected document counts as cited if one of the 4 chunks cited
   in the answer comes from it.
 
-The report (`corpus/local/coverage.json`) is a baseline, not a pass/fail check;
-retrieval evaluation is #21.
+The report (`corpus/local/coverage.json`) is a baseline, not a pass/fail check.
+Retrieval and answer metrics are defined in [scoring.md](scoring.md).
 
 ## Runtime use
 

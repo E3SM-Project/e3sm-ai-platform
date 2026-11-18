@@ -13,6 +13,8 @@ prototype, focused on E3SM Compass.
   routing, generation, and extension boundaries.
 - [Evaluation](dev/evaluation.md): deterministic integration evaluation and the
   adapter contract.
+- [Scoring](dev/scoring.md): in-progress retrieval and answer quality metrics
+  and baseline results.
 - [Roadmap](roadmap.md): planned implementation areas and known gaps.
 - [Observability](dev/observability.md): canonical observability guidance and
   local tracing workflow.
