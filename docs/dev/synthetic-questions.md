@@ -45,41 +45,36 @@ adapted to the corpus:
 
 ## Process
 
-Source: the local build `corpus/local/corpus-expanded` (539 documents). Its
-`acquisition.json` `scope_sha256` matches the current `corpus/sources.json`,
-and `verify-build` passes.
+Built from the local build `corpus/local/corpus-expanded` (539 documents,
+matching the current `sources.json`). Documents were read directly, without
+the application's retrieval or the web.
 
-The model read documents directly. It did not use the application's
-retrieval, `make corpus-coverage`, or the web.
+1. **Generate** candidates across the feature × scenario × persona grid,
+   starting with one-document how-tos.
+2. **Verify** each one: read the passage that answers it, and search the
+   corpus text for each should-refuse question.
+3. **Select** a set balanced across the grid, realistic for each persona,
+   and free of near-duplicates.
+4. **Refine** in rounds 2 and 3: re-read every passage, look for other
+   answering documents, fill grid gaps, and remove near-duplicates.
+5. **Fill coverage** so every explicit content document in `sources.json`
+   is expected by a question.
+6. **Human review** of the questions the model flagged.
 
-1. **Generate.** For sampled feature × scenario × persona combinations, read
-   the documents, then write one question as that persona would ask it.
-   Started with one-document how-tos, then the other scenarios. Of 168
-   drafts, 18 that repeated another draft's document and topic were dropped,
-   leaving 150 candidates: 125 answerable and 25 should-refuse.
-2. **Verify each candidate.** For each expected document, a pattern must
-   match the passage that answers the question; the passage was read. For
-   each should-refuse question, the corpus text was searched (`rg`) for its
-   key terms. Every expected ID exists in the build manifest.
-3. **Select and refine** over 3 rounds (below).
-4. **Fill coverage.** Write 16 more answerable questions so every explicit
-   content document in `sources.json` is expected by at least one question,
-   and add 2 verified should-refuse candidates.
-
-In total, 169 candidates (150 initial, 3 added in round 2, and 16 written in
-the coverage fill) produced the final 100: 80 answerable and 20 should-refuse.
-
-| Step | Checks | Changes |
+| Step | Result | Why it matters |
 | --- | --- | --- |
-| Round 1 | Generate, verify, select by grid balance, persona realism, verified documents, and no near-duplicates | Selected 64 answerable and 18 should-refuse questions from the 150 candidates |
-| Round 2 | Re-read every expected passage; corpus-wide text search for other answering documents; re-search refusals; grid gaps | Added 6 documents to 5 questions; removed 1 document that only linked elsewhere (scenario changed to single-document); reworded 1 question to fit troubleshooting; replaced 1 question; replaced 3 questions with 3 new candidates to fill analysis-tools and data-access persona gaps; refusals unchanged |
-| Round 3 | Near-duplicate scan (question wording and shared documents); recheck changes | Reworded 1 question that overlapped another; added 5 review flags. Stopped at the 3-round limit. |
-| Fill | Same verification and near-duplicate scan | Added 16 answerable and 2 should-refuse questions, for 100 in total; added 1 document to an existing question; reworded 1 new question that overlapped another |
-| Human review | The 16 flagged questions | Resolved all 16 flags: added expected documents to 2 questions, reworded 1 question, kept 3 near-miss refusals, and added answer expectations for 16 questions; added 2 corpus gaps; reported 2 upstream documentation issues ([e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109), [e3sm-unified#159](https://github.com/E3SM-Project/e3sm-unified/issues/159)) |
+| Generate | 168 drafts; 18 near-duplicates dropped; 150 candidates (125 answerable, 25 should-refuse) | Questions cover every topic, question type, and user type, not only what search already finds easily. |
+| Select (round 1) | 64 answerable and 18 should-refuse | No single area dominates the scores, and every question is tied to text that answers it. |
+| Round 2 | 6 documents added to 5 questions, 1 removed; 1 question reworded; 4 replaced (3 with new candidates) | Expected documents are complete and correct, so retrieval is not penalized for finding another valid answer; thin areas got more questions. |
+| Round 3 | 1 question reworded; 5 review flags added | One weakness is not counted twice, and uncertain questions are marked for a person to check. |
+| Fill coverage | 16 answerable and 2 should-refuse added, for 100; 1 document added; 1 question reworded | Every document hand-picked for the corpus is tested, so none is kept without a reason. |
+| Human review | 16 flags resolved: documents added to 2 questions, 1 reworded, 3 near-miss refusals kept, answer expectations for 16 questions, 2 corpus gaps, 2 upstream issues ([e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109), [e3sm-unified#159](https://github.com/E3SM-Project/e3sm-unified/issues/159)) | A person confirmed the uncertain questions, graders know when an answer needs a qualifier, and wrong upstream docs are reported for fixing. |
+
+169 candidates in total produced the final 100: 80 answerable and 20
+should-refuse.
 
 Deliberate pairs remain: an answerable question next to a should-refuse near
-miss on the same topic (for example, v3.LR citation versus v3.RRM citation,
-and the conda-forge NCO version versus the hpc-variant NCO version).
+miss on the same topic (for example, v3.LR versus v3.RRM citation).
 
 ## Final coverage
 
