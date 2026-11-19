@@ -90,6 +90,59 @@ def test_measure_coverage_rejects_unknown_documents_and_bad_question_sets(tmp_pa
         load_questions(_questions(tmp_path, [{**entry, "expected_documents": []}]))
 
 
+def test_load_questions_requires_empty_documents_only_for_should_refuse(tmp_path):
+    """Only should-refuse questions may, and must, omit expected documents."""
+    refuse = {"id": "r", "question": "What is E3SMv3's climate sensitivity?"}
+
+    loaded = load_questions(
+        _questions(tmp_path, [{**refuse, "expected_documents": [], "should_refuse": True}])
+    )
+
+    assert loaded.questions[0].should_refuse
+    with pytest.raises(CurationValidationError, match="should-refuse question has expected"):
+        load_questions(
+            _questions(
+                tmp_path, [{**refuse, "expected_documents": ["setup"], "should_refuse": True}]
+            )
+        )
+    with pytest.raises(CurationValidationError, match="invalid question set"):
+        load_questions(_questions(tmp_path, [{**refuse, "expected_documents": [], "tag": "x"}]))
+
+
+def test_measure_coverage_skips_should_refuse_questions(tmp_path):
+    """Should-refuse questions add nothing to the coverage report or its totals."""
+    root = _build(tmp_path)
+    answerable = {"id": "submit", "question": "How do I submit?", "expected_documents": ["submit"]}
+    refuse = {
+        "id": "refuse",
+        "question": "What is E3SMv3's climate sensitivity?",
+        "expected_documents": [],
+        "should_refuse": True,
+    }
+
+    report = measure_coverage(root, _questions(tmp_path, [answerable, refuse]))
+
+    assert [result.id for result in report.questions] == ["submit"]
+    assert report.expected_total == 1
+
+
+def test_checked_in_questions_use_every_explicit_document():
+    """Both question sets are present and every explicit content document is expected."""
+    questions = load_questions(REPOSITORY / "corpus" / "questions.json").questions
+    scope = json.loads((REPOSITORY / "corpus" / "sources.json").read_text())
+    explicit = {
+        document["id"]
+        for source in scope["sources"]
+        for document in source["documents"]
+        if document.get("role", "content") == "content"
+    }
+    expected = {doc for question in questions for doc in question.expected_documents}
+
+    assert any(question.should_refuse for question in questions)
+    assert any(not question.should_refuse for question in questions)
+    assert explicit <= expected, sorted(explicit - expected)
+
+
 def test_checked_in_questions_reference_selected_content_documents():
     """Expected documents are explicit content documents or pattern-selected files."""
     questions = load_questions(REPOSITORY / "corpus" / "questions.json")
@@ -110,7 +163,6 @@ def test_checked_in_questions_reference_selected_content_documents():
             for source in scope["sources"]
         )
 
-    assert len(questions.questions) == 18
     for question in questions.questions:
         for doc_id in question.expected_documents:
             assert doc_id in explicit or pattern_selected(doc_id), (question.id, doc_id)

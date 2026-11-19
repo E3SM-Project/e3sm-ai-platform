@@ -15,6 +15,8 @@ prototype, focused on E3SM Compass.
   adapter contract.
 - [Scoring](dev/scoring.md): in-progress retrieval and answer quality metrics
   and baseline results.
+- [Synthetic questions](dev/synthetic-questions.md): how the 100-question
+  evaluation set was generated, its coverage, and what needs review.
 - [Roadmap](roadmap.md): planned implementation areas and known gaps.
 - [Observability](dev/observability.md): canonical observability guidance and
   local tracing workflow.

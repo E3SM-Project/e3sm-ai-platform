@@ -93,6 +93,8 @@ approves a build. `validate --require-approved` fails until a reviewer approves.
 
 `corpus/questions.json` maps each representative question to the documents that
 should support it; tests check that each one is selected in the scope.
+Should-refuse questions list no documents and are skipped by coverage; see
+[synthetic questions](synthetic-questions.md).
 
 `make corpus-coverage` answers each question with the application's own
 chunking, lexical retrieval, and deterministic generation (no LLM, no network):

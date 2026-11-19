@@ -8,12 +8,11 @@ Metric implementations come from the evaluation framework chosen in #37
 (task 2); definitions may be aligned to it. For the response contract test
 suite, see [evaluation.md](evaluation.md).
 
-Question sets:
+Question sets, both in [`corpus/questions.json`](../../corpus/questions.json)
+(method in [synthetic-questions.md](synthetic-questions.md)):
 
-- **Answerable:** the 18 questions in
-  [`corpus/questions.json`](../../corpus/questions.json).
-- **Should refuse:** the 3 `insufficient_evidence` cases in
-  [`e3sm_questions.json`](../../evaluation/fixtures/e3sm_questions.json).
+- **Answerable:** the 80 questions with `should_refuse` false.
+- **Should refuse:** the 20 questions with `should_refuse` true.
 
 ## Metrics
 
