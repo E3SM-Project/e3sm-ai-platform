@@ -1,105 +1,1351 @@
 {
   "schema_version": 1,
   "questions": [
-    {"id": "syn-running-clone-case-newuser", "question": "I want a copy of an existing case that keeps its user_nl edits and SourceMods. What command does that, and what should I avoid changing in the copy?", "expected_documents": ["cime.doc.source.ccs.cloning-a-case.rst"], "feature": "running-cases", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-restart-after-crash-newuser", "question": "My run crashed partway through a segment. How do I restart it from the last good restart files?", "expected_documents": ["E3SM-Project.github.io.docs.running-e3sm-guide.guide-production.md", "cime-case-run"], "feature": "running-cases", "scenario": "troubleshooting", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-timeout-vs-crash-developer", "question": "How can I tell from the logs whether my E3SM job ran out of wallclock time or the model actually crashed?", "expected_documents": ["cime.doc.source.ccs.troubleshooting.rst"], "feature": "running-cases", "scenario": "troubleshooting", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-throughput-vague-newuser", "question": "how fast is my run going? where do i see years per day", "expected_documents": ["E3SM-Project.github.io.docs.running-e3sm-guide.guide-documenting.md", "E3SM-Project.github.io.docs.running-e3sm-guide.guide-production.md", "cime.doc.source.ccs.timers.rst"], "feature": "running-cases", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-job-died-vague-newuser", "question": "my e3sm job just died with no obvious error, where do i even look", "expected_documents": ["cime-case-run", "cime.doc.source.ccs.troubleshooting.rst"], "feature": "running-cases", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-bfb-short-tests-developer", "question": "Before a long production run, which short tests should I run to confirm restarts and PE-layout changes are bit-for-bit, and how do I compare the results?", "expected_documents": ["e3sm-run-template", "site-pre-production"], "feature": "running-cases", "scenario": "multi-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-chrysalis-queue-newuser", "question": "If I submit an E3SM case on Chrysalis without choosing a queue, which queue does it use and how long can that job run?", "expected_documents": ["e3sm-batch"], "feature": "running-cases", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-pmcpu-paths-developer", "question": "On pm-cpu, where does E3SM put a case's build and run directories by default, and where is the shared input data?", "expected_documents": ["e3sm-machines"], "feature": "running-cases", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-domain-files-developer", "question": "I've generated domain files for my new atmosphere grid. Where do I register them so E3SM can find them at runtime?", "expected_documents": ["E3SM.docs.dev-guide.adding-grid-support.adding-grid-support-step-by-step-guide.add-grid-config.md"], "feature": "running-cases", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-query-config-newuser", "question": "How do I list the compsets and grids my E3SM checkout supports before I create a case?", "expected_documents": ["E3SM.components.mpas-ocean.docs.user-guide.index.md", "cime.doc.source.ccs.query-configuration.rst"], "feature": "running-cases", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-f2010-case-newuser", "question": "How do I create an F2010 atmosphere-only case on the supported ne30pg2 grid, and which components does F2010 include?", "expected_documents": ["cime-case-create", "e3sm-eam-compsets", "e3sm-eam-user-guide"], "feature": "running-cases", "scenario": "multi-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-case-setup-files-newuser", "question": "Which files does case.setup generate in my case directory, and where do I put my own namelist changes?", "expected_documents": ["cime-case-setup"], "feature": "running-cases", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-running-guide-index-vague-newuser", "question": "where is the official step by step guide for running e3sm", "expected_documents": ["site-running-guide-index"], "feature": "running-cases", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-elm-output-analyst", "question": "I only want TG, TV, and FSA in my monthly ELM output, plus a separate daily file. What goes in user_nl_elm?", "expected_documents": ["E3SM.components.elm.docs.user-guide.index.md"], "feature": "model-components", "scenario": "single-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-elm-phenology-v3-researcher", "question": "Did the E3SM v3 water cycle simulations use prescribed leaf area index in ELM, as v1 and v2 did?", "expected_documents": ["E3SM.components.elm.docs.user-guide.index.md"], "feature": "model-components", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-mosart-water-management-researcher", "question": "How do I turn on reservoir water management in MOSART, and what extra inputs does it need?", "expected_documents": ["E3SM.components.mosart.docs.user-guide.index.md"], "feature": "model-components", "scenario": "single-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eam-cosp-developer", "question": "How do I turn on COSP satellite-simulator output in EAM, and what does cosp_lite change?", "expected_documents": ["E3SM.components.eam.docs.tech-guide.cosp.md", "E3SM.components.eam.docs.user-guide.namelist_parameters.md", "e3sm-run-template"], "feature": "model-components", "scenario": "multi-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eamxx-atmchange-developer", "question": "atmchange says my parameter name is ambiguous. How do I change number_of_subcycles for HOMME only?", "expected_documents": ["E3SM.components.eamxx.docs.user.model_configuration.md"], "feature": "model-components", "scenario": "troubleshooting", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eamxx-nudging-researcher", "question": "How do I nudge EAMxx toward reanalysis winds and temperature while leaving my refined region free-running?", "expected_documents": ["E3SM.components.eamxx.docs.user.nudging.md", "E3SM.components.eamxx.docs.user.rrm_eamxx.md"], "feature": "model-components", "scenario": "multi-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-mpaso-gcase-newuser", "question": "How do I set up an ocean and sea-ice-only run forced by JRA55, and which mesh goes with it?", "expected_documents": ["E3SM.components.mpas-ocean.docs.user-guide.index.md"], "feature": "model-components", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-mpaso-oqu240-vague-newuser", "question": "is the 2 degree ocean mesh ok for a quick science run", "expected_documents": ["E3SM.components.mpas-ocean.docs.user-guide.index.md"], "feature": "model-components", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-fates-docs-vague-developer", "question": "fates in elm - where are the docs", "expected_documents": ["E3SM.components.elm.docs.user-guide.fates.md"], "feature": "model-components", "scenario": "vague", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-cmip7-compset-researcher", "question": "Does E3SM v3.1.0 include a CMIP7 pre-industrial coupled compset, and which components does it use?", "expected_documents": ["e3sm-coupled-compsets"], "feature": "model-components", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eamxx-rcs-developer", "question": "My EAMxx change isn't bit-for-bit. How can I test whether it changes the model climate statistically?", "expected_documents": ["E3SM.components.eamxx.docs.user.multi-instance-rcs.md"], "feature": "model-components", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-elm-interpinic-developer", "question": "How do I create an ELM initial condition file for a new grid from an existing simulation's land restart file?", "expected_documents": ["E3SM.components.elm.docs.user-guide.interpinic.md"], "feature": "model-components", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eam-orodrag-developer", "question": "I set use_od_ls = .true. in user_nl_eam and left the default orographic gravity-wave drag on. Is that a problem?", "expected_documents": ["E3SM.components.eam.docs.user-guide.namelist_parameters.md"], "feature": "model-components", "scenario": "troubleshooting", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eam-avgflag-analyst", "question": "The EAM user guide lists 'A' twice for avgflag_pertape. Which flag actually gives instantaneous history output, and which values are valid?", "expected_documents": ["e3sm-eam-namelist-definitions", "e3sm-eam-user-guide"], "feature": "model-components", "scenario": "troubleshooting", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-eamxx-support-researcher", "question": "Is EAMxx a supported atmosphere for science runs in E3SM v3.1.0, which configuration of it is available, and where is case setup documented?", "expected_documents": ["e3sm-eamxx-cases", "e3sm-eamxx-introduction", "e3sm-model-overview"], "feature": "model-components", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-elm-docs-vague-developer", "question": "elm guides - which one has the code and data structure stuff vs the science", "expected_documents": ["E3SM.components.elm.docs.dev-guide.index.md", "E3SM.components.elm.docs.tech-guide.index.md", "e3sm-elm-introduction"], "feature": "model-components", "scenario": "vague", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-components-mpas-analysis-setup-researcher", "question": "Do I need to change namelists or streams in an E3SM run so MPAS-Analysis works, and what changes if I run MPAS-Seaice standalone?", "expected_documents": ["E3SM.components.mpas-ocean.docs.user-guide.index.md", "mpas-e3sm-setup", "mpas-seaice-setup"], "feature": "model-components", "scenario": "multi-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-diags-web-chrysalis-newuser", "question": "I ran e3sm_diags on Chrysalis. Where do I put the results so I can view them in a web browser?", "expected_documents": ["e3sm_diags.docs.source.quickguides.quick-guide-chrysalis.rst", "e3sm_diags.docs.source.quickguides.quick-guide-general.rst"], "feature": "diagnostics", "scenario": "multi-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-diags-native-grid-analyst", "question": "Can e3sm_diags plot EAM output on its native ne30pg2 grid without regridding, and which version added that?", "expected_documents": ["e3sm_diags.docs.source.available-parameters.rst"], "feature": "diagnostics", "scenario": "version-specific", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-enso-regions-researcher", "question": "Both e3sm_diags and MPAS-Analysis do ENSO or Niño index analysis. Which Niño regions can each use, and what are the defaults?", "expected_documents": ["MPAS-Analysis.docs.users_guide.tasks.indexNino34.rst", "e3sm_diags.docs.source.available-parameters.rst"], "feature": "diagnostics", "scenario": "multi-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-diags-derived-variable-developer", "question": "How do I add my own derived variable to e3sm_diags without changing the package code?", "expected_documents": ["e3sm_diags.docs.source.add-new-diagnostics.rst"], "feature": "diagnostics", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-zppy-reference-path-analyst", "question": "My zppy e3sm_diags model-vs-model task compared my run against observations instead of my control run. Why, and what should I set?", "expected_documents": ["mache.docs.users_guide.quick_start.md", "zppy.docs.source.parameters.rst"], "feature": "diagnostics", "scenario": "troubleshooting", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-zppy-install-latest-analyst", "question": "The zppy in E3SM-Unified is older than the release I need. How do I install the latest zppy myself?", "expected_documents": ["zppy.docs.source.getting_started.rst"], "feature": "diagnostics", "scenario": "single-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-mpas-ncclimo-memory-analyst", "question": "MPAS-Analysis crashes while ncclimo builds climatologies, probably out of memory. What should I change?", "expected_documents": ["MPAS-Analysis.docs.users_guide.config.execute.rst", "nco-manual"], "feature": "diagnostics", "scenario": "troubleshooting", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-plots-online-vague-newuser", "question": "zppy finished, how do i see the plots online", "expected_documents": ["E3SM-Project.github.io.docs.running-e3sm-guide.guide-documenting.md", "E3SM-Project.github.io.docs.running-e3sm-guide.guide-post-processing.md", "e3sm_diags.docs.source.quickguides.quick-guide-general.rst", "zppy-tutorial"], "feature": "diagnostics", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-obs-data-vague-newuser", "question": "where is the obs data for e3sm diags on perlmutter", "expected_documents": ["diags-perlmutter-guide", "e3sm_diags.docs.source.quickguides.quick-guide-general.rst"], "feature": "diagnostics", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-zppy-status-newuser", "question": "I launched zppy. How do I check which of its jobs failed?", "expected_documents": ["E3SM-Project.github.io.docs.running-e3sm-guide.guide-post-processing.md", "zppy-tutorial"], "feature": "diagnostics", "scenario": "troubleshooting", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-qbo-inputs-analyst", "question": "For the e3sm_diags QBO diagnostic, which variable and reference dataset are used by default, and does it need climatology or time-series input?", "expected_documents": ["diags-input-requirements", "diags-qbo-defaults", "diags-qbo-driver", "diags-qbo-parameter", "e3sm_diags.docs.source.available-parameters.rst"], "feature": "diagnostics", "scenario": "multi-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-ex5-model-vs-obs-analyst", "question": "I want to compare my model's surface air temperature climatology with ERA-Interim in e3sm_diags. Is there an official example I can copy and adapt?", "expected_documents": ["diags-ex5-config", "diags-ex5-python", "diags-examples"], "feature": "diagnostics", "scenario": "multi-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-latlon-precip-refs-analyst", "question": "Which observational datasets does the default e3sm_diags lat_lon model-vs-obs set compare precipitation (PRECT) against?", "expected_documents": ["diags-lat-lon-defaults"], "feature": "diagnostics", "scenario": "single-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-diags-tests-developer", "question": "After changing e3sm_diags code, how do I run its tests, and what do I do when integration-test images differ from the expected ones?", "expected_documents": ["diags-testing"], "feature": "diagnostics", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-diags-v2-to-v3-researcher", "question": "What changed between e3sm_diags v2 and v3 under the hood, and will my v2-style run script still work in v3?", "expected_documents": ["diags-overview", "diags-v2-config-run", "e3sm_diags.docs.source.config-run.rst"], "feature": "diagnostics", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-zppy-nco-path-developer", "question": "My zppy climo jobs need a newer NCO than the one in E3SM-Unified. What does the climo task run, and how do I point zppy at a different NCO build?", "expected_documents": ["zppy-boilerplate", "zppy-climo-template", "zppy-defaults"], "feature": "diagnostics", "scenario": "multi-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-zppy-default-sets-analyst", "question": "Which e3sm_diags sets does zppy run if I don't list any, and where does its e3sm_diags job look for the climatology files made by the climo task?", "expected_documents": ["zppy-defaults", "zppy-diags-template"], "feature": "diagnostics", "scenario": "multi-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-diagnostics-zppy-diurnal-analyst", "question": "How do I set up zppy to make a diurnal-cycle climatology of PRECT from 3-hourly eam.h4 output?", "expected_documents": ["zppy-tutorial-config"], "feature": "diagnostics", "scenario": "single-document", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-ncclimo-month-weights-researcher", "question": "To reproduce E3SM seasonal and annual climatologies outside NCO, how does ncclimo weight the months when it averages them?", "expected_documents": ["nco-manual"], "feature": "analysis-tools", "scenario": "single-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-ncclimo-split-newuser", "question": "How do I turn a folder of monthly EAM history files into one time-series file per variable?", "expected_documents": ["diags-input-requirements", "nco-manual", "nco-ncclimo"], "feature": "analysis-tools", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-ncremap-dim-order-analyst", "question": "ncremap gives bad results for fields with dimensions ordered lat, lev, lon. What is wrong and how do I fix it?", "expected_documents": ["nco-manual"], "feature": "analysis-tools", "scenario": "troubleshooting", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-xcdat-mergeerror-analyst", "question": "xcdat.open_mfdataset fails with 'MergeError: conflicting values' for the bounds across my E3SM files. How do I work around it?", "expected_documents": ["xcdat.docs.getting-started-guide.faqs.rst"], "feature": "analysis-tools", "scenario": "troubleshooting", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-xcdat-djf-analyst", "question": "In xCDAT 0.11.2, how do I drop incomplete DJF seasons when computing a seasonal climatology, and is drop_incomplete_djf still the right option?", "expected_documents": ["xcdat-temporal-api"], "feature": "analysis-tools", "scenario": "version-specific", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-xcdat-deps-developer", "question": "What Python and xarray versions does the xCDAT 0.11.2 conda package require?", "expected_documents": ["xcdat-recipe"], "feature": "analysis-tools", "scenario": "version-specific", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-xcdat-hpc-jupyter-newuser", "question": "How do I set up xCDAT in Jupyter on an HPC machine?", "expected_documents": ["xcdat.docs.getting-started-guide.getting-started-hpc-jupyter.rst"], "feature": "analysis-tools", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-nco-unified-version-analyst", "question": "Which NCO version comes with E3SM-Unified 1.13.0 from conda-forge, and does the nco package pull in TempestRemap?", "expected_documents": ["nco-recipe", "unified-recipe"], "feature": "analysis-tools", "scenario": "version-specific", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-ncclimo-highfreq-researcher", "question": "How do I split daily (sub-monthly) EAM output into time series for e3sm_to_cmip?", "expected_documents": ["e3sm_to_cmip.docs.source.high_freq.rst", "nco-manual"], "feature": "analysis-tools", "scenario": "multi-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-tools-xcdat-bounds-developer", "question": "My dataset has no latitude or longitude bounds. How does xCDAT generate missing bounds, and what happens to auxiliary coordinates such as a second latitude variable?", "expected_documents": ["xcdat.docs.getting-started-guide.faqs.rst"], "feature": "analysis-tools", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-unified-versions-researcher", "question": "Which versions of e3sm_diags, zppy, and MPAS-Analysis are pinned in E3SM-Unified 1.13.0?", "expected_documents": ["diags-recipe", "mpas-recipe", "unified-recipe", "zppy-recipe"], "feature": "environment-tooling", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-unified-variants-developer", "question": "Which package variants does the E3SM-Unified 1.13.0 feedstock build, and how does the hpc variant differ from nompi?", "expected_documents": ["e3sm-unified.docs.packages.md", "unified-recipe", "unified-variants"], "feature": "environment-tooling", "scenario": "version-specific", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-zstash-dtn-newuser", "question": "Where should I run zstash at NERSC for the best transfer speed, and how do I keep it running after I log out?", "expected_documents": ["E3SM-Project.github.io.docs.running-e3sm-guide.guide-long-term-archiving.md", "zstash.docs.source.best_practices.rst", "zstash.docs.source.getting_started.rst"], "feature": "environment-tooling", "scenario": "multi-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-e2c-atm-prep-researcher", "question": "e3sm_to_cmip wants atmosphere input as regridded time series named like PRECC_185001_201412.nc. How do I produce those from raw EAM output?", "expected_documents": ["e3sm_to_cmip.docs.source.preprocessing.rst", "nco-manual"], "feature": "environment-tooling", "scenario": "multi-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-e2c-handlers-developer", "question": "How does e3sm_to_cmip map an E3SM variable like TREFHT to a CMIP6 variable, and how would I add a new mapping?", "expected_documents": ["e3sm_to_cmip.docs.source.var-handlers.rst"], "feature": "environment-tooling", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-e2c-tables-newuser", "question": "e3sm_to_cmip says I need a tables path. Where do I get the CMOR tables?", "expected_documents": ["e3sm_to_cmip.docs.source.getting-started.rst", "e3sm_to_cmip.docs.source.usage.rst"], "feature": "environment-tooling", "scenario": "troubleshooting", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-paraview-vague-analyst", "question": "how do i look at mpas ocean output in paraview", "expected_documents": ["MPAS-Tools.conda_package.docs.mpas_to_xdmf.rst", "MPAS-Tools.conda_package.docs.paraview_extractor.rst"], "feature": "environment-tooling", "scenario": "vague", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-seaice-partition-developer", "question": "How do I create better-balanced graph partition files for MPAS-Seaice?", "expected_documents": ["MPAS-Tools.conda_package.docs.seaice.partition.rst"], "feature": "environment-tooling", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-unified-verify-newuser", "question": "After sourcing the E3SM-Unified load script, how do I check that the environment loaded correctly and which package variant is active?", "expected_documents": ["e3sm-unified.docs.troubleshooting.md", "unified-quickstart"], "feature": "environment-tooling", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-unified-windows-vague-newuser", "question": "can i use e3sm unified on windows", "expected_documents": ["e3sm-unified.docs.introduction.md", "unified-quickstart", "unified-readme"], "feature": "environment-tooling", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-mache-detect-developer", "question": "How can my Python script detect which E3SM machine it is running on and find the shared diagnostics directory?", "expected_documents": ["mache.docs.users_guide.quick_start.md"], "feature": "environment-tooling", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-mache-new-machine-developer", "question": "What do I need to change to add a new HPC machine to mache and then to E3SM-Unified's deployment?", "expected_documents": ["e3sm-unified.docs.releasing.adding-new-machines.md", "mache.docs.developers_guide.adding_new_machine.md"], "feature": "environment-tooling", "scenario": "multi-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-zstash-ls-cache-analyst", "question": "I ran zstash update to add new files, but zstash ls doesn't show them. Why?", "expected_documents": ["zstash.docs.source.usage.rst"], "feature": "environment-tooling", "scenario": "troubleshooting", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-zstash-checksum-researcher", "question": "zstash check reported a checksum mismatch. What does that mean, and what should I do with my original data?", "expected_documents": ["zstash.docs.source.best_practices.rst", "zstash.docs.source.usage.rst"], "feature": "environment-tooling", "scenario": "troubleshooting", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-zstash-tar-size-vague-analyst", "question": "what tar size should zstash use", "expected_documents": ["zstash.docs.source.best_practices.rst", "zstash.docs.source.usage.rst"], "feature": "environment-tooling", "scenario": "vague", "persona": "analyst", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-mache-parallel-developer", "question": "How can I build a machine-correct srun or mpiexec command for my workflow with mache?", "expected_documents": ["mache.docs.users_guide.parallel.md"], "feature": "environment-tooling", "scenario": "single-document", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-environment-diags-install-newuser", "question": "How do I install e3sm_diags in my own conda environment instead of using E3SM-Unified?", "expected_documents": ["diags-install"], "feature": "environment-tooling", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-data-no-nersc-account-researcher", "question": "Can I download released E3SM simulation output without a NERSC account?", "expected_documents": ["data-docs-access"], "feature": "data-access", "scenario": "single-document", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-data-reproduce-v2-researcher", "question": "How do I reproduce the v2.LR.piControl simulation bit-for-bit, and which machine do I need?", "expected_documents": ["e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.index.rst", "e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.reproduction_table.rst"], "feature": "data-access", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-data-best-way-vague-newuser", "question": "best way to get e3sm model output?", "expected_documents": ["data-docs-access"], "feature": "data-access", "scenario": "vague", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-data-v3-citation-researcher", "question": "Which papers should I cite if I use data from the E3SMv3 v3.LR simulations?", "expected_documents": ["data-docs-v3-overview"], "feature": "data-access", "scenario": "version-specific", "persona": "researcher", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-data-esgf-cmip-native-newuser", "question": "The E3SM simulation tables have CMIP and Native ESGF links. What is the difference, and how do I download a dataset from ESGF?", "expected_documents": ["data-docs-access"], "feature": "data-access", "scenario": "single-document", "persona": "new-user", "origin": "synthetic-37", "should_refuse": false, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-pmcpu-max-walltime-newuser", "question": "What is the maximum wallclock time allowed in Perlmutter's regular queue for E3SM jobs?", "expected_documents": [], "feature": "running-cases", "scenario": "should-refuse", "persona": "new-user", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-frontier-account-newuser", "question": "Which project account and queue should I use to run E3SM on Frontier?", "expected_documents": [], "feature": "running-cases", "scenario": "should-refuse", "persona": "new-user", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-v3lr-sypd-researcher", "question": "How many simulated years per day does v3.LR achieve on pm-cpu with the L PE layout?", "expected_documents": [], "feature": "running-cases", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-pace-api-developer", "question": "How do I query PACE's REST API to pull performance data for all of my jobs automatically?", "expected_documents": [], "feature": "running-cases", "scenario": "should-refuse", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-wrf-downscaling-researcher", "question": "How do I install WRF and use it to downscale E3SM output over the western US?", "expected_documents": [], "feature": "running-cases", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-ecs-v3-researcher", "question": "What is the equilibrium climate sensitivity of E3SMv3?", "expected_documents": [], "feature": "model-components", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-mali-calving-developer", "question": "How do I turn on iceberg calving in MALI for a coupled Greenland run?", "expected_documents": [], "feature": "model-components", "scenario": "should-refuse", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-fates-pft-developer", "question": "Which FATES parameter file and how many PFTs does ELM-FATES use by default in E3SM v3.1.0?", "expected_documents": [], "feature": "model-components", "scenario": "should-refuse", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-marbl-developer", "question": "How do I enable MARBL ocean biogeochemistry in MPAS-Ocean for a v3 run?", "expected_documents": [], "feature": "model-components", "scenario": "should-refuse", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-diags-fail-threshold-analyst", "question": "What RMSE threshold does e3sm_diags use to decide that a simulation fails?", "expected_documents": [], "feature": "diagnostics", "scenario": "should-refuse", "persona": "analyst", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-zppy-highres-perlmutter-analyst", "question": "Does zppy's high_res_v1 campaign work on Perlmutter?", "expected_documents": [], "feature": "diagnostics", "scenario": "should-refuse", "persona": "analyst", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-hpc-nco-version-analyst", "question": "Exactly which NCO version do I get on Perlmutter with the hpc variant of E3SM-Unified 1.13.0?", "expected_documents": [], "feature": "environment-tooling", "scenario": "should-refuse", "persona": "analyst", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-e2c-cmip7-researcher", "question": "How do I use e3sm_to_cmip to produce CMIP7-compliant output for the CMIP7 data request?", "expected_documents": [], "feature": "environment-tooling", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-gpu-purchase-analyst", "question": "Which GPU should I buy to train a machine-learning emulator on E3SM output?", "expected_documents": [], "feature": "environment-tooling", "scenario": "should-refuse", "persona": "analyst", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-unified-114-developer", "question": "What changes are in E3SM-Unified 1.14.0?", "expected_documents": [], "feature": "environment-tooling", "scenario": "should-refuse", "persona": "model-developer", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-zarr-convert-analyst", "question": "How do I convert my own E3SM history files to Zarr like the AI training datasets?", "expected_documents": [], "feature": "data-access", "scenario": "should-refuse", "persona": "analyst", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-ace-predictions-researcher", "question": "How do I run the ACE emulator on the E3SM AI training data to make climate predictions?", "expected_documents": [], "feature": "data-access", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-hpss-quota-researcher", "question": "How much HPSS storage quota does the E3SM project have at NERSC?", "expected_documents": [], "feature": "data-access", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-v3-rrm-citation-researcher", "question": "Which paper should I cite for the E3SMv3 regionally refined (v3.RRM) simulations?", "expected_documents": [], "feature": "data-access", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""},
-    {"id": "syn-refuse-screamv1-ai-release-researcher", "question": "When will the SCREAMv1 AI training dataset be released, and how large is it?", "expected_documents": [], "feature": "data-access", "scenario": "should-refuse", "persona": "researcher", "origin": "synthetic-37", "should_refuse": true, "needs_review": false, "review_note": ""}
+    {
+      "id": "syn-running-clone-case-newuser",
+      "question": "I want a copy of an existing case that keeps its user_nl edits and SourceMods. What command does that, and what should I avoid changing in the copy?",
+      "expected_documents": ["cime.doc.source.ccs.cloning-a-case.rst"],
+      "feature": "running-cases",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-restart-after-crash-newuser",
+      "question": "My run crashed partway through a segment. How do I restart it from the last good restart files?",
+      "expected_documents": [
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-production.md",
+        "cime-case-run"
+      ],
+      "feature": "running-cases",
+      "scenario": "troubleshooting",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-timeout-vs-crash-developer",
+      "question": "How can I tell from the logs whether my E3SM job ran out of wallclock time or the model actually crashed?",
+      "expected_documents": ["cime.doc.source.ccs.troubleshooting.rst"],
+      "feature": "running-cases",
+      "scenario": "troubleshooting",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-throughput-vague-newuser",
+      "question": "how fast is my run going? where do i see years per day",
+      "expected_documents": [
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-documenting.md",
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-production.md",
+        "cime.doc.source.ccs.timers.rst"
+      ],
+      "feature": "running-cases",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-job-died-vague-newuser",
+      "question": "my e3sm job just died with no obvious error, where do i even look",
+      "expected_documents": [
+        "cime-case-run",
+        "cime.doc.source.ccs.troubleshooting.rst"
+      ],
+      "feature": "running-cases",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-bfb-short-tests-developer",
+      "question": "Before a long production run, which short tests should I run to confirm restarts and PE-layout changes are bit-for-bit, and how do I compare the results?",
+      "expected_documents": ["e3sm-run-template", "site-pre-production"],
+      "feature": "running-cases",
+      "scenario": "multi-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-chrysalis-queue-newuser",
+      "question": "If I submit an E3SM case on Chrysalis without choosing a queue, which queue does it use and how long can that job run?",
+      "expected_documents": ["e3sm-batch"],
+      "feature": "running-cases",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-pmcpu-paths-developer",
+      "question": "On pm-cpu, where does E3SM put a case's build and run directories by default, and where is the shared input data?",
+      "expected_documents": ["e3sm-machines"],
+      "feature": "running-cases",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-domain-files-developer",
+      "question": "I've generated domain files for my new atmosphere grid. Where do I register them so E3SM can find them at runtime?",
+      "expected_documents": [
+        "E3SM.docs.dev-guide.adding-grid-support.adding-grid-support-step-by-step-guide.add-grid-config.md"
+      ],
+      "feature": "running-cases",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-query-config-newuser",
+      "question": "How do I list the compsets and grids my E3SM checkout supports before I create a case?",
+      "expected_documents": [
+        "E3SM.components.mpas-ocean.docs.user-guide.index.md",
+        "cime.doc.source.ccs.query-configuration.rst"
+      ],
+      "feature": "running-cases",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-f2010-case-newuser",
+      "question": "How do I create an F2010 atmosphere-only case on the supported ne30pg2 grid, and which components does F2010 include?",
+      "expected_documents": [
+        "cime-case-create",
+        "e3sm-eam-compsets",
+        "e3sm-eam-user-guide"
+      ],
+      "feature": "running-cases",
+      "scenario": "multi-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-case-setup-files-newuser",
+      "question": "Which files does case.setup generate in my case directory, and where do I put my own namelist changes?",
+      "expected_documents": ["cime-case-setup"],
+      "feature": "running-cases",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-running-guide-index-vague-newuser",
+      "question": "where is the official step by step guide for running e3sm",
+      "expected_documents": ["site-running-guide-index"],
+      "feature": "running-cases",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-elm-output-analyst",
+      "question": "I only want TG, TV, and FSA in my monthly ELM output, plus a separate daily file. What goes in user_nl_elm?",
+      "expected_documents": ["E3SM.components.elm.docs.user-guide.index.md"],
+      "feature": "model-components",
+      "scenario": "single-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-elm-phenology-v3-researcher",
+      "question": "Did the E3SM v3 water cycle simulations use prescribed leaf area index in ELM, as v1 and v2 did?",
+      "expected_documents": ["E3SM.components.elm.docs.user-guide.index.md"],
+      "feature": "model-components",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-mosart-water-management-researcher",
+      "question": "How do I turn on reservoir water management in MOSART, and what extra inputs does it need?",
+      "expected_documents": ["E3SM.components.mosart.docs.user-guide.index.md"],
+      "feature": "model-components",
+      "scenario": "single-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eam-cosp-developer",
+      "question": "How do I turn on COSP satellite-simulator output in EAM, and what does cosp_lite change?",
+      "expected_documents": [
+        "E3SM.components.eam.docs.tech-guide.cosp.md",
+        "E3SM.components.eam.docs.user-guide.namelist_parameters.md",
+        "e3sm-run-template"
+      ],
+      "feature": "model-components",
+      "scenario": "multi-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eamxx-atmchange-developer",
+      "question": "atmchange says my parameter name is ambiguous. How do I change number_of_subcycles for HOMME only?",
+      "expected_documents": [
+        "E3SM.components.eamxx.docs.user.model_configuration.md"
+      ],
+      "feature": "model-components",
+      "scenario": "troubleshooting",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eamxx-nudging-researcher",
+      "question": "How do I nudge EAMxx toward reanalysis winds and temperature while leaving my refined region free-running?",
+      "expected_documents": [
+        "E3SM.components.eamxx.docs.user.nudging.md",
+        "E3SM.components.eamxx.docs.user.rrm_eamxx.md"
+      ],
+      "feature": "model-components",
+      "scenario": "multi-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-mpaso-gcase-newuser",
+      "question": "How do I set up an ocean and sea-ice-only run forced by JRA55, and which mesh goes with it?",
+      "expected_documents": [
+        "E3SM.components.mpas-ocean.docs.user-guide.index.md"
+      ],
+      "feature": "model-components",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-mpaso-oqu240-vague-newuser",
+      "question": "is the 2 degree ocean mesh ok for a quick science run",
+      "expected_documents": [
+        "E3SM.components.mpas-ocean.docs.user-guide.index.md"
+      ],
+      "feature": "model-components",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-fates-docs-vague-developer",
+      "question": "fates in elm - where are the docs",
+      "expected_documents": ["E3SM.components.elm.docs.user-guide.fates.md"],
+      "feature": "model-components",
+      "scenario": "vague",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-cmip7-compset-researcher",
+      "question": "Does E3SM v3.1.0 include a CMIP7 pre-industrial coupled compset, and which components does it use?",
+      "expected_documents": ["e3sm-coupled-compsets"],
+      "feature": "model-components",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eamxx-rcs-developer",
+      "question": "My EAMxx change isn't bit-for-bit. How can I test whether it changes the model climate statistically?",
+      "expected_documents": [
+        "E3SM.components.eamxx.docs.user.multi-instance-rcs.md"
+      ],
+      "feature": "model-components",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-elm-interpinic-developer",
+      "question": "How do I create an ELM initial condition file for a new grid from an existing simulation's land restart file?",
+      "expected_documents": [
+        "E3SM.components.elm.docs.user-guide.interpinic.md"
+      ],
+      "feature": "model-components",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eam-orodrag-developer",
+      "question": "I set use_od_ls = .true. in user_nl_eam and left the default orographic gravity-wave drag on. Is that a problem?",
+      "expected_documents": [
+        "E3SM.components.eam.docs.user-guide.namelist_parameters.md"
+      ],
+      "feature": "model-components",
+      "scenario": "troubleshooting",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eam-avgflag-analyst",
+      "question": "The EAM user guide lists 'A' twice for avgflag_pertape. Which flag actually gives instantaneous history output, and which values are valid?",
+      "expected_documents": [
+        "e3sm-eam-namelist-definitions",
+        "e3sm-eam-user-guide"
+      ],
+      "feature": "model-components",
+      "scenario": "troubleshooting",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-eamxx-support-researcher",
+      "question": "Is EAMxx a supported atmosphere for science runs in E3SM v3.1.0, which configuration of it is available, and where is case setup documented?",
+      "expected_documents": [
+        "e3sm-eamxx-cases",
+        "e3sm-eamxx-introduction",
+        "e3sm-model-overview"
+      ],
+      "feature": "model-components",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-elm-docs-vague-developer",
+      "question": "elm guides - which one has the code and data structure stuff vs the science",
+      "expected_documents": [
+        "E3SM.components.elm.docs.dev-guide.index.md",
+        "E3SM.components.elm.docs.tech-guide.index.md",
+        "e3sm-elm-introduction"
+      ],
+      "feature": "model-components",
+      "scenario": "vague",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-components-mpas-analysis-setup-researcher",
+      "question": "Do I need to change namelists or streams in an E3SM run so MPAS-Analysis works, and what changes if I run MPAS-Seaice standalone?",
+      "expected_documents": [
+        "E3SM.components.mpas-ocean.docs.user-guide.index.md",
+        "mpas-e3sm-setup",
+        "mpas-seaice-setup"
+      ],
+      "feature": "model-components",
+      "scenario": "multi-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-diags-web-chrysalis-newuser",
+      "question": "I ran e3sm_diags on Chrysalis. Where do I put the results so I can view them in a web browser?",
+      "expected_documents": [
+        "e3sm_diags.docs.source.quickguides.quick-guide-chrysalis.rst",
+        "e3sm_diags.docs.source.quickguides.quick-guide-general.rst"
+      ],
+      "feature": "diagnostics",
+      "scenario": "multi-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-diags-native-grid-analyst",
+      "question": "Can e3sm_diags plot EAM output on its native ne30pg2 grid without regridding, and which version added that?",
+      "expected_documents": ["e3sm_diags.docs.source.available-parameters.rst"],
+      "feature": "diagnostics",
+      "scenario": "version-specific",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-enso-regions-researcher",
+      "question": "Both e3sm_diags and MPAS-Analysis do ENSO or Niño index analysis. Which Niño regions can each use, and what are the defaults?",
+      "expected_documents": [
+        "MPAS-Analysis.docs.users_guide.tasks.indexNino34.rst",
+        "e3sm_diags.docs.source.available-parameters.rst"
+      ],
+      "feature": "diagnostics",
+      "scenario": "multi-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-diags-derived-variable-developer",
+      "question": "How do I add my own derived variable to e3sm_diags without changing the package code?",
+      "expected_documents": ["e3sm_diags.docs.source.add-new-diagnostics.rst"],
+      "feature": "diagnostics",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-zppy-reference-path-analyst",
+      "question": "My zppy e3sm_diags model-vs-model task compared my run against observations instead of my control run. Why, and what should I set?",
+      "expected_documents": [
+        "mache.docs.users_guide.quick_start.md",
+        "zppy.docs.source.parameters.rst"
+      ],
+      "feature": "diagnostics",
+      "scenario": "troubleshooting",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-zppy-install-latest-analyst",
+      "question": "The zppy in E3SM-Unified is older than the release I need. How do I install the latest zppy myself?",
+      "expected_documents": ["zppy.docs.source.getting_started.rst"],
+      "feature": "diagnostics",
+      "scenario": "single-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-mpas-ncclimo-memory-analyst",
+      "question": "MPAS-Analysis crashes while ncclimo builds climatologies, probably out of memory. What should I change?",
+      "expected_documents": [
+        "MPAS-Analysis.docs.users_guide.config.execute.rst",
+        "nco-manual"
+      ],
+      "feature": "diagnostics",
+      "scenario": "troubleshooting",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-plots-online-vague-newuser",
+      "question": "zppy finished, how do i see the plots online",
+      "expected_documents": [
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-documenting.md",
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-post-processing.md",
+        "e3sm_diags.docs.source.quickguides.quick-guide-general.rst",
+        "zppy-tutorial"
+      ],
+      "feature": "diagnostics",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-obs-data-vague-newuser",
+      "question": "where is the obs data for e3sm diags on perlmutter",
+      "expected_documents": [
+        "diags-perlmutter-guide",
+        "e3sm_diags.docs.source.quickguides.quick-guide-general.rst"
+      ],
+      "feature": "diagnostics",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-zppy-status-newuser",
+      "question": "I launched zppy. How do I check which of its jobs failed?",
+      "expected_documents": [
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-post-processing.md",
+        "zppy-tutorial"
+      ],
+      "feature": "diagnostics",
+      "scenario": "troubleshooting",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-qbo-inputs-analyst",
+      "question": "For the e3sm_diags QBO diagnostic, which variable and reference dataset are used by default, and does it need climatology or time-series input?",
+      "expected_documents": [
+        "diags-input-requirements",
+        "diags-qbo-defaults",
+        "diags-qbo-driver",
+        "diags-qbo-parameter",
+        "e3sm_diags.docs.source.available-parameters.rst"
+      ],
+      "feature": "diagnostics",
+      "scenario": "multi-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-ex5-model-vs-obs-analyst",
+      "question": "I want to compare my model's surface air temperature climatology with ERA-Interim in e3sm_diags. Is there an official example I can copy and adapt?",
+      "expected_documents": [
+        "diags-ex5-config",
+        "diags-ex5-python",
+        "diags-examples"
+      ],
+      "feature": "diagnostics",
+      "scenario": "multi-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-latlon-precip-refs-analyst",
+      "question": "Which observational datasets does the default e3sm_diags lat_lon model-vs-obs set compare precipitation (PRECT) against?",
+      "expected_documents": ["diags-lat-lon-defaults"],
+      "feature": "diagnostics",
+      "scenario": "single-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-diags-tests-developer",
+      "question": "After changing e3sm_diags code, how do I run its tests, and what do I do when integration-test images differ from the expected ones?",
+      "expected_documents": ["diags-testing"],
+      "feature": "diagnostics",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-diags-v2-to-v3-researcher",
+      "question": "What changed between e3sm_diags v2 and v3 under the hood, and will my v2-style run script still work in v3?",
+      "expected_documents": [
+        "diags-overview",
+        "diags-v2-config-run",
+        "e3sm_diags.docs.source.config-run.rst"
+      ],
+      "feature": "diagnostics",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-zppy-nco-path-developer",
+      "question": "My zppy climo jobs need a newer NCO than the one in E3SM-Unified. What does the climo task run, and how do I point zppy at a different NCO build?",
+      "expected_documents": [
+        "zppy-boilerplate",
+        "zppy-climo-template",
+        "zppy-defaults"
+      ],
+      "feature": "diagnostics",
+      "scenario": "multi-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-zppy-default-sets-analyst",
+      "question": "Which e3sm_diags sets does zppy run if I don't list any, and where does its e3sm_diags job look for the climatology files made by the climo task?",
+      "expected_documents": ["zppy-defaults", "zppy-diags-template"],
+      "feature": "diagnostics",
+      "scenario": "multi-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-diagnostics-zppy-diurnal-analyst",
+      "question": "How do I set up zppy to make a diurnal-cycle climatology of PRECT from 3-hourly eam.h4 output?",
+      "expected_documents": ["zppy-tutorial-config"],
+      "feature": "diagnostics",
+      "scenario": "single-document",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-ncclimo-month-weights-researcher",
+      "question": "To reproduce E3SM seasonal and annual climatologies outside NCO, how does ncclimo weight the months when it averages them?",
+      "expected_documents": ["nco-manual"],
+      "feature": "analysis-tools",
+      "scenario": "single-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-ncclimo-split-newuser",
+      "question": "How do I turn a folder of monthly EAM history files into one time-series file per variable?",
+      "expected_documents": [
+        "diags-input-requirements",
+        "nco-manual",
+        "nco-ncclimo"
+      ],
+      "feature": "analysis-tools",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-ncremap-dim-order-analyst",
+      "question": "ncremap gives bad results for fields with dimensions ordered lat, lev, lon. What is wrong and how do I fix it?",
+      "expected_documents": ["nco-manual"],
+      "feature": "analysis-tools",
+      "scenario": "troubleshooting",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-xcdat-mergeerror-analyst",
+      "question": "xcdat.open_mfdataset fails with 'MergeError: conflicting values' for the bounds across my E3SM files. How do I work around it?",
+      "expected_documents": ["xcdat.docs.getting-started-guide.faqs.rst"],
+      "feature": "analysis-tools",
+      "scenario": "troubleshooting",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-xcdat-djf-analyst",
+      "question": "In xCDAT 0.11.2, how do I drop incomplete DJF seasons when computing a seasonal climatology, and is drop_incomplete_djf still the right option?",
+      "expected_documents": ["xcdat-temporal-api"],
+      "feature": "analysis-tools",
+      "scenario": "version-specific",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-xcdat-deps-developer",
+      "question": "What Python and xarray versions does the xCDAT 0.11.2 conda package require?",
+      "expected_documents": ["xcdat-recipe"],
+      "feature": "analysis-tools",
+      "scenario": "version-specific",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-xcdat-hpc-jupyter-newuser",
+      "question": "How do I set up xCDAT in Jupyter on an HPC machine?",
+      "expected_documents": [
+        "xcdat.docs.getting-started-guide.getting-started-hpc-jupyter.rst"
+      ],
+      "feature": "analysis-tools",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-nco-unified-version-analyst",
+      "question": "Which NCO version comes with E3SM-Unified 1.13.0 from conda-forge, and does the nco package pull in TempestRemap?",
+      "expected_documents": ["nco-recipe", "unified-recipe"],
+      "feature": "analysis-tools",
+      "scenario": "version-specific",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-ncclimo-highfreq-researcher",
+      "question": "How do I split daily (sub-monthly) EAM output into time series for e3sm_to_cmip?",
+      "expected_documents": [
+        "e3sm_to_cmip.docs.source.high_freq.rst",
+        "nco-manual"
+      ],
+      "feature": "analysis-tools",
+      "scenario": "multi-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-tools-xcdat-bounds-developer",
+      "question": "My dataset has no latitude or longitude bounds. How does xCDAT generate missing bounds, and what happens to auxiliary coordinates such as a second latitude variable?",
+      "expected_documents": ["xcdat.docs.getting-started-guide.faqs.rst"],
+      "feature": "analysis-tools",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-unified-versions-researcher",
+      "question": "Which versions of e3sm_diags, zppy, and MPAS-Analysis are pinned in E3SM-Unified 1.13.0?",
+      "expected_documents": [
+        "diags-recipe",
+        "mpas-recipe",
+        "unified-recipe",
+        "zppy-recipe"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-unified-variants-developer",
+      "question": "Which package variants does the E3SM-Unified 1.13.0 feedstock build, and how does the hpc variant differ from nompi?",
+      "expected_documents": [
+        "e3sm-unified.docs.packages.md",
+        "unified-recipe",
+        "unified-variants"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "version-specific",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-zstash-dtn-newuser",
+      "question": "Where should I run zstash at NERSC for the best transfer speed, and how do I keep it running after I log out?",
+      "expected_documents": [
+        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-long-term-archiving.md",
+        "zstash.docs.source.best_practices.rst",
+        "zstash.docs.source.getting_started.rst"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "multi-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-e2c-atm-prep-researcher",
+      "question": "e3sm_to_cmip wants atmosphere input as regridded time series named like PRECC_185001_201412.nc. How do I produce those from raw EAM output?",
+      "expected_documents": [
+        "e3sm_to_cmip.docs.source.preprocessing.rst",
+        "nco-manual"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "multi-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-e2c-handlers-developer",
+      "question": "How does e3sm_to_cmip map an E3SM variable like TREFHT to a CMIP6 variable, and how would I add a new mapping?",
+      "expected_documents": ["e3sm_to_cmip.docs.source.var-handlers.rst"],
+      "feature": "environment-tooling",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-e2c-tables-newuser",
+      "question": "e3sm_to_cmip says I need a tables path. Where do I get the CMOR tables?",
+      "expected_documents": [
+        "e3sm_to_cmip.docs.source.getting-started.rst",
+        "e3sm_to_cmip.docs.source.usage.rst"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "troubleshooting",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-paraview-vague-analyst",
+      "question": "how do i look at mpas ocean output in paraview",
+      "expected_documents": [
+        "MPAS-Tools.conda_package.docs.mpas_to_xdmf.rst",
+        "MPAS-Tools.conda_package.docs.paraview_extractor.rst"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "vague",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-seaice-partition-developer",
+      "question": "How do I create better-balanced graph partition files for MPAS-Seaice?",
+      "expected_documents": [
+        "MPAS-Tools.conda_package.docs.seaice.partition.rst"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-unified-verify-newuser",
+      "question": "After sourcing the E3SM-Unified load script, how do I check that the environment loaded correctly and which package variant is active?",
+      "expected_documents": [
+        "e3sm-unified.docs.troubleshooting.md",
+        "unified-quickstart"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-unified-windows-vague-newuser",
+      "question": "can i use e3sm unified on windows",
+      "expected_documents": [
+        "e3sm-unified.docs.introduction.md",
+        "unified-quickstart",
+        "unified-readme"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-mache-detect-developer",
+      "question": "How can my Python script detect which E3SM machine it is running on and find the shared diagnostics directory?",
+      "expected_documents": ["mache.docs.users_guide.quick_start.md"],
+      "feature": "environment-tooling",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-mache-new-machine-developer",
+      "question": "What do I need to change to add a new HPC machine to mache and then to E3SM-Unified's deployment?",
+      "expected_documents": [
+        "e3sm-unified.docs.releasing.adding-new-machines.md",
+        "mache.docs.developers_guide.adding_new_machine.md"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "multi-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-zstash-ls-cache-analyst",
+      "question": "I ran zstash update to add new files, but zstash ls doesn't show them. Why?",
+      "expected_documents": ["zstash.docs.source.usage.rst"],
+      "feature": "environment-tooling",
+      "scenario": "troubleshooting",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-zstash-checksum-researcher",
+      "question": "zstash check reported a checksum mismatch. What does that mean, and what should I do with my original data?",
+      "expected_documents": [
+        "zstash.docs.source.best_practices.rst",
+        "zstash.docs.source.usage.rst"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "troubleshooting",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-zstash-tar-size-vague-analyst",
+      "question": "what tar size should zstash use",
+      "expected_documents": [
+        "zstash.docs.source.best_practices.rst",
+        "zstash.docs.source.usage.rst"
+      ],
+      "feature": "environment-tooling",
+      "scenario": "vague",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-mache-parallel-developer",
+      "question": "How can I build a machine-correct srun or mpiexec command for my workflow with mache?",
+      "expected_documents": ["mache.docs.users_guide.parallel.md"],
+      "feature": "environment-tooling",
+      "scenario": "single-document",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-environment-diags-install-newuser",
+      "question": "How do I install e3sm_diags in my own conda environment instead of using E3SM-Unified?",
+      "expected_documents": ["diags-install"],
+      "feature": "environment-tooling",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-data-no-nersc-account-researcher",
+      "question": "Can I download released E3SM simulation output without a NERSC account?",
+      "expected_documents": ["data-docs-access"],
+      "feature": "data-access",
+      "scenario": "single-document",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-data-reproduce-v2-researcher",
+      "question": "How do I reproduce the v2.LR.piControl simulation bit-for-bit, and which machine do I need?",
+      "expected_documents": [
+        "e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.index.rst",
+        "e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.reproduction_table.rst"
+      ],
+      "feature": "data-access",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-data-best-way-vague-newuser",
+      "question": "best way to get e3sm model output?",
+      "expected_documents": ["data-docs-access"],
+      "feature": "data-access",
+      "scenario": "vague",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-data-v3-citation-researcher",
+      "question": "Which papers should I cite if I use data from the E3SMv3 v3.LR simulations?",
+      "expected_documents": ["data-docs-v3-overview"],
+      "feature": "data-access",
+      "scenario": "version-specific",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-data-esgf-cmip-native-newuser",
+      "question": "The E3SM simulation tables have CMIP and Native ESGF links. What is the difference, and how do I download a dataset from ESGF?",
+      "expected_documents": ["data-docs-access"],
+      "feature": "data-access",
+      "scenario": "single-document",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": false,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-pmcpu-max-walltime-newuser",
+      "question": "What is the maximum wallclock time allowed in Perlmutter's regular queue for E3SM jobs?",
+      "expected_documents": [],
+      "feature": "running-cases",
+      "scenario": "should-refuse",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-frontier-account-newuser",
+      "question": "Which project account and queue should I use to run E3SM on Frontier?",
+      "expected_documents": [],
+      "feature": "running-cases",
+      "scenario": "should-refuse",
+      "persona": "new-user",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-v3lr-sypd-researcher",
+      "question": "How many simulated years per day does v3.LR achieve on pm-cpu with the L PE layout?",
+      "expected_documents": [],
+      "feature": "running-cases",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-pace-api-developer",
+      "question": "How do I query PACE's REST API to pull performance data for all of my jobs automatically?",
+      "expected_documents": [],
+      "feature": "running-cases",
+      "scenario": "should-refuse",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-wrf-downscaling-researcher",
+      "question": "How do I install WRF and use it to downscale E3SM output over the western US?",
+      "expected_documents": [],
+      "feature": "running-cases",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-ecs-v3-researcher",
+      "question": "What is the equilibrium climate sensitivity of E3SMv3?",
+      "expected_documents": [],
+      "feature": "model-components",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-mali-calving-developer",
+      "question": "How do I turn on iceberg calving in MALI for a coupled Greenland run?",
+      "expected_documents": [],
+      "feature": "model-components",
+      "scenario": "should-refuse",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-fates-pft-developer",
+      "question": "Which FATES parameter file and how many PFTs does ELM-FATES use by default in E3SM v3.1.0?",
+      "expected_documents": [],
+      "feature": "model-components",
+      "scenario": "should-refuse",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-marbl-developer",
+      "question": "How do I enable MARBL ocean biogeochemistry in MPAS-Ocean for a v3 run?",
+      "expected_documents": [],
+      "feature": "model-components",
+      "scenario": "should-refuse",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-diags-fail-threshold-analyst",
+      "question": "What RMSE threshold does e3sm_diags use to decide that a simulation fails?",
+      "expected_documents": [],
+      "feature": "diagnostics",
+      "scenario": "should-refuse",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-zppy-highres-perlmutter-analyst",
+      "question": "Does zppy's high_res_v1 campaign work on Perlmutter?",
+      "expected_documents": [],
+      "feature": "diagnostics",
+      "scenario": "should-refuse",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-hpc-nco-version-analyst",
+      "question": "Exactly which NCO version do I get on Perlmutter with the hpc variant of E3SM-Unified 1.13.0?",
+      "expected_documents": [],
+      "feature": "environment-tooling",
+      "scenario": "should-refuse",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-e2c-cmip7-researcher",
+      "question": "How do I use e3sm_to_cmip to produce CMIP7-compliant output for the CMIP7 data request?",
+      "expected_documents": [],
+      "feature": "environment-tooling",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-gpu-purchase-analyst",
+      "question": "Which GPU should I buy to train a machine-learning emulator on E3SM output?",
+      "expected_documents": [],
+      "feature": "environment-tooling",
+      "scenario": "should-refuse",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-unified-114-developer",
+      "question": "What changes are in E3SM-Unified 1.14.0?",
+      "expected_documents": [],
+      "feature": "environment-tooling",
+      "scenario": "should-refuse",
+      "persona": "model-developer",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-zarr-convert-analyst",
+      "question": "How do I convert my own E3SM history files to Zarr like the AI training datasets?",
+      "expected_documents": [],
+      "feature": "data-access",
+      "scenario": "should-refuse",
+      "persona": "analyst",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-ace-predictions-researcher",
+      "question": "How do I run the ACE emulator on the E3SM AI training data to make climate predictions?",
+      "expected_documents": [],
+      "feature": "data-access",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-hpss-quota-researcher",
+      "question": "How much HPSS storage quota does the E3SM project have at NERSC?",
+      "expected_documents": [],
+      "feature": "data-access",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-v3-rrm-citation-researcher",
+      "question": "Which paper should I cite for the E3SMv3 regionally refined (v3.RRM) simulations?",
+      "expected_documents": [],
+      "feature": "data-access",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    },
+    {
+      "id": "syn-refuse-screamv1-ai-release-researcher",
+      "question": "When will the SCREAMv1 AI training dataset be released, and how large is it?",
+      "expected_documents": [],
+      "feature": "data-access",
+      "scenario": "should-refuse",
+      "persona": "researcher",
+      "origin": "synthetic-37",
+      "should_refuse": true,
+      "needs_review": false,
+      "review_note": ""
+    }
   ]
 }
