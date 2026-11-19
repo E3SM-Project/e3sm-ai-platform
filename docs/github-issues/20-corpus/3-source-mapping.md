@@ -467,7 +467,7 @@ validation, or retrieval coverage.
 - [ ] Retain complete raw upstream files separately, with byte hashes and a local
   provenance record connecting each raw file/revision to its normalized copy.
   The CLI stores normalized content only; it does not archive or hash raw originals.
-- [ ] Prepare Markdown under the existing [curation workflow](../../dev/corpus-curation.md).
+- [ ] Prepare Markdown under the existing [curation workflow](../../corpus/curation.md).
   Capture treats any UTF-8 input as Markdown and normalizes whitespace; it does
   not check or convert formats. Convert RST and resolve includes, and fence code,
   configuration, and recipe excerpts before capture.

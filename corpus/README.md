@@ -3,8 +3,8 @@
 `sources.json` is the human-owned scope of the corpus: each source is one
 repository at a pinned commit, selecting files by folder pattern or explicit
 path. `questions.json` lists the representative questions and the documents each
-should retrieve. See [corpus curation](../docs/dev/corpus-curation.md) for the
-workflow and [scope format](../docs/dev/corpus-curation.md#source-scope-format).
+should retrieve. See [corpus curation](../docs/corpus/curation.md) for the
+workflow and [scope format](../docs/corpus/curation.md#source-scope-format).
 
 ## Contents
 

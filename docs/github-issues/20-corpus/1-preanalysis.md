@@ -64,4 +64,4 @@ data, configuration, and workflow dependencies—not just tool descriptions.
 Source coverage is sufficient for an initial baseline when representative
 questions have traceable evidence or explicit gaps. Retrieval and answer quality
 still require evaluation in #21. Follow the existing
-[corpus curation workflow](../../dev/corpus-curation.md) for capture and approval.
+[corpus curation workflow](../../corpus/curation.md) for capture and approval.

@@ -2,9 +2,7 @@
 
 This guide describes observability expectations for the current E3SM Compass
 prototype and separates the implemented baseline from deployment and governance
-work that must be completed before production use. The implementation status in
-[`prototype-status.md`](prototype-status.md) remains the source of truth for
-delivered features; this document focuses on durable operating guidance.
+work that must be completed before production use.
 
 ## Implemented baseline
 

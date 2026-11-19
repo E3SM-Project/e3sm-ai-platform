@@ -2,7 +2,7 @@
 
 [`corpus/questions.json`](../../corpus/questions.json) holds 100 generated
 questions for the retrieval and answer baseline defined in
-[scoring.md](scoring.md): 80 answerable and 20 should-refuse. All were written
+[2-scoring.md](2-scoring.md): 80 answerable and 20 should-refuse. All were written
 from the curated corpus for #37.
 
 A person reviewed the 16 questions the model flagged (see

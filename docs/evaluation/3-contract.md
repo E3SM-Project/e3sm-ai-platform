@@ -5,7 +5,7 @@ E3SM Compass response contract. It does not import a backend by default. Instead
 pytest loads an adapter named by `E3SM_COMPASS_EVALUATOR` once per session and
 calls it for each fixture question.
 
-For retrieval and answer quality scoring, see [scoring.md](scoring.md).
+For retrieval and answer quality scoring, see [2-scoring.md](2-scoring.md).
 
 ## Running evaluation
 
@@ -91,4 +91,4 @@ make evaluation-lint
 make evaluation-typecheck
 ```
 
-For repository-level Ruff and ty guidance, see [setup.md](setup.md).
+For repository-level Ruff and ty guidance, see [setup.md](../dev/setup.md).

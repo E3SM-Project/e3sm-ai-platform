@@ -1,7 +1,7 @@
 # E3SM Compass evaluation adapter contract
 
 This directory contains the independent deterministic integration evaluation.
-The canonical evaluation guide is [../docs/dev/evaluation.md](../docs/dev/evaluation.md).
+The canonical evaluation guide is [../docs/evaluation/3-contract.md](../docs/evaluation/3-contract.md).
 
 Configure a synchronous Python adapter before running pytest:
 

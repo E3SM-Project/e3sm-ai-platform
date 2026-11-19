@@ -3,34 +3,36 @@
 This directory is the documentation entry point for the current E3SM AI Platform
 prototype, focused on E3SM Compass.
 
-## Canonical guides
+## User
 
-- [User usage guide](user/usage.md): run the prototype locally and submit
-  assistant questions.
-- [Developer setup](dev/setup.md): install dependencies, configure local
-  services, and run validation commands.
+- [Usage guide](user/usage.md): run the prototype locally and submit assistant
+  questions.
+
+## Development
+
+- [Setup](dev/setup.md): install dependencies, configure local services, and
+  run validation commands.
 - [Architecture](dev/architecture.md): current backend, frontend, retrieval,
   routing, generation, and extension boundaries.
-- [Evaluation](dev/evaluation.md): deterministic integration evaluation and the
-  adapter contract.
-- [Scoring](dev/scoring.md): in-progress retrieval and answer quality metrics
-  and baseline results.
-- [Synthetic questions](dev/synthetic-questions.md): how the 100-question
-  evaluation set was generated, its coverage, and what needs review.
-- [Roadmap](roadmap.md): planned implementation areas and known gaps.
-- [Observability](dev/observability.md): canonical observability guidance and
-  local tracing workflow.
-- [Corpus curation](dev/corpus-curation.md): source scope, reproducible local
-  corpus builds, question coverage, and opt-in runtime use.
-- [Corpus review checklist](dev/corpus-review.md): steps to approve and package a
-  corpus build.
+- [Observability](dev/observability.md): observability guidance and local
+  tracing workflow.
 
-## Status and historical documents
+## Corpus
 
-- [Prototype status](dev/prototype-status.md): delivered feature/status claims
-  and verification evidence only.
-- [Original prompt](dev/prompt.md): historical, non-canonical initial
-  specification retained for context.
+- [Curation](corpus/curation.md): source scope, reproducible local corpus
+  builds, question coverage, and opt-in runtime use.
+- [Review checklist](corpus/review.md): steps to approve and package a corpus
+  build.
+
+## Evaluation
+
+- [Synthetic questions](evaluation/1-synthetic-questions.md): how the
+  100-question evaluation set was generated, its coverage, and what needs
+  review.
+- [Scoring](evaluation/2-scoring.md): in-progress retrieval and answer quality
+  metrics and baseline results.
+- [Contract](evaluation/3-contract.md): deterministic integration evaluation and
+  the adapter contract.
 
 ## Repository areas
 

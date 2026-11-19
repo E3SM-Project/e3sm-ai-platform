@@ -6,10 +6,10 @@ citation today; the other metrics and a retrieval-mode option are planned.
 
 Metric implementations come from the evaluation framework chosen in #37
 (task 2); definitions may be aligned to it. For the response contract test
-suite, see [evaluation.md](evaluation.md).
+suite, see [3-contract.md](3-contract.md).
 
 Question sets, both in [`corpus/questions.json`](../../corpus/questions.json)
-(method in [synthetic-questions.md](synthetic-questions.md)):
+(method in [1-synthetic-questions.md](1-synthetic-questions.md)):
 
 - **Answerable:** the 80 questions with `should_refuse` false.
 - **Should refuse:** the 20 questions with `should_refuse` true.
