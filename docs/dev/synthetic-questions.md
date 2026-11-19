@@ -5,22 +5,23 @@ questions for the retrieval and answer baseline defined in
 [scoring.md](scoring.md): 80 answerable and 20 should-refuse. All were written
 from the curated corpus for #37.
 
-The questions are not human-verified. Review the expected documents before
-trusting baseline results (see [Review list](#review-list)).
+A person reviewed the 16 questions the model flagged (see
+[Process](#process)). The rest are model-verified only; review a sample of
+their expected documents before trusting baseline results.
 
 ## Fields
 
 Each question has `id` (`syn-` prefix), `question`, and `expected_documents`,
 plus:
 
-| Field | Values |
-| --- | --- |
-| `feature` | `running-cases`, `model-components`, `diagnostics`, `analysis-tools`, `environment-tooling`, `data-access` |
-| `scenario` | `single-document`, `multi-document`, `version-specific`, `troubleshooting`, `vague`, `should-refuse` |
-| `persona` | `new-user`, `analyst`, `model-developer`, `researcher` |
-| `origin` | `synthetic-37` |
-| `should_refuse` | `true` when no corpus document answers; `expected_documents` is then empty |
-| `needs_review`, `review_note` | Set when the expected documents or the scenario fit are uncertain |
+| Field                         | Values                                                                                                     |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `feature`                     | `running-cases`, `model-components`, `diagnostics`, `analysis-tools`, `environment-tooling`, `data-access` |
+| `scenario`                    | `single-document`, `multi-document`, `version-specific`, `troubleshooting`, `vague`, `should-refuse`       |
+| `persona`                     | `new-user`, `analyst`, `model-developer`, `researcher`                                                     |
+| `origin`                      | `synthetic-37`                                                                                             |
+| `should_refuse`               | `true` when no corpus document answers; `expected_documents` is then empty                                 |
+| `needs_review`, `review_note` | Set when the expected documents or the scenario fit are uncertain                                          |
 
 `make corpus-coverage` skips should-refuse questions.
 
@@ -46,7 +47,7 @@ adapted to the corpus:
 
 Source: the local build `corpus/local/corpus-expanded` (539 documents). Its
 `acquisition.json` `scope_sha256` matches the current `corpus/sources.json`,
-and `verify-build` passes. `corpus/local/corpus` is an older 65-document build.
+and `verify-build` passes.
 
 The model read documents directly. It did not use the application's
 retrieval, `make corpus-coverage`, or the web.
@@ -63,15 +64,18 @@ retrieval, `make corpus-coverage`, or the web.
 3. **Select and refine** over 3 rounds (below).
 4. **Fill coverage.** Write 16 more answerable questions so every explicit
    content document in `sources.json` is expected by at least one question,
-   and add 2 verified should-refuse candidates. These went through the same
-   checks and a final near-duplicate scan.
+   and add 2 verified should-refuse candidates.
 
-| Round | Checks | Changes |
+In total, 169 candidates (150 initial, 3 added in round 2, and 16 written in
+the coverage fill) produced the final 100: 80 answerable and 20 should-refuse.
+
+| Step | Checks | Changes |
 | --- | --- | --- |
-| 1 | Generate, verify, select by grid balance, persona realism, verified documents, and no near-duplicates | 150 candidates → 82 selected (64 answerable, 18 should-refuse) |
-| 2 | Re-read every expected passage; corpus-wide text search for other answering documents; re-search refusals; grid gaps | Added 6 documents to 5 questions; removed 1 document that only linked elsewhere (scenario changed to single-document); reworded 1 question to fit troubleshooting; replaced 1 question; replaced 3 questions with 3 new candidates to fill analysis-tools and data-access persona gaps; refusals unchanged |
-| 3 | Near-duplicate scan (question wording and shared documents); recheck changes | Reworded 1 question that overlapped another; added 5 review flags. Stopped at the 3-round limit. |
-| Fill | Same verification on 16 new answerable and 2 should-refuse questions | Added 18 questions; added 1 document to an existing question; reworded 1 new question that overlapped another |
+| Round 1 | Generate, verify, select by grid balance, persona realism, verified documents, and no near-duplicates | Selected 64 answerable and 18 should-refuse questions from the 150 candidates |
+| Round 2 | Re-read every expected passage; corpus-wide text search for other answering documents; re-search refusals; grid gaps | Added 6 documents to 5 questions; removed 1 document that only linked elsewhere (scenario changed to single-document); reworded 1 question to fit troubleshooting; replaced 1 question; replaced 3 questions with 3 new candidates to fill analysis-tools and data-access persona gaps; refusals unchanged |
+| Round 3 | Near-duplicate scan (question wording and shared documents); recheck changes | Reworded 1 question that overlapped another; added 5 review flags. Stopped at the 3-round limit. |
+| Fill | Same verification and near-duplicate scan | Added 16 answerable and 2 should-refuse questions, for 100 in total; added 1 document to an existing question; reworded 1 new question that overlapped another |
+| Human review | The 16 flagged questions | Resolved all 16 flags: added expected documents to 2 questions, reworded 1 question, kept 3 near-miss refusals, and added answer expectations for 16 questions; added 2 corpus gaps; reported 2 upstream documentation issues ([e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109), [e3sm-unified#159](https://github.com/E3SM-Project/e3sm-unified/issues/159)) |
 
 Deliberate pairs remain: an answerable question next to a should-refuse near
 miss on the same topic (for example, v3.LR citation versus v3.RRM citation,
@@ -79,15 +83,15 @@ and the conda-forge NCO version versus the hpc-variant NCO version).
 
 ## Final coverage
 
-| Feature | Single | Multi | Version | Trouble | Vague | Refuse | Total |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| running-cases | 6 | 2 | 0 | 2 | 3 | 5 | 18 |
-| model-components | 5 | 3 | 3 | 3 | 3 | 4 | 21 |
-| diagnostics | 5 | 6 | 2 | 3 | 2 | 2 | 20 |
-| analysis-tools | 4 | 1 | 3 | 2 | 0 | 0 | 10 |
-| environment-tooling | 6 | 3 | 2 | 3 | 3 | 4 | 21 |
-| data-access | 2 | 0 | 2 | 0 | 1 | 5 | 10 |
-| Total | 28 | 15 | 12 | 13 | 12 | 20 | 100 |
+| Feature             | Single | Multi | Version | Trouble | Vague | Refuse | Total |
+| ------------------- | ------ | ----- | ------- | ------- | ----- | ------ | ----- |
+| running-cases       | 6      | 2     | 0       | 2       | 3     | 5      | 18    |
+| model-components    | 5      | 3     | 3       | 3       | 3     | 4      | 21    |
+| diagnostics         | 5      | 6     | 2       | 3       | 2     | 2      | 20    |
+| analysis-tools      | 4      | 1     | 3       | 2       | 0     | 0      | 10    |
+| environment-tooling | 6      | 3     | 2       | 3       | 3     | 4      | 21    |
+| data-access         | 2      | 0     | 2       | 0       | 1     | 5      | 10    |
+| Total               | 28     | 15    | 12      | 13      | 12    | 20     | 100   |
 
 Personas: new-user 26, analyst 23, model-developer 27, researcher 24.
 
@@ -106,26 +110,68 @@ tools, and multi-document and troubleshooting data access.
 - Several documents are release snapshots: machine and batch XML, Unified
   package pins, and paths may not match current facilities.
 
+## Answer expectations
+
+Some answers are correct only with a qualifier:
+
+- `syn-running-chrysalis-queue-newuser`, `syn-running-pmcpu-paths-developer`:
+  say the values come from the release's machine and batch XML, and to check
+  current facility settings if needed.
+- `syn-components-cmip7-compset-researcher`: describe `WCYCL1850-CMIP7` as
+  defined in the release's compset XML (`e3sm-coupled-compsets`), not as
+  validated or supported for CMIP7 production runs.
+- `syn-environment-diags-install-newuser`,
+  `syn-diagnostics-zppy-install-latest-analyst`,
+  `syn-environment-zstash-dtn-newuser`: do not present disabling SSL
+  verification as an install step. If mentioned, say the guide includes it for
+  networks that intercept SSL, that it turns off certificate checking and is
+  not recommended, and that users who hit SSL errors should ask their site
+  administrators about configuring the site's certificate.
+- `syn-tools-nco-unified-version-analyst`,
+  `syn-environment-unified-versions-researcher`: give versions from
+  `unified-recipe` and the package recipes (for example, NCO 5.3.9,
+  e3sm_diags 3.2.0, zppy 3.2.0, MPAS-Analysis 1.15.0), not the `1.13.0rc1`
+  pins in `e3sm-unified.docs.packages.md`.
+- `syn-environment-unified-variants-developer`: say the 1.13.0 feedstock builds
+  `nompi` and `hpc` (`unified-variants`), and that `hpc` omits system-library
+  packages (such as NCO, MOAB, and TempestRemap) that the HPC deployment
+  provides through Spack. Other docs mention `mpich` and `openmpi` variants; do
+  not claim those builds exist for 1.13.0.
+- `syn-components-elm-docs-vague-developer`: name the Developer Guide for code
+  and the Technical Guide for the science. Note that the introduction says the
+  Developer Guide explains data structures, but the captured Developer Guide
+  covers only testing.
+- `syn-diagnostics-diags-v2-to-v3-researcher`: say v3 replaced the CDAT back
+  end with xarray and xCDAT and kept the run API backward-compatible. Do not
+  claim v2 and v3 give identical numbers; the corpus does not document the
+  v2-to-v3 regression testing or its tolerances.
+- `syn-components-mpas-analysis-setup-researcher`: say the MPAS-Analysis docs
+  state E3SM runs need no namelist or stream changes, and the E3SM MPAS-Ocean
+  guide confirms monthly `timeSeriesStatsMonthly` output by default. Do not
+  promise every task works unchanged. For standalone sea ice, give the
+  analysis-member and stream settings from `mpas-seaice-setup`, and do not
+  repeat its stale "not yet publicly released" statement.
+- `syn-diagnostics-obs-data-vague-newuser`: give both Perlmutter observation
+  paths, `/global/cfs/cdirs/e3sm/diagnostics/observations/Atm/`
+  (`diags-perlmutter-guide`) and
+  `/global/cfs/cdirs/e3sm/e3sm_diags/obs_for_e3sm_diags/`
+  (`e3sm_diags.docs.source.quickguides.quick-guide-general.rst`). Say the guides
+  disagree and to check which path exists on Perlmutter; do not present either
+  as confirmed. Reported upstream in
+  [E3SM-Project/e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109).
+- Near-miss should-refuse questions: refuse, but it is fine to mention the
+  nearby fact without treating it as the answer.
+  - `syn-refuse-pmcpu-max-walltime-newuser`: `e3sm-batch` lists a 30-minute
+    pm-cpu default that it says is not the limit.
+  - `syn-refuse-hpc-nco-version-analyst`: the recipes pin NCO only for non-hpc
+    variants.
+  - `syn-refuse-ace-predictions-researcher`: the AI training overview links to
+    ACE but does not document its use.
+
 ## Review list
 
-| Question | Note |
-| --- | --- |
-| `syn-running-chrysalis-queue-newuser` | Answer comes from release-defined batch XML, not current facility settings. |
-| `syn-running-pmcpu-paths-developer` | Answer comes from release-defined machine XML, not current facility settings. |
-| `syn-running-domain-files-developer` | E3SM's grid guide links a domain-file page that is not in the corpus; only the generic CIME `gen_domain` description answers. |
-| `syn-components-cmip7-compset-researcher` | Compset XML entries are not scientific validation. |
-| `syn-components-eamxx-support-researcher` | `e3sm-eamxx-cases` has only a heading and one sentence; it names the topic but does not explain case setup. |
-| `syn-components-elm-docs-vague-developer` | `e3sm-elm-introduction` is placeholder text that only links to the guides. |
-| `syn-components-mpas-analysis-setup-researcher` | Source notes: the E3SM default-output claim is unverified for v3.1.0, and the sea-ice page has a stale release statement. |
-| `syn-diagnostics-obs-data-vague-newuser` | The general quick guide and the Perlmutter guide give different Perlmutter observation paths. |
-| `syn-diagnostics-diags-v2-to-v3-researcher` | API compatibility is not numerical equivalence; confirm the v2 page fits. |
-| `syn-tools-nco-unified-version-analyst` | `e3sm-unified.docs.packages.md` lists NCO 5.3.6 for 1.13.0rc1; the recipe pins 5.3.9. |
-| `syn-environment-unified-versions-researcher` | `e3sm-unified.docs.packages.md` shows 1.13.0rc1 pins that differ from the released recipe. |
-| `syn-environment-unified-variants-developer` | The feedstock variant file lists only `nompi` and `hpc`; other docs describe `mpich` and `openmpi` variants. |
-| `syn-environment-diags-install-newuser` | The page also advises disabling SSL verification; that advice must not be presented as guidance. |
-| `syn-refuse-pmcpu-max-walltime-newuser` | The batch XML `walltimemax` for pm-cpu is documented as a default, not the limit; confirm refusal is intended. |
-| `syn-refuse-hpc-nco-version-analyst` | Recipes pin NCO only for non-hpc variants; confirm no other source records the hpc NCO version. |
-| `syn-refuse-ace-predictions-researcher` | The AI training overview links to ACE; confirm a link alone is not an answer. |
+No questions are flagged. To flag one, set `needs_review` to true and explain
+why in `review_note`, then list it here with its expected documents.
 
 ## Corpus gaps
 
@@ -135,6 +181,10 @@ Realistic questions the corpus cannot answer:
   machines beyond the `pm-cpu` and `chrysalis` XML excerpts (for example,
   Frontier).
 - Measured throughput (SYPD) for standard configurations.
+- e3sm_diags v2-to-v3 regression-testing results and tolerances.
+- MPAS-Ocean and MPAS-Seaice default analysis-member and stream settings in
+  E3SM v3.1.0. No MPAS document lists them; the namelist defaults and streams
+  templates are not captured.
 - Scientific results, such as E3SMv3 climate sensitivity.
 - E3SM's own domain-file generation page (linked from the grid guide, not
   captured) and EAMxx case setup (the captured page is only a heading).
@@ -144,8 +194,9 @@ Realistic questions the corpus cannot answer:
 - CMIP7 conversion with e3sm_to_cmip; only CMIP7 compsets are present.
 - The NCO version in the hpc Unified variant (provided by Spack), and
   releases after E3SM-Unified 1.13.0.
-- ACE emulator usage, the SCREAMv1 AI dataset release, and the v3.RRM citation
-  (upstream lists the last two as coming soon or TBD).
+- ACE documentation: not ingested; the corpus only links to the ACE repository.
+- The SCREAMv1 AI dataset release and the v3.RRM citation (upstream lists both
+  as coming soon or TBD).
 - Whether zppy's `high_res_v1` campaign works on Perlmutter (upstream TODO).
 - NERSC HPSS project quotas and PACE API access.
 
