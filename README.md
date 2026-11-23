@@ -157,7 +157,6 @@ The optional tracing stack uses Docker Compose. See [Observability](docs/dev/obs
 - [Usage guide](docs/user/usage.md)
 - [Developer setup](docs/dev/setup.md)
 - [Architecture](docs/dev/architecture.md)
-- [Evaluation contract](docs/evaluation/3-contract.md)
-- [Scoring](docs/evaluation/2-scoring.md)
+- [Evaluation](evaluation/README.md)
 - [Observability](docs/dev/observability.md)
 - [Corpus curation](docs/corpus/curation.md)

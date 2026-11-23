@@ -26,13 +26,7 @@ prototype, focused on E3SM Compass.
 
 ## Evaluation
 
-- [Synthetic questions](evaluation/1-synthetic-questions.md): how the
-  100-question evaluation set was generated, its coverage, and what needs
-  review.
-- [Scoring](evaluation/2-scoring.md): in-progress retrieval and answer quality
-  metrics and baseline results.
-- [Contract](evaluation/3-contract.md): deterministic integration evaluation and
-  the adapter contract.
+- [Evaluation](../evaluation/README.md): contract tests, scoring, and synthetic questions.
 
 ## Repository areas
 

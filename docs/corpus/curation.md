@@ -94,7 +94,7 @@ approves a build. `validate --require-approved` fails until a reviewer approves.
 `corpus/questions.json` maps each representative question to the documents that
 should support it; tests check that each one is selected in the scope.
 Should-refuse questions list no documents and are skipped by coverage; see
-[synthetic questions](../evaluation/1-synthetic-questions.md).
+[synthetic questions](../../evaluation/docs/1-synthetic-questions.md).
 
 `make corpus-coverage` answers each question with the application's own
 chunking, lexical retrieval, and deterministic generation (no LLM, no network):
@@ -105,7 +105,7 @@ chunking, lexical retrieval, and deterministic generation (no LLM, no network):
   in the answer comes from it.
 
 The report (`corpus/local/coverage.json`) is a baseline, not a pass/fail check.
-Retrieval and answer metrics are defined in [scoring.md](../evaluation/2-scoring.md).
+See the [scoring guide](../../evaluation/docs/2-scoring.md) for retrieval and answer metrics.
 
 ## Runtime use
 

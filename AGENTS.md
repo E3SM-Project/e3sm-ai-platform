@@ -127,7 +127,7 @@ Agents may run repository QA tools without requesting permission.
 | Project overview and commands | `README.md`, `make help` |
 | Developer setup | `docs/dev/setup.md` |
 | Architecture | `docs/dev/architecture.md` |
-| Evaluation contract | `docs/evaluation/3-contract.md` |
+| Evaluation contract | `evaluation/README.md` |
 | Observability | `docs/dev/observability.md` |
 | Python tooling | `pyproject.toml`, `backend/pyproject.toml` |
 | Frontend tooling | `frontend/package.json` |

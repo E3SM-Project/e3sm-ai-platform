@@ -6,7 +6,7 @@ citation today; the other metrics and a retrieval-mode option are planned.
 
 Metric implementations come from the evaluation framework chosen in #37
 (task 2); definitions may be aligned to it. For the response contract test
-suite, see [3-contract.md](3-contract.md).
+suite, see the [evaluation contract](../README.md).
 
 Question sets, both in [`corpus/questions.json`](../../corpus/questions.json)
 (method in [1-synthetic-questions.md](1-synthetic-questions.md)):
