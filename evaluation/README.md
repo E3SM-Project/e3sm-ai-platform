@@ -1,8 +1,11 @@
 # E3SM Compass evaluation contract
 
 This independent pytest suite checks the response contract without live LLM or
-web requests. For the broader quality baseline, see the
-[scoring guide](docs/2-scoring.md) and [synthetic questions](docs/1-synthetic-questions.md).
+web requests. For the broader quality baseline, see:
+
+1. [Synthetic questions](docs/1-synthetic-questions.md)
+2. [Agent-assisted human review](docs/2-agent-assisted-human-review.md)
+3. [Scoring guide](docs/3-scoring.md)
 
 ## Run the suite
 

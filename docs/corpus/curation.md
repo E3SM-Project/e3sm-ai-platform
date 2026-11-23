@@ -105,7 +105,7 @@ chunking, lexical retrieval, and deterministic generation (no LLM, no network):
   in the answer comes from it.
 
 The report (`corpus/local/coverage.json`) is a baseline, not a pass/fail check.
-See the [scoring guide](../../evaluation/docs/2-scoring.md) for retrieval and answer metrics.
+See the [scoring guide](../../evaluation/docs/3-scoring.md) for retrieval and answer metrics.
 
 ## Runtime use
 

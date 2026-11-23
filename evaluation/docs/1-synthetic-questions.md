@@ -2,12 +2,12 @@
 
 [`corpus/questions.json`](../../corpus/questions.json) holds 100 generated
 questions for the retrieval and answer baseline defined in
-[2-scoring.md](2-scoring.md): 80 answerable and 20 should-refuse. All were written
-from the curated corpus for #37.
+the [scoring guide](3-scoring.md): 80 answerable and 20 should-refuse. All were
+written from the curated corpus for #37.
 
-A person reviewed the 16 questions the model flagged (see
-[Process](#process)). The rest are model-verified only; review a sample of
-their expected documents before trusting baseline results.
+A person reviewed the 16 questions the model flagged (see [Process](#process)).
+The rest are model-verified only. Track the follow-up in the
+[agent-assisted human review log](2-agent-assisted-human-review.md).
 
 ## Fields
 
