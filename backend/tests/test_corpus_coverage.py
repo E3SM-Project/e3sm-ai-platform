@@ -74,6 +74,31 @@ def test_measure_coverage_reports_retrieved_and_cited_documents(tmp_path):
     assert measure_coverage(root, questions) == report
 
 
+def test_optional_documents_are_accepted_citations_without_counting_toward_recall(tmp_path):
+    """Optional citations are accepted but cannot satisfy required coverage."""
+    root = _build(tmp_path)
+    questions = _questions(
+        tmp_path,
+        [
+            {
+                "id": "q",
+                "question": "When should I run case.submit?",
+                "expected_documents": ["setup"],
+                "optional_documents": ["submit"],
+            }
+        ],
+    )
+
+    report = measure_coverage(root, questions)
+    result = report.questions[0]
+
+    assert result.optional == ["submit"]
+    assert "submit" in result.accepted_cited
+    assert "submit" not in result.expected_retrieved
+    assert "submit" not in result.expected_cited
+    assert report.expected_total == 1
+
+
 def test_measure_coverage_rejects_unknown_documents_and_bad_question_sets(tmp_path):
     """Question sets must name build documents and have unique, non-empty entries."""
     root = _build(tmp_path)
@@ -84,6 +109,10 @@ def test_measure_coverage_rejects_unknown_documents_and_bad_question_sets(tmp_pa
         measure_coverage(root, unknown)
 
     entry = {"id": "q", "question": "Submit?", "expected_documents": ["submit"]}
+    with pytest.raises(CurationValidationError, match="not in build: missing"):
+        measure_coverage(root, _questions(tmp_path, [{**entry, "optional_documents": ["missing"]}]))
+    with pytest.raises(CurationValidationError, match="expected and optional documents overlap"):
+        load_questions(_questions(tmp_path, [{**entry, "optional_documents": ["submit"]}]))
     with pytest.raises(CurationValidationError, match="duplicate question IDs"):
         load_questions(_questions(tmp_path, [entry, entry]))
     with pytest.raises(CurationValidationError, match="no expected documents: q"):
@@ -103,6 +132,20 @@ def test_load_questions_requires_empty_documents_only_for_should_refuse(tmp_path
         load_questions(
             _questions(
                 tmp_path, [{**refuse, "expected_documents": ["setup"], "should_refuse": True}]
+            )
+        )
+    with pytest.raises(CurationValidationError, match="should-refuse question has optional"):
+        load_questions(
+            _questions(
+                tmp_path,
+                [
+                    {
+                        **refuse,
+                        "expected_documents": [],
+                        "optional_documents": ["setup"],
+                        "should_refuse": True,
+                    }
+                ],
             )
         )
     with pytest.raises(CurationValidationError, match="invalid question set"):
@@ -127,7 +170,7 @@ def test_measure_coverage_skips_should_refuse_questions(tmp_path):
 
 
 def test_checked_in_questions_use_every_explicit_document():
-    """Both question sets are present and every explicit content document is expected."""
+    """Both question types are present and every explicit content source is mapped."""
     questions = load_questions(REPOSITORY / "corpus" / "questions.json").questions
     scope = json.loads((REPOSITORY / "corpus" / "sources.json").read_text())
     explicit = {
@@ -136,15 +179,19 @@ def test_checked_in_questions_use_every_explicit_document():
         for document in source["documents"]
         if document.get("role", "content") == "content"
     }
-    expected = {doc for question in questions for doc in question.expected_documents}
+    mapped = {
+        doc
+        for question in questions
+        for doc in (*question.expected_documents, *question.optional_documents)
+    }
 
     assert any(question.should_refuse for question in questions)
     assert any(not question.should_refuse for question in questions)
-    assert explicit <= expected, sorted(explicit - expected)
+    assert explicit <= mapped, sorted(explicit - mapped)
 
 
 def test_checked_in_questions_reference_selected_content_documents():
-    """Expected documents are explicit content documents or pattern-selected files."""
+    """Required and optional sources are explicit or pattern-selected content."""
     questions = load_questions(REPOSITORY / "corpus" / "questions.json")
     scope = json.loads((REPOSITORY / "corpus" / "sources.json").read_text())
     explicit = {
@@ -164,7 +211,7 @@ def test_checked_in_questions_reference_selected_content_documents():
         )
 
     for question in questions.questions:
-        for doc_id in question.expected_documents:
+        for doc_id in (*question.expected_documents, *question.optional_documents):
             assert doc_id in explicit or pattern_selected(doc_id), (question.id, doc_id)
 
 

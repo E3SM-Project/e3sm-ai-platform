@@ -23,7 +23,7 @@ Score each question, then average across questions unless noted.
 | Recall@k | Share of expected documents in the top k | Answerable | No |
 | MRR@k | 1 ÷ rank of the first expected document; 0 if none in the top k | Answerable | No |
 | Cited recall | Share of expected documents cited | Answerable | No |
-| Cited precision | Share of cited documents that are expected | Answerable | No |
+| Cited precision | Share of cited documents listed as expected or optional | Answerable | No |
 | False refusal | Share of questions refused | Answerable | No |
 | False answer | Share of questions answered | Should refuse | No |
 | Latency | Median and p95 seconds per question | Both | No |
@@ -36,7 +36,10 @@ Terms:
 - **k:** how many top-ranked chunks count as retrieved. Report k = 4 (the
   default `top_k`, the chunks the answer can cite) and k = 8 (the candidate
   set).
-- **Expected document:** a document listed for a question in the question set.
+- **Expected document:** a required source listed in `expected_documents`.
+- **Optional document:** a source listed in `optional_documents`. Omission
+  does not affect recall or rank; citation counts toward precision. The
+  coverage report lists valid citations in `accepted_cited`.
 - **Top k / rank:** a document is in the top k if any of its chunks is; its
   rank is its best chunk's rank.
 - **Recall@k:** what share of expected documents retrieval finds. With 3

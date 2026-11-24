@@ -43,7 +43,8 @@ the question's design and review status:
 | `scenario` | `single-document`, `multi-document`, `version-specific`, `troubleshooting`, `vague`, or `should-refuse` |
 | `persona` | `new-user`, `analyst`, `model-developer`, or `researcher` |
 | `origin` | `synthetic-37` |
-| `should_refuse` | `true` when no corpus document answers the question. `expected_documents` is empty, and `make corpus-coverage` skips the entry. |
+| `optional_documents` | Supporting corpus document IDs accepted as citations but not required for recall. Defaults to an empty list and must not overlap `expected_documents`. |
+| `should_refuse` | `true` when no corpus document answers the question. Both document lists are empty, and `make corpus-coverage` skips the entry. |
 | `needs_review`, `review_note` | Flag and explanation when the expected documents or scenario label are uncertain. |
 
 ## Local files

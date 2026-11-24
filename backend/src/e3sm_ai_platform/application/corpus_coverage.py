@@ -42,6 +42,8 @@ class CoverageQuestion(BaseModel):
     expected_documents : list of str
         Build document IDs that answer the question; empty only when
         ``should_refuse`` is true.
+    optional_documents : list of str
+        Supporting build document IDs accepted as citations but not required.
     feature, scenario, persona : str or None
         Optional test-design tags (topic area, question type, user type).
     origin : str or None
@@ -59,6 +61,7 @@ class CoverageQuestion(BaseModel):
     id: str
     question: str
     expected_documents: list[str]
+    optional_documents: list[str] = []
     feature: str | None = None
     scenario: str | None = None
     persona: str | None = None
@@ -87,6 +90,8 @@ class QuestionCoverage(BaseModel):
     cited: list[str]
     expected_retrieved: list[str]
     expected_cited: list[str]
+    optional: list[str] = []
+    accepted_cited: list[str] = []
 
 
 class CoverageReport(BaseModel):
@@ -135,6 +140,10 @@ def load_questions(path: Path | str) -> QuestionSet:
             failures.append(f"should-refuse question has expected documents: {question.id}")
         if not question.should_refuse and not question.expected_documents:
             failures.append(f"no expected documents: {question.id}")
+        if question.should_refuse and question.optional_documents:
+            failures.append(f"should-refuse question has optional documents: {question.id}")
+        if set(question.expected_documents).intersection(question.optional_documents):
+            failures.append(f"expected and optional documents overlap: {question.id}")
     if failures:
         raise CurationValidationError("; ".join(failures))
 
@@ -168,9 +177,14 @@ def measure_coverage(build_root: Path | str, questions_path: Path | str) -> Cove
     questions = [q for q in load_questions(questions_path).questions if not q.should_refuse]
     entries = runtime_entries(root)
     known = {entry.source_id for entry in entries}
-    missing = sorted({doc for question in questions for doc in question.expected_documents} - known)
+    labeled = {
+        doc
+        for question in questions
+        for doc in (*question.expected_documents, *question.optional_documents)
+    }
+    missing = sorted(labeled - known)
     if missing:
-        raise CurationValidationError(f"expected documents not in build: {', '.join(missing)}")
+        raise CurationValidationError(f"question documents not in build: {', '.join(missing)}")
 
     settings = Settings()
     store = build_retriever(settings)
@@ -198,6 +212,8 @@ def _measure(
     )
     cited = sorted({citation.source_id for citation in response.citations})
     expected = sorted(question.expected_documents)
+    optional = sorted(question.optional_documents)
+    accepted = set(expected).union(optional)
 
     return QuestionCoverage(
         id=question.id,
@@ -207,6 +223,8 @@ def _measure(
         cited=cited,
         expected_retrieved=[doc for doc in expected if doc in retrieved],
         expected_cited=[doc for doc in expected if doc in cited],
+        optional=optional,
+        accepted_cited=[doc for doc in cited if doc in accepted],
     )
 
 

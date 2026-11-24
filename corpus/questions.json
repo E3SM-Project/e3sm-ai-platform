@@ -43,9 +43,9 @@
     {
       "id": "syn-running-throughput-vague-newuser",
       "question": "how fast is my run going? where do i see years per day",
-      "expected_documents": [
+      "expected_documents": ["E3SM-Project.github.io.docs.running-e3sm-guide.guide-production.md"],
+      "optional_documents": [
         "E3SM-Project.github.io.docs.running-e3sm-guide.guide-documenting.md",
-        "E3SM-Project.github.io.docs.running-e3sm-guide.guide-production.md",
         "cime.doc.source.ccs.timers.rst"
       ],
       "feature": "running-cases",
@@ -74,7 +74,8 @@
     {
       "id": "syn-running-bfb-short-tests-developer",
       "question": "Before a long production run, which short tests should I run to confirm restarts and PE-layout changes are bit-for-bit, and how do I compare the results?",
-      "expected_documents": ["e3sm-run-template", "site-pre-production"],
+      "expected_documents": ["site-pre-production"],
+      "optional_documents": ["e3sm-run-template"],
       "feature": "running-cases",
       "scenario": "multi-document",
       "persona": "model-developer",
@@ -124,10 +125,8 @@
     {
       "id": "syn-running-query-config-newuser",
       "question": "How do I list the compsets and grids my E3SM checkout supports before I create a case?",
-      "expected_documents": [
-        "E3SM.components.mpas-ocean.docs.user-guide.index.md",
-        "cime.doc.source.ccs.query-configuration.rst"
-      ],
+      "expected_documents": ["cime.doc.source.ccs.query-configuration.rst"],
+      "optional_documents": ["E3SM.components.mpas-ocean.docs.user-guide.index.md"],
       "feature": "running-cases",
       "scenario": "single-document",
       "persona": "new-user",
@@ -168,6 +167,7 @@
       "id": "syn-running-guide-index-vague-newuser",
       "question": "where is the official step by step guide for running e3sm",
       "expected_documents": ["site-running-guide-index"],
+      "optional_documents": ["e3sm-eam-user-guide"],
       "feature": "running-cases",
       "scenario": "vague",
       "persona": "new-user",
@@ -217,8 +217,7 @@
       "question": "How do I turn on COSP satellite-simulator output in EAM, and what does cosp_lite change?",
       "expected_documents": [
         "E3SM.components.eam.docs.tech-guide.cosp.md",
-        "E3SM.components.eam.docs.user-guide.namelist_parameters.md",
-        "e3sm-run-template"
+        "E3SM.components.eam.docs.user-guide.namelist_parameters.md"
       ],
       "feature": "model-components",
       "scenario": "multi-document",
@@ -245,10 +244,8 @@
     {
       "id": "syn-components-eamxx-nudging-researcher",
       "question": "How do I nudge EAMxx toward reanalysis winds and temperature while leaving my refined region free-running?",
-      "expected_documents": [
-        "E3SM.components.eamxx.docs.user.nudging.md",
-        "E3SM.components.eamxx.docs.user.rrm_eamxx.md"
-      ],
+      "expected_documents": ["E3SM.components.eamxx.docs.user.nudging.md"],
+      "optional_documents": ["E3SM.components.eamxx.docs.user.rrm_eamxx.md"],
       "feature": "model-components",
       "scenario": "multi-document",
       "persona": "researcher",
@@ -261,10 +258,11 @@
       "id": "syn-components-mpaso-gcase-newuser",
       "question": "How do I set up an ocean and sea-ice-only run forced by JRA55, and which mesh goes with it?",
       "expected_documents": [
-        "E3SM.components.mpas-ocean.docs.user-guide.index.md"
+        "E3SM.components.mpas-ocean.docs.user-guide.index.md",
+        "cime-case-create"
       ],
       "feature": "model-components",
-      "scenario": "single-document",
+      "scenario": "multi-document",
       "persona": "new-user",
       "origin": "synthetic-37",
       "should_refuse": false,
@@ -354,10 +352,8 @@
     {
       "id": "syn-components-eam-avgflag-analyst",
       "question": "The EAM user guide lists 'A' twice for avgflag_pertape. Which flag actually gives instantaneous history output, and which values are valid?",
-      "expected_documents": [
-        "e3sm-eam-namelist-definitions",
-        "e3sm-eam-user-guide"
-      ],
+      "expected_documents": ["e3sm-eam-namelist-definitions"],
+      "optional_documents": ["e3sm-eam-user-guide"],
       "feature": "model-components",
       "scenario": "troubleshooting",
       "persona": "analyst",
@@ -369,10 +365,9 @@
     {
       "id": "syn-components-eamxx-support-researcher",
       "question": "Is EAMxx a supported atmosphere for science runs in E3SM v3.1.0, which configuration of it is available, and where is case setup documented?",
-      "expected_documents": [
-        "e3sm-eamxx-cases",
-        "e3sm-eamxx-introduction",
-        "e3sm-model-overview"
+      "expected_documents": ["e3sm-eamxx-cases", "e3sm-eamxx-introduction", "e3sm-model-overview"],
+      "optional_documents": [
+        "E3SM.components.eamxx.docs._presentations_srcs.eamxx-tutorial-2025-part1.md"
       ],
       "feature": "model-components",
       "scenario": "version-specific",
@@ -385,10 +380,10 @@
     {
       "id": "syn-components-elm-docs-vague-developer",
       "question": "elm guides - which one has the code and data structure stuff vs the science",
-      "expected_documents": [
+      "expected_documents": ["e3sm-elm-introduction"],
+      "optional_documents": [
         "E3SM.components.elm.docs.dev-guide.index.md",
-        "E3SM.components.elm.docs.tech-guide.index.md",
-        "e3sm-elm-introduction"
+        "E3SM.components.elm.docs.tech-guide.index.md"
       ],
       "feature": "model-components",
       "scenario": "vague",
@@ -401,11 +396,8 @@
     {
       "id": "syn-components-mpas-analysis-setup-researcher",
       "question": "Do I need to change namelists or streams in an E3SM run so MPAS-Analysis works, and what changes if I run MPAS-Seaice standalone?",
-      "expected_documents": [
-        "E3SM.components.mpas-ocean.docs.user-guide.index.md",
-        "mpas-e3sm-setup",
-        "mpas-seaice-setup"
-      ],
+      "expected_documents": ["mpas-e3sm-setup", "mpas-seaice-setup"],
+      "optional_documents": ["E3SM.components.mpas-ocean.docs.user-guide.index.md"],
       "feature": "model-components",
       "scenario": "multi-document",
       "persona": "researcher",
@@ -417,10 +409,8 @@
     {
       "id": "syn-diagnostics-diags-web-chrysalis-newuser",
       "question": "I ran e3sm_diags on Chrysalis. Where do I put the results so I can view them in a web browser?",
-      "expected_documents": [
-        "e3sm_diags.docs.source.quickguides.quick-guide-chrysalis.rst",
-        "e3sm_diags.docs.source.quickguides.quick-guide-general.rst"
-      ],
+      "expected_documents": ["e3sm_diags.docs.source.quickguides.quick-guide-chrysalis.rst"],
+      "optional_documents": ["e3sm_diags.docs.source.quickguides.quick-guide-general.rst"],
       "feature": "diagnostics",
       "scenario": "multi-document",
       "persona": "new-user",
@@ -471,10 +461,8 @@
     {
       "id": "syn-diagnostics-zppy-reference-path-analyst",
       "question": "My zppy e3sm_diags model-vs-model task compared my run against observations instead of my control run. Why, and what should I set?",
-      "expected_documents": [
-        "mache.docs.users_guide.quick_start.md",
-        "zppy.docs.source.parameters.rst"
-      ],
+      "expected_documents": ["zppy.docs.source.parameters.rst"],
+      "optional_documents": ["mache.docs.users_guide.quick_start.md"],
       "feature": "diagnostics",
       "scenario": "troubleshooting",
       "persona": "analyst",
@@ -498,10 +486,8 @@
     {
       "id": "syn-diagnostics-mpas-ncclimo-memory-analyst",
       "question": "MPAS-Analysis crashes while ncclimo builds climatologies, probably out of memory. What should I change?",
-      "expected_documents": [
-        "MPAS-Analysis.docs.users_guide.config.execute.rst",
-        "nco-manual"
-      ],
+      "expected_documents": ["MPAS-Analysis.docs.users_guide.config.execute.rst"],
+      "optional_documents": ["nco-manual"],
       "feature": "diagnostics",
       "scenario": "troubleshooting",
       "persona": "analyst",
@@ -515,8 +501,10 @@
       "question": "zppy finished, how do i see the plots online",
       "expected_documents": [
         "E3SM-Project.github.io.docs.running-e3sm-guide.guide-documenting.md",
+        "e3sm_diags.docs.source.quickguides.quick-guide-general.rst"
+      ],
+      "optional_documents": [
         "E3SM-Project.github.io.docs.running-e3sm-guide.guide-post-processing.md",
-        "e3sm_diags.docs.source.quickguides.quick-guide-general.rst",
         "zppy-tutorial"
       ],
       "feature": "diagnostics",
@@ -560,10 +548,8 @@
     {
       "id": "syn-diagnostics-qbo-inputs-analyst",
       "question": "For the e3sm_diags QBO diagnostic, which variable and reference dataset are used by default, and does it need climatology or time-series input?",
-      "expected_documents": [
-        "diags-input-requirements",
-        "diags-qbo-defaults",
-        "diags-qbo-driver",
+      "expected_documents": ["diags-input-requirements", "diags-qbo-defaults", "diags-qbo-driver"],
+      "optional_documents": [
         "diags-qbo-parameter",
         "e3sm_diags.docs.source.available-parameters.rst"
       ],
@@ -686,11 +672,8 @@
     {
       "id": "syn-tools-ncclimo-split-newuser",
       "question": "How do I turn a folder of monthly EAM history files into one time-series file per variable?",
-      "expected_documents": [
-        "diags-input-requirements",
-        "nco-manual",
-        "nco-ncclimo"
-      ],
+      "expected_documents": ["nco-manual"],
+      "optional_documents": ["diags-input-requirements", "nco-ncclimo"],
       "feature": "analysis-tools",
       "scenario": "single-document",
       "persona": "new-user",
@@ -803,12 +786,8 @@
     {
       "id": "syn-environment-unified-versions-researcher",
       "question": "Which versions of e3sm_diags, zppy, and MPAS-Analysis are pinned in E3SM-Unified 1.13.0?",
-      "expected_documents": [
-        "diags-recipe",
-        "mpas-recipe",
-        "unified-recipe",
-        "zppy-recipe"
-      ],
+      "expected_documents": ["unified-recipe"],
+      "optional_documents": ["diags-recipe", "mpas-recipe", "zppy-recipe"],
       "feature": "environment-tooling",
       "scenario": "version-specific",
       "persona": "researcher",
@@ -820,11 +799,8 @@
     {
       "id": "syn-environment-unified-variants-developer",
       "question": "Which package variants does the E3SM-Unified 1.13.0 feedstock build, and how does the hpc variant differ from nompi?",
-      "expected_documents": [
-        "e3sm-unified.docs.packages.md",
-        "unified-recipe",
-        "unified-variants"
-      ],
+      "expected_documents": ["unified-recipe", "unified-variants"],
+      "optional_documents": ["e3sm-unified.docs.releasing.conda-vs-spack.md"],
       "feature": "environment-tooling",
       "scenario": "version-specific",
       "persona": "model-developer",
@@ -836,9 +812,9 @@
     {
       "id": "syn-environment-zstash-dtn-newuser",
       "question": "Where should I run zstash at NERSC for the best transfer speed, and how do I keep it running after I log out?",
-      "expected_documents": [
+      "expected_documents": ["zstash.docs.source.best_practices.rst"],
+      "optional_documents": [
         "E3SM-Project.github.io.docs.running-e3sm-guide.guide-long-term-archiving.md",
-        "zstash.docs.source.best_practices.rst",
         "zstash.docs.source.getting_started.rst"
       ],
       "feature": "environment-tooling",
@@ -879,10 +855,8 @@
     {
       "id": "syn-environment-e2c-tables-newuser",
       "question": "e3sm_to_cmip says I need a tables path. Where do I get the CMOR tables?",
-      "expected_documents": [
-        "e3sm_to_cmip.docs.source.getting-started.rst",
-        "e3sm_to_cmip.docs.source.usage.rst"
-      ],
+      "expected_documents": ["e3sm_to_cmip.docs.source.usage.rst"],
+      "optional_documents": ["e3sm_to_cmip.docs.source.getting-started.rst"],
       "feature": "environment-tooling",
       "scenario": "troubleshooting",
       "persona": "new-user",
@@ -894,10 +868,8 @@
     {
       "id": "syn-environment-paraview-vague-analyst",
       "question": "how do i look at mpas ocean output in paraview",
-      "expected_documents": [
-        "MPAS-Tools.conda_package.docs.mpas_to_xdmf.rst",
-        "MPAS-Tools.conda_package.docs.paraview_extractor.rst"
-      ],
+      "expected_documents": ["MPAS-Tools.conda_package.docs.mpas_to_xdmf.rst"],
+      "optional_documents": ["MPAS-Tools.conda_package.docs.paraview_extractor.rst"],
       "feature": "environment-tooling",
       "scenario": "vague",
       "persona": "analyst",
@@ -923,10 +895,8 @@
     {
       "id": "syn-environment-unified-verify-newuser",
       "question": "After sourcing the E3SM-Unified load script, how do I check that the environment loaded correctly and which package variant is active?",
-      "expected_documents": [
-        "e3sm-unified.docs.troubleshooting.md",
-        "unified-quickstart"
-      ],
+      "expected_documents": ["unified-quickstart"],
+      "optional_documents": ["e3sm-unified.docs.troubleshooting.md"],
       "feature": "environment-tooling",
       "scenario": "single-document",
       "persona": "new-user",
@@ -938,11 +908,8 @@
     {
       "id": "syn-environment-unified-windows-vague-newuser",
       "question": "can i use e3sm unified on windows",
-      "expected_documents": [
-        "e3sm-unified.docs.introduction.md",
-        "unified-quickstart",
-        "unified-readme"
-      ],
+      "expected_documents": ["unified-quickstart"],
+      "optional_documents": ["e3sm-unified.docs.introduction.md", "unified-readme"],
       "feature": "environment-tooling",
       "scenario": "vague",
       "persona": "new-user",
@@ -1060,7 +1027,9 @@
       "id": "syn-data-reproduce-v2-researcher",
       "question": "How do I reproduce the v2.LR.piControl simulation bit-for-bit, and which machine do I need?",
       "expected_documents": [
-        "e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.index.rst",
+        "e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.index.rst"
+      ],
+      "optional_documents": [
         "e3sm_data_docs.docs.source.v2.WaterCycle.reproducing_simulations.reproduction_table.rst"
       ],
       "feature": "data-access",

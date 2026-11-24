@@ -39,7 +39,7 @@ that answers the question from evidence that only looks relevant.
 
 ### How the questions were built
 
-![Four steps from the curated corpus to the 100-question baseline: the model drafts, verifies, and refines questions, then a person reviews 16 flags. A separate follow-up checks all 100 against the corpus.](synthetic-question-process.svg)
+<a href="synthetic-question-process.svg"><img src="synthetic-question-process.svg" width="560" alt="Four steps from the curated corpus to the 100-question baseline: the model drafts, verifies, and refines questions, then a person reviews 16 flags. A separate follow-up checks all 100 against the corpus."></a>
 
 The model worked directly from `corpus/local/corpus-expanded`, a local build
 with 539 documents matching the scope in `corpus/sources.json`. It used
@@ -90,20 +90,29 @@ neither the application's retrieval nor the web.
 - **Coverage is not representativeness.** The questions were generated from
   the corpus, not collected from users. The mix tests a range of cases and
   covers every explicitly selected document, but it does not show how often
-  real users ask these questions or use this wording. See
-  [#38 for help from domain experts](https://github.com/E3SM-Project/e3sm-ai-platform/issues/38).
+  real users ask these questions or use this wording.
+  - **How to address it:** Use [expert-written questions (#38)](https://github.com/E3SM-Project/e3sm-ai-platform/issues/38)
+    to improve realism. Use real user questions, when available, to check
+    what users actually ask.
 - **Verification was not independent.** The model wrote the questions, chose
   the expected documents, and assigned the tags. The initial human review
   covered only the 16 flagged questions; it could not catch errors in the
-  other 84. The [follow-up review](2-agent-assisted-human-review.md) covers
-  all 100.
+  other 84.
+  - **How to address it:** The [follow-up review](2-agent-assisted-human-review.md)
+    records human sign-off on the agent’s findings for all 100 questions.
 - **Search can miss evidence.** A read passage supports an expected document,
   but keyword searches can miss other valid sources or partial answers that
-  use different wording. A should-refuse label reflects what was found in the
-  snapshot, not proof that no answer exists.
+  use different wording. A refusal reflects what was found in the snapshot,
+  not proof that no answer exists.
+  - **How to address it:** For refusals and ambiguous cases, search with
+    synonyms, acronyms, and version names, then read likely source sections.
+    In [#37 error analysis](https://github.com/E3SM-Project/e3sm-ai-platform/issues/37),
+    distinguish a corpus gap from a missing expected source or a retrieval miss.
 - **Evidence can go stale.** Release snapshots may not reflect current
-  facility settings, paths, or E3SM-Unified package pins. See
-  [#31 for corpus refresh and versioned releases](https://github.com/E3SM-Project/e3sm-ai-platform/issues/31).
+  facility settings, paths, or E3SM-Unified package pins.
+  - **How to address it:** Refresh sources in [versioned corpus releases (#31)](https://github.com/E3SM-Project/e3sm-ai-platform/issues/31)
+    and recheck affected questions against the new snapshot before changing
+    scoring fields.
 
 ## Final coverage
 
@@ -124,12 +133,12 @@ definitions and allowed values.
 | Feature             | Single | Multi | Version | Trouble | Vague | Refuse | Total |
 | ------------------- | ------ | ----- | ------- | ------- | ----- | ------ | ----- |
 | running-cases       | 6      | 2     | 0       | 2       | 3     | 5      | 18    |
-| model-components    | 5      | 3     | 3       | 3       | 3     | 4      | 21    |
+| model-components    | 4      | 4     | 3       | 3       | 3     | 4      | 21    |
 | diagnostics         | 5      | 6     | 2       | 3       | 2     | 2      | 20    |
 | analysis-tools      | 4      | 1     | 3       | 2       | 0     | 0      | 10    |
 | environment-tooling | 6      | 3     | 2       | 3       | 3     | 4      | 21    |
 | data-access         | 2      | 0     | 2       | 0       | 1     | 5      | 10    |
-| Total               | 28     | 15    | 12      | 13      | 12    | 20     | 100   |
+| Total               | 27     | 16    | 12      | 13      | 12    | 20     | 100   |
 
 Personas: new-user 26, analyst 23, model-developer 27, researcher 24.
 
@@ -172,30 +181,6 @@ then recheck affected questions before changing their evidence or refusal labels
 - **Storage quotas and API access.** NERSC HPSS project quotas and PACE API
   access.
 
-## Rebuild the question set
-
-Rebuild `corpus/questions.json` when the curated corpus changes enough that
-existing questions or evidence labels no longer fit. This is not part of a
-routine evaluation run. The steps produce a replacement question set grounded
-in the updated corpus; they do not recreate the original 100 questions.
-
-1. Use a build whose `acquisition.json` `scope_sha256` matches
-   `corpus/sources.json` (`shasum -a 256 corpus/sources.json`) and that passes
-   `uv run --all-packages python backend/scripts/corpus.py verify-build <build> --scope corpus/sources.json`.
-2. Read documents under `<build>/captured/content/`; IDs come from
-   `<build>/capture-manifest.json`.
-3. Follow the [process](#process): generate, verify against the text, select,
-   refine for up to 3 rounds, and fill coverage so every explicit content
-   document is expected.
-4. Check the file loads:
-   `make corpus-coverage CORPUS_BUILD=<build>`. Do not use retrieval scores
-   to revise the questions: that would favor evidence E3SM Chat already finds.
-5. Run `uv run --all-packages pytest backend/tests/test_corpus_coverage.py`.
-6. Establish a new baseline using the [scoring guide](3-scoring.md). Keep the
-   question set and corpus snapshot fixed when comparing changes against it.
-
-The candidate pool and verification scripts were working files and are not
-checked in.
 
 ## Next: review the questions against the corpus
 
