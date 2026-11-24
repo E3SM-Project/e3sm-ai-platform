@@ -209,7 +209,7 @@ needed source is not available from Git; refresh automation belongs to #31.
 ## Remaining issues
 
 - [ ] Reviewer approval of the build using the
-  [review checklist](../../dev/corpus-review.md); then
+  [review checklist](../../corpus/review.md); then
   `make corpus-package VERSION=<label>`.
 - [ ] Decide whether the reviewed build replaces the packaged corpus; that requires
   updated evaluation fixtures because their citations use packaged source IDs.
@@ -239,4 +239,4 @@ captured content, and snapshot; only `acquisition.json` timestamps differ.
 [pilot]: 5-capture-pilot.md
 [question-set]: ../../../corpus/questions.json
 [scope]: ../../../corpus/sources.json
-[workflow]: ../../dev/corpus-curation.md
+[workflow]: ../../corpus/curation.md

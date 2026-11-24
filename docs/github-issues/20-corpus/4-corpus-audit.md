@@ -202,7 +202,7 @@ No corpus entries, acquisition policy, runtime code, or evaluation fixtures chan
 [curation]: ../../../backend/src/e3sm_ai_platform/knowledge/curation.py
 [scope]: ../../../corpus/sources.json
 [fixtures]: ../../../evaluation/fixtures/e3sm_questions.json
-[workflow]: ../../dev/corpus-curation.md
+[workflow]: ../../corpus/curation.md
 [questions]: 2-representative-questions.md
 [mapping]: 3-source-mapping.md
 [versions]: 3-source-mapping.md#version-selection-and-distribution-evidence

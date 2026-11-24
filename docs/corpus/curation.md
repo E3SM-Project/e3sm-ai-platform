@@ -17,7 +17,7 @@ Run from the repository root.
 | 1. Curate | `make corpus-curate` | Downloads every selected file at its pinned revision and builds `corpus/local/corpus/`. Set `GITHUB_TOKEN` to avoid GitHub API rate limits. |
 | 2. Validate | `make corpus-validate` | Rechecks the scope and the build offline, and fails if the build is out of date with `sources.json`. |
 | 3. Coverage | `make corpus-coverage` | Reports which expected documents each [representative question](../../corpus/questions.json) retrieves and cites. |
-| 4. Review | [Review checklist](corpus-review.md) | An authorized reviewer sets `approved` in `captured/review.json`. Curation never approves. |
+| 4. Review | [Review checklist](review.md) | An authorized reviewer sets `approved` in `captured/review.json`. Curation never approves. |
 | 5. Package | `make corpus-package VERSION=<label>` | Writes a deterministic local archive and `.sha256` for an approved build; the unpacked archive passes validation. Never uploads. |
 
 Optional: `make corpus-export` writes the build for the backend
@@ -93,6 +93,8 @@ approves a build. `validate --require-approved` fails until a reviewer approves.
 
 `corpus/questions.json` maps each representative question to the documents that
 should support it; tests check that each one is selected in the scope.
+Should-refuse questions list no documents and are skipped by coverage; see
+[synthetic questions](../../evaluation/docs/1-synthetic-questions.md).
 
 `make corpus-coverage` answers each question with the application's own
 chunking, lexical retrieval, and deterministic generation (no LLM, no network):
@@ -102,8 +104,8 @@ chunking, lexical retrieval, and deterministic generation (no LLM, no network):
 - **Cited:** an expected document counts as cited if one of the 4 chunks cited
   in the answer comes from it.
 
-The report (`corpus/local/coverage.json`) is a baseline, not a pass/fail check;
-retrieval evaluation is #21.
+The report (`corpus/local/coverage.json`) is a baseline, not a pass/fail check.
+See the [scoring guide](../../evaluation/docs/3-scoring.md) for retrieval and answer metrics.
 
 ## Runtime use
 

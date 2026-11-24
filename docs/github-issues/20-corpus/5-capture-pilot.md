@@ -249,7 +249,7 @@ with `corpus.py: error: review is not approved`; verification reports
 - [ ] Publication with retained license companions, under separate authorization.
 - [ ] Capture of the remaining five pilot questions.
 
-[workflow]: ../../dev/corpus-curation.md
+[workflow]: ../../corpus/curation.md
 [scope]: ../../../corpus/sources.json
 [audit]: 4-corpus-audit.md
 [pilot-run]: 3-source-mapping.md#running-case-setup--simulation-configuration

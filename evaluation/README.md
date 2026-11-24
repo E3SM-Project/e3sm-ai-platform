@@ -1,38 +1,50 @@
-# E3SM Compass evaluation adapter contract
+# E3SM Compass evaluation contract
 
-This directory contains the independent deterministic integration evaluation.
-The canonical evaluation guide is [../docs/dev/evaluation.md](../docs/dev/evaluation.md).
+This independent pytest suite checks the response contract without live LLM or
+web requests. For the broader quality baseline, see:
 
-Configure a synchronous Python adapter before running pytest:
+1. [Synthetic questions](docs/1-synthetic-questions.md)
+2. [Agent-assisted human review](docs/2-agent-assisted-human-review.md)
+3. [Scoring guide](docs/3-scoring.md)
+
+## Run the suite
+
+From the repository root, run `make evaluation-test`, or run the equivalent
+command with the packaged backend adapter:
 
 ```sh
 E3SM_COMPASS_EVALUATOR=e3sm_ai_platform.evaluation:evaluate \
   uv run --all-packages pytest evaluation
 ```
 
-Run this command from the repository root. `--all-packages` makes the evaluation
-and backend workspace packages available together.
+`--all-packages` makes both workspace packages available. Without
+`E3SM_COMPASS_EVALUATOR`, the tests skip. For lint and type checks, run
+`make evaluation-lint` and `make evaluation-typecheck`.
 
-`evaluate(question: str) -> Mapping[str, object]` receives one question and must return a mapping with this shape:
+## Adapter contract
+
+Pytest imports the adapter once per session and calls it for each fixture
+question. The adapter must be synchronous: `evaluate(question: str) ->
+Mapping[str, object]`. Return a mapping with these fields:
 
 ```python
 {
-    "answer": "...",                         # str
-    "route": "curated",                       # exactly: curated | web | future_operational | insufficient_evidence
-    "retrieved_evidence": [
-        {"source_id": "user-guide:compsets", "text": "..."}  # flat list, not nested by source
-    ],
-    "citations": [
-        {"source_id": "user-guide:compsets", "provenance": "official URL or corpus provenance"}
-    ],
+    "answer": "...",
+    "route": "curated",
+    "retrieved_evidence": [{"source_id": "user-guide:compsets", "text": "..."}],
+    "citations": [{"source_id": "user-guide:compsets", "provenance": "..."}],
     "insufficient_evidence": False,
 }
 ```
 
-`retrieved_evidence` is always a flat list of records with `source_id`. Each citation has both `source_id` and `provenance`. `insufficient_evidence` is a boolean. An API adapter may call `POST /query` and normalize its response to this mapping; keep HTTP/client details out of the tests.
+- `route` must be `curated`, `web`, `future_operational`, or `insufficient_evidence`.
+- `retrieved_evidence` must be a flat list of records with `source_id`. Each
+  citation must include `source_id` and `provenance`.
+- For curated cases, retrieved evidence must include the source IDs expected by
+  [the fixtures](fixtures/e3sm_questions.json). Translate backend IDs if needed.
+- For unsupported cases, use the `insufficient_evidence` route, set the boolean
+  `insufficient_evidence` to `True`, return no retrieved evidence, and state in
+  the answer that evidence is insufficient.
 
-Pytest imports the adapter once per session and invokes it once for every fixture question. Keep it deterministic: no live LLM or web requests are needed for these assertions.
-
-Curated corpus records must use the `source_id` values named in `fixtures/e3sm_questions.json` (or the adapter must translate backend identifiers to them). For curated cases, expected source IDs must appear in `retrieved_evidence`; citations must contain both `source_id` and `provenance`. Unsupported cases must return the `insufficient_evidence` route, set `insufficient_evidence` to `true`, return no retrieved evidence, and say that evidence is insufficient in the answer.
-
-Without `E3SM_COMPASS_EVALUATOR`, tests are skipped intentionally rather than guessing backend package paths.
+The packaged adapter uses the backend query service. An HTTP adapter can call
+`POST /query` and normalize the response; keep HTTP details out of the tests.

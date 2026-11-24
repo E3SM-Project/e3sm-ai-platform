@@ -1,11 +1,13 @@
 """Representative-question coverage for a local corpus build.
 
-:func:`measure_coverage` runs each question in ``corpus/questions.json`` against
-a build written by :func:`~e3sm_ai_platform.knowledge.corpus_build.curate`,
-using the application's chunking, retrieval, routing, and deterministic
-generation with default settings. It reports which expected documents are
-retrieved and cited. It measures whether mapped evidence is surfaced; it does
-not judge answer quality or set pass/fail thresholds.
+:func:`measure_coverage` runs each answerable question in
+``corpus/questions.json`` against a build written by
+:func:`~e3sm_ai_platform.knowledge.corpus_build.curate`, using the application's
+chunking, retrieval, routing, and deterministic generation with default
+settings. It reports which expected documents are retrieved and cited. It
+measures whether mapped evidence is surfaced; it does not judge answer quality
+or set pass/fail thresholds. Should-refuse questions have no expected documents
+and are skipped.
 """
 
 from __future__ import annotations
@@ -29,13 +31,44 @@ ANSWER_TOP_K = 4
 
 
 class CoverageQuestion(BaseModel):
-    """A representative question and the documents that should support it."""
+    """A representative question and the documents that should support it.
+
+    Attributes
+    ----------
+    id : str
+        Unique question identifier.
+    question : str
+        Question text as a user would ask it.
+    expected_documents : list of str
+        Build document IDs that answer the question; empty only when
+        ``should_refuse`` is true.
+    optional_documents : list of str
+        Supporting build document IDs accepted as citations but not required.
+    feature, scenario, persona : str or None
+        Optional test-design tags (topic area, question type, user type).
+    origin : str or None
+        Optional provenance label, such as ``"synthetic-37"``.
+    should_refuse : bool
+        Whether no corpus document answers the question.
+    needs_review : bool
+        Whether a person should confirm the expected documents or tags.
+    review_note : str
+        Why the question needs review.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     id: str
     question: str
     expected_documents: list[str]
+    optional_documents: list[str] = []
+    feature: str | None = None
+    scenario: str | None = None
+    persona: str | None = None
+    origin: str | None = None
+    should_refuse: bool = False
+    needs_review: bool = False
+    review_note: str = ""
 
 
 class QuestionSet(BaseModel):
@@ -57,6 +90,8 @@ class QuestionCoverage(BaseModel):
     cited: list[str]
     expected_retrieved: list[str]
     expected_cited: list[str]
+    optional: list[str] = []
+    accepted_cited: list[str] = []
 
 
 class CoverageReport(BaseModel):
@@ -88,8 +123,9 @@ def load_questions(path: Path | str) -> QuestionSet:
     Raises
     ------
     CurationValidationError
-        If the file is invalid or has duplicate IDs, blank questions, or
-        questions without expected documents.
+        If the file is invalid or has duplicate IDs, blank questions,
+        answerable questions without expected documents, or should-refuse
+        questions with expected documents.
     """
     try:
         questions = QuestionSet.model_validate_json(Path(path).read_bytes())
@@ -100,8 +136,14 @@ def load_questions(path: Path | str) -> QuestionSet:
     for question in questions.questions:
         if not question.question.strip():
             failures.append(f"blank question: {question.id}")
-        if not question.expected_documents:
+        if question.should_refuse and question.expected_documents:
+            failures.append(f"should-refuse question has expected documents: {question.id}")
+        if not question.should_refuse and not question.expected_documents:
             failures.append(f"no expected documents: {question.id}")
+        if question.should_refuse and question.optional_documents:
+            failures.append(f"should-refuse question has optional documents: {question.id}")
+        if set(question.expected_documents).intersection(question.optional_documents):
+            failures.append(f"expected and optional documents overlap: {question.id}")
     if failures:
         raise CurationValidationError("; ".join(failures))
 
@@ -109,7 +151,10 @@ def load_questions(path: Path | str) -> QuestionSet:
 
 
 def measure_coverage(build_root: Path | str, questions_path: Path | str) -> CoverageReport:
-    """Run every question against a corpus build and report document coverage.
+    """Run every answerable question against a build and report document coverage.
+
+    Should-refuse questions are skipped, so they add nothing to the report or
+    its totals.
 
     Parameters
     ----------
@@ -129,20 +174,23 @@ def measure_coverage(build_root: Path | str, questions_path: Path | str) -> Cove
         If the question set is invalid or names documents absent from the build.
     """
     root = Path(build_root)
-    questions = load_questions(questions_path)
+    questions = [q for q in load_questions(questions_path).questions if not q.should_refuse]
     entries = runtime_entries(root)
     known = {entry.source_id for entry in entries}
-    missing = sorted(
-        {doc for question in questions.questions for doc in question.expected_documents} - known
-    )
+    labeled = {
+        doc
+        for question in questions
+        for doc in (*question.expected_documents, *question.optional_documents)
+    }
+    missing = sorted(labeled - known)
     if missing:
-        raise CurationValidationError(f"expected documents not in build: {', '.join(missing)}")
+        raise CurationValidationError(f"question documents not in build: {', '.join(missing)}")
 
     settings = Settings()
     store = build_retriever(settings)
     store.add(chunk_corpus(entries))
     service = CompassService(retriever=store, generator=generate_response, settings=settings)
-    results = [_measure(service, store, question) for question in questions.questions]
+    results = [_measure(service, store, question) for question in questions]
     report = CoverageReport(
         snapshot_sha256=_sha256_file(root / "captured" / "snapshot.json"),
         expected_total=sum(len(result.expected) for result in results),
@@ -164,6 +212,8 @@ def _measure(
     )
     cited = sorted({citation.source_id for citation in response.citations})
     expected = sorted(question.expected_documents)
+    optional = sorted(question.optional_documents)
+    accepted = set(expected).union(optional)
 
     return QuestionCoverage(
         id=question.id,
@@ -173,6 +223,8 @@ def _measure(
         cited=cited,
         expected_retrieved=[doc for doc in expected if doc in retrieved],
         expected_cited=[doc for doc in expected if doc in cited],
+        optional=optional,
+        accepted_cited=[doc for doc in cited if doc in accepted],
     )
 
 

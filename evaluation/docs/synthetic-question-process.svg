@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">How the synthetic questions were built</title>
+  <desc id="description">Starting with the curated corpus, the model drafts, verifies, and refines questions. A person reviews the 16 flagged questions. The baseline has 80 answerable questions and 20 refusals. The follow-up covers all 100 questions: an agent checks them against the corpus and a person signs off on verified findings.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1 1l5 3-5 3" fill="none" stroke="#52667c" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="#f1f5f9"/>
+  <g font-family="system-ui, sans-serif" fill="#14283e">
+    <text x="80" y="98" font-size="24" font-weight="700" letter-spacing="2" fill="#16665c">E3SM CHAT · EVALUATION BASELINE</text>
+    <text x="80" y="174" font-size="58" font-weight="750">How the synthetic questions were built</text>
+    <text x="80" y="231" font-size="29" fill="#40556c">Test whether E3SM Chat answers from evidence and declines when evidence is missing.</text>
+
+    <g fill="#fff" stroke="#ced9e4" stroke-width="2">
+      <rect x="80" y="300" width="327" height="270" rx="16"/>
+      <rect x="451" y="300" width="327" height="270" rx="16"/>
+      <rect x="822" y="300" width="327" height="270" rx="16"/>
+      <rect x="1193" y="300" width="327" height="270" rx="16" fill="#e7f5ef" stroke="#16665c"/>
+    </g>
+    <g stroke="#52667c" stroke-width="3" marker-end="url(#arrow)">
+      <path d="M414 435h28"/>
+      <path d="M785 435h28"/>
+      <path d="M1156 435h28"/>
+    </g>
+    <g font-size="22" font-weight="700" letter-spacing="1" fill="#16665c">
+      <text x="106" y="354">01 · MODEL</text>
+      <text x="477" y="354">02 · MODEL</text>
+      <text x="848" y="354">03 · MODEL</text>
+      <text x="1219" y="354">04 · HUMAN</text>
+    </g>
+    <g font-size="34" font-weight="700">
+      <text x="106" y="410">Draft</text>
+      <text x="477" y="410">Verify</text>
+      <text x="848" y="410">Refine</text>
+      <text x="1219" y="410" font-size="30">Review 16 flagged<tspan x="1219" dy="36">questions</tspan></text>
+    </g>
+    <g font-size="24" fill="#40556c">
+      <text x="106" y="460">Use the curated corpus.<tspan x="106" dy="34">Vary topics, question</tspan><tspan x="106" dy="34">types, and user roles.</tspan></text>
+      <text x="477" y="460">Check source passages.<tspan x="477" dy="34">Search before marking a</tspan><tspan x="477" dy="34">question unanswerable.</tspan></text>
+      <text x="848" y="460">Remove duplicates.<tspan x="848" dy="34">Find other valid sources.</tspan><tspan x="848" dy="34">Fill coverage gaps.</tspan></text>
+      <text x="1219" y="494">Resolve uncertain cases.<tspan x="1219" dy="34">Record answer guidance.</tspan></text>
+    </g>
+
+    <rect x="80" y="616" width="1440" height="100" rx="16" fill="#14283e"/>
+    <text x="110" y="680" font-size="36" font-weight="700" fill="#fff">100 baseline questions</text>
+    <text x="1490" y="679" text-anchor="end" font-size="32" fill="#fff">80 answerable · 20 should-refuse</text>
+
+    <text x="80" y="779" font-size="28" font-weight="700" fill="#16665c">Follow-up scope: all 100 questions</text>
+    <text x="80" y="818" font-size="26">Agents check corpus evidence; humans sign off on verified findings.</text>
+  </g>
+</svg>
