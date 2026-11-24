@@ -1,35 +1,22 @@
 # Synthetic evaluation questions
 
-[`corpus/questions.json`](../../corpus/questions.json) holds 100 generated
-questions for the retrieval and answer baseline defined in
-the [scoring guide](3-scoring.md): 80 answerable and 20 should-refuse. All were
-written from the curated corpus for #37.
+This document explains how the synthetic questions were designed and
+generated, and what the initial human review covered. It also points to the
+follow-up review of all 100 questions against the corpus.
 
-A person reviewed the 16 questions the model flagged (see [Process](#process)).
-The rest are model-verified only. Track the follow-up in the
-[agent-assisted human review log](2-agent-assisted-human-review.md).
+[`corpus/questions.json`](../../corpus/questions.json) contains 100 synthetic
+questions based on the curated corpus for #37. They set a [baseline for
+E3SM Chat](3-scoring.md):
 
-## Fields
+- **80 answerable:** Can it find and use supporting evidence?
+- **20 should-refuse:** Does it decline when the corpus lacks enough evidence?
 
-Each question has `id` (`syn-` prefix), `question`, and `expected_documents`,
-plus:
+## Question design
 
-| Field                         | Values                                                                                                     |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `feature`                     | `running-cases`, `model-components`, `diagnostics`, `analysis-tools`, `environment-tooling`, `data-access` |
-| `scenario`                    | `single-document`, `multi-document`, `version-specific`, `troubleshooting`, `vague`, `should-refuse`       |
-| `persona`                     | `new-user`, `analyst`, `model-developer`, `researcher`                                                     |
-| `origin`                      | `synthetic-37`                                                                                             |
-| `should_refuse`               | `true` when no corpus document answers; `expected_documents` is then empty                                 |
-| `needs_review`, `review_note` | Set when the expected documents or the scenario fit are uncertain                                          |
-
-`make corpus-coverage` skips should-refuse questions.
-
-## Framework
-
-Dimensions follow Hamel Husain's
-[test-data framework](https://hamel.dev/blog/posts/field-guide/#a-framework-for-generating-realistic-test-data),
-adapted to the corpus:
+The questions adapt Hamel Husain's
+[test-data framework](https://hamel.dev/blog/posts/field-guide/#a-framework-for-generating-realistic-test-data).
+Varying the topic, the kind of question, and who asks it keeps the baseline
+from reflecting only straightforward lookups:
 
 - **Feature:** running cases (CIME, running-E3SM guide, machine and batch
   XML); model components (EAM, EAMxx, ELM, MOSART, MPAS-Ocean, MPAS-Seaice,
@@ -43,40 +30,96 @@ adapted to the corpus:
   developer, researcher reproducing or using published simulations. Wording
   ranges from jargon to plain, lowercase fragments.
 
+Near-miss pairs are deliberate: the corpus supports an answer on one topic
+but not on a closely related one. For example, it gives a citation for v3.LR
+but not for v3.RRM. These pairs test whether E3SM Chat can distinguish evidence
+that answers the question from evidence that only looks relevant.
+
 ## Process
 
-Built from the local build `corpus/local/corpus-expanded` (539 documents,
-matching the current `sources.json`). Documents were read directly, without
-the application's retrieval or the web.
+### How the questions were built
 
-1. **Generate** candidates across the feature × scenario × persona grid,
-   starting with one-document how-tos.
-2. **Verify** each one: read the passage that answers it, and search the
-   corpus text for each should-refuse question.
-3. **Select** a set balanced across the grid, realistic for each persona,
-   and free of near-duplicates.
-4. **Refine** in rounds 2 and 3: re-read every passage, look for other
-   answering documents, fill grid gaps, and remove near-duplicates.
-5. **Fill coverage** so every explicit content document in `sources.json`
-   is expected by a question.
-6. **Human review** of the questions the model flagged.
+![Four steps from the curated corpus to the 100-question baseline: the model drafts, verifies, and refines questions, then a person reviews 16 flags. A separate follow-up checks all 100 against the corpus.](synthetic-question-process.svg)
 
-| Step | Result | Why it matters |
-| --- | --- | --- |
-| Generate | 168 drafts; 18 near-duplicates dropped; 150 candidates (125 answerable, 25 should-refuse) | Questions cover every topic, question type, and user type, not only what search already finds easily. |
-| Select (round 1) | 64 answerable and 18 should-refuse | No single area dominates the scores, and every question is tied to text that answers it. |
-| Round 2 | 6 documents added to 5 questions, 1 removed; 1 question reworded; 4 replaced (3 with new candidates) | Expected documents are complete and correct, so retrieval is not penalized for finding another valid answer; thin areas got more questions. |
-| Round 3 | 1 question reworded; 5 review flags added | One weakness is not counted twice, and uncertain questions are marked for a person to check. |
-| Fill coverage | 16 answerable and 2 should-refuse added, for 100; 1 document added; 1 question reworded | Every document hand-picked for the corpus is tested, so none is kept without a reason. |
-| Human review | 16 flags resolved: documents added to 2 questions, 1 reworded, 3 near-miss refusals kept, answer expectations for 16 questions, 2 corpus gaps, 2 upstream issues ([e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109), [e3sm-unified#159](https://github.com/E3SM-Project/e3sm-unified/issues/159)) | A person confirmed the uncertain questions, graders know when an answer needs a qualifier, and wrong upstream docs are reported for fixing. |
+The model worked directly from `corpus/local/corpus-expanded`, a local build
+with 539 documents matching the scope in `corpus/sources.json`. It used
+neither the application's retrieval nor the web.
 
-169 candidates in total produced the final 100: 80 answerable and 20
-should-refuse.
+1. **Draft.** The model started with single-document how-tos, then varied
+   topics, question types, and user roles to go beyond straightforward lookups.
+2. **Verify and select.** The model read supporting passages for answers and
+   checked the closest search hits for refusals. It selected questions so no
+   one area dominated the set.
+3. **Refine.** The model reduced overlap, filled gaps, and looked for other
+   valid sources so scoring would not penalize finding a different source.
+4. **Fill document coverage.** The model brought the set to 100 questions and
+   made sure every explicit content document in `corpus/sources.json` appeared
+   in at least one question’s `expected_documents`.
+5. **Review flagged questions.** A person resolved all 16 flags, clarifying
+   expected sources, refusal decisions, and what good answers should say.
 
-Deliberate pairs remain: an answerable question next to a should-refuse near
-miss on the same topic (for example, v3.LR versus v3.RRM citation).
+#### Build notes
+
+- **Drafting:** 168 drafts, minus 18 near-duplicates, left 125 answerable and
+  25 should-refuse candidates. In all, the model considered 169 candidates.
+- **Round 1:** Selected 64 answerable and 18 should-refuse questions.
+- **Round 2:** Added six expected documents across five questions, removed one
+  expected document, reworded one question, and replaced four questions
+  (three with new candidates).
+- **Round 3:** Reworded one question and added five review flags.
+- **Document coverage:** Added 16 answerable questions and two refusals,
+  added one expected document, and reworded one question.
+- **Initial human review:** Added expected documents to two questions,
+  reworded one question, kept three near-miss refusals, and recorded answer
+  guidance for 16 questions. Identified two corpus gaps and two upstream
+  issues ([e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109),
+  [e3sm-unified#159](https://github.com/E3SM-Project/e3sm-unified/issues/159)).
+
+### Why this approach
+
+- **Compare changes consistently.** Use a repeatable baseline for E3SM Chat.
+- **Test for missed evidence.** Start from curated source text, not the
+  app’s search results.
+- **Cover a range of questions.** Use the model to draft across topics,
+  question types, and user roles.
+- **Ground the labels.** Check source passages for expected documents and
+  have a person resolve the cases the model flagged as uncertain.
+
+### Trade-offs and limitations
+
+- **Coverage is not representativeness.** The questions were generated from
+  the corpus, not collected from users. The mix tests a range of cases and
+  covers every explicitly selected document, but it does not show how often
+  real users ask these questions or use this wording. See
+  [#38 for help from domain experts](https://github.com/E3SM-Project/e3sm-ai-platform/issues/38).
+- **Verification was not independent.** The model wrote the questions, chose
+  the expected documents, and assigned the tags. The initial human review
+  covered only the 16 flagged questions; it could not catch errors in the
+  other 84. The [follow-up review](2-agent-assisted-human-review.md) covers
+  all 100.
+- **Search can miss evidence.** A read passage supports an expected document,
+  but keyword searches can miss other valid sources or partial answers that
+  use different wording. A should-refuse label reflects what was found in the
+  snapshot, not proof that no answer exists.
+- **Evidence can go stale.** Release snapshots may not reflect current
+  facility settings, paths, or E3SM-Unified package pins. See
+  [#31 for corpus refresh and versioned releases](https://github.com/E3SM-Project/e3sm-ai-platform/issues/31).
 
 ## Final coverage
+
+The table summarizes the final question set in
+[`corpus/questions.json`](../../corpus/questions.json). See the
+[question file format](../../corpus/README.md#question-file-format) for field
+definitions and allowed values.
+
+**Scenario legend**
+
+- **Single:** One document answers the question.
+- **Multi:** The answer draws on multiple documents.
+- **Version:** The answer depends on a specific version.
+- **Trouble:** The question asks how to diagnose or fix a problem.
+- **Vague:** The question is loosely worded or underspecified.
+- **Refuse:** The corpus lacks enough evidence to answer.
 
 | Feature             | Single | Multi | Version | Trouble | Vague | Refuse | Total |
 | ------------------- | ------ | ----- | ------- | ------- | ----- | ------ | ----- |
@@ -93,109 +136,48 @@ Personas: new-user 26, analyst 23, model-developer 27, researcher 24.
 Empty cells: version-specific running cases, vague and should-refuse analysis
 tools, and multi-document and troubleshooting data access.
 
-## Verification limits
-
-- The model wrote the questions, chose expected documents, and assigned all
-  tags.
-- A document counts as expected when a read passage answers the question.
-  Other answering documents were found by keyword search, which can miss
-  documents that use different words.
-- Should-refuse questions were confirmed by keyword absence plus reading the
-  closest hits. A different phrasing could still find a partial answer.
-- Several documents are release snapshots: machine and batch XML, Unified
-  package pins, and paths may not match current facilities.
-
-## Answer expectations
-
-Some answers are correct only with a qualifier:
-
-- `syn-running-chrysalis-queue-newuser`, `syn-running-pmcpu-paths-developer`:
-  say the values come from the release's machine and batch XML, and to check
-  current facility settings if needed.
-- `syn-components-cmip7-compset-researcher`: describe `WCYCL1850-CMIP7` as
-  defined in the release's compset XML (`e3sm-coupled-compsets`), not as
-  validated or supported for CMIP7 production runs.
-- `syn-environment-diags-install-newuser`,
-  `syn-diagnostics-zppy-install-latest-analyst`,
-  `syn-environment-zstash-dtn-newuser`: do not present disabling SSL
-  verification as an install step. If mentioned, say the guide includes it for
-  networks that intercept SSL, that it turns off certificate checking and is
-  not recommended, and that users who hit SSL errors should ask their site
-  administrators about configuring the site's certificate.
-- `syn-tools-nco-unified-version-analyst`,
-  `syn-environment-unified-versions-researcher`: give versions from
-  `unified-recipe` and the package recipes (for example, NCO 5.3.9,
-  e3sm_diags 3.2.0, zppy 3.2.0, MPAS-Analysis 1.15.0), not the `1.13.0rc1`
-  pins in `e3sm-unified.docs.packages.md`.
-- `syn-environment-unified-variants-developer`: say the 1.13.0 feedstock builds
-  `nompi` and `hpc` (`unified-variants`), and that `hpc` omits system-library
-  packages (such as NCO, MOAB, and TempestRemap) that the HPC deployment
-  provides through Spack. Other docs mention `mpich` and `openmpi` variants; do
-  not claim those builds exist for 1.13.0.
-- `syn-components-elm-docs-vague-developer`: name the Developer Guide for code
-  and the Technical Guide for the science. Note that the introduction says the
-  Developer Guide explains data structures, but the captured Developer Guide
-  covers only testing.
-- `syn-diagnostics-diags-v2-to-v3-researcher`: say v3 replaced the CDAT back
-  end with xarray and xCDAT and kept the run API backward-compatible. Do not
-  claim v2 and v3 give identical numbers; the corpus does not document the
-  v2-to-v3 regression testing or its tolerances.
-- `syn-components-mpas-analysis-setup-researcher`: say the MPAS-Analysis docs
-  state E3SM runs need no namelist or stream changes, and the E3SM MPAS-Ocean
-  guide confirms monthly `timeSeriesStatsMonthly` output by default. Do not
-  promise every task works unchanged. For standalone sea ice, give the
-  analysis-member and stream settings from `mpas-seaice-setup`, and do not
-  repeat its stale "not yet publicly released" statement.
-- `syn-diagnostics-obs-data-vague-newuser`: give both Perlmutter observation
-  paths, `/global/cfs/cdirs/e3sm/diagnostics/observations/Atm/`
-  (`diags-perlmutter-guide`) and
-  `/global/cfs/cdirs/e3sm/e3sm_diags/obs_for_e3sm_diags/`
-  (`e3sm_diags.docs.source.quickguides.quick-guide-general.rst`). Say the guides
-  disagree and to check which path exists on Perlmutter; do not present either
-  as confirmed. Reported upstream in
-  [E3SM-Project/e3sm_diags#1109](https://github.com/E3SM-Project/e3sm_diags/issues/1109).
-- Near-miss should-refuse questions: refuse, but it is fine to mention the
-  nearby fact without treating it as the answer.
-  - `syn-refuse-pmcpu-max-walltime-newuser`: `e3sm-batch` lists a 30-minute
-    pm-cpu default that it says is not the limit.
-  - `syn-refuse-hpc-nco-version-analyst`: the recipes pin NCO only for non-hpc
-    variants.
-  - `syn-refuse-ace-predictions-researcher`: the AI training overview links to
-    ACE but does not document its use.
-
-## Review list
-
-No questions are flagged. To flag one, set `needs_review` to true and explain
-why in `review_note`, then list it here with its expected documents.
-
 ## Corpus gaps
 
-Realistic questions the corpus cannot answer:
+The current corpus lacks reliable evidence on these topics. E3SM Chat should
+say so rather than guess. Add or refresh authoritative sources when available,
+then recheck affected questions before changing their evidence or refusal labels.
 
-- Current facility limits and accounts: maximum queue walltimes, and E3SM on
-  machines beyond the `pm-cpu` and `chrysalis` XML excerpts (for example,
-  Frontier).
-- Measured throughput (SYPD) for standard configurations.
-- e3sm_diags v2-to-v3 regression-testing results and tolerances.
-- MPAS-Ocean and MPAS-Seaice default analysis-member and stream settings in
-  E3SM v3.1.0. No MPAS document lists them; the namelist defaults and streams
-  templates are not captured.
-- Scientific results, such as E3SMv3 climate sensitivity.
-- E3SM's own domain-file generation page (linked from the grid guide, not
-  captured) and EAMxx case setup (the captured page is only a heading).
-- Land-ice (MALI) configuration such as calving, MARBL ocean biogeochemistry,
-  and FATES parameter files and PFTs (the corpus only links to external FATES
-  docs).
-- CMIP7 conversion with e3sm_to_cmip; only CMIP7 compsets are present.
-- The NCO version in the hpc Unified variant (provided by Spack), and
-  releases after E3SM-Unified 1.13.0.
-- ACE documentation: not ingested; the corpus only links to the ACE repository.
-- The SCREAMv1 AI dataset release and the v3.RRM citation (upstream lists both
-  as coming soon or TBD).
-- Whether zppy's `high_res_v1` campaign works on Perlmutter (upstream TODO).
-- NERSC HPSS project quotas and PACE API access.
+- **Facility limits and accounts.** Current maximum queue walltimes and E3SM
+  setup on machines outside the `pm-cpu` and `chrysalis` XML excerpts, such
+  as Frontier.
+- **Model throughput.** Measured simulated years per day (SYPD) for standard
+  configurations.
+- **e3sm_diags regression testing.** Results and tolerances for the transition
+  from v2 to v3.
+- **MPAS defaults.** E3SM v3.1.0 analysis-member and stream settings for
+  MPAS-Ocean and MPAS-Seaice. The MPAS docs do not list them, and the corpus
+  does not include the namelist defaults or stream templates.
+- **Scientific results.** Findings such as E3SMv3 climate sensitivity.
+- **Domain files and EAMxx case setup.** The grid guide links to E3SM's
+  domain-file generation page, but the corpus does not include it. The captured
+  EAMxx case setup page contains only a heading.
+- **Component configuration.** MALI land-ice settings such as calving, MARBL
+  ocean biogeochemistry, and FATES parameter files and plant functional types
+  (PFTs). The corpus only links to the external FATES docs.
+- **CMIP7 conversion.** The corpus includes CMIP7 compsets, but not conversion
+  instructions for e3sm_to_cmip.
+- **E3SM-Unified versions.** The NCO version Spack supplies for the `hpc`
+  variant and any Unified releases after 1.13.0.
+- **ACE documentation.** The corpus links to the ACE repository but does not
+  include its documentation.
+- **SCREAMv1 dataset and v3.RRM citation.** Upstream lists the AI dataset
+  release and the citation as coming soon or TBD.
+- **zppy on Perlmutter.** Upstream leaves support for the `high_res_v1`
+  campaign as a TODO.
+- **Storage quotas and API access.** NERSC HPSS project quotas and PACE API
+  access.
 
-## Regenerate
+## Rebuild the question set
+
+Rebuild `corpus/questions.json` when the curated corpus changes enough that
+existing questions or evidence labels no longer fit. This is not part of a
+routine evaluation run. The steps produce a replacement question set grounded
+in the updated corpus; they do not recreate the original 100 questions.
 
 1. Use a build whose `acquisition.json` `scope_sha256` matches
    `corpus/sources.json` (`shasum -a 256 corpus/sources.json`) and that passes
@@ -206,9 +188,18 @@ Realistic questions the corpus cannot answer:
    refine for up to 3 rounds, and fill coverage so every explicit content
    document is expected.
 4. Check the file loads:
-   `make corpus-coverage CORPUS_BUILD=<build>`. Do not use its results to
-   change questions.
+   `make corpus-coverage CORPUS_BUILD=<build>`. Do not use retrieval scores
+   to revise the questions: that would favor evidence E3SM Chat already finds.
 5. Run `uv run --all-packages pytest backend/tests/test_corpus_coverage.py`.
+6. Establish a new baseline using the [scoring guide](3-scoring.md). Keep the
+   question set and corpus snapshot fixed when comparing changes against it.
 
 The candidate pool and verification scripts were working files and are not
 checked in.
+
+## Next: review the questions against the corpus
+
+The [agent-assisted human review](2-agent-assisted-human-review.md) follows up
+on all 100 questions, including the 16 reviewed during generation. It checks
+whether the expected documents support each answer and whether each refusal
+is warranted, with agent findings and evidence recorded for human sign-off.

@@ -30,6 +30,22 @@ in the build lists each one by source.
 | NCO | — | `ncclimo` script; manual excerpts for `ncclimo` and `ncremap` |
 | conda-forge feedstocks (E3SM-Unified, e3sm_diags, zppy, MPAS-Analysis, NCO, xCDAT) | — | Recipe files: versions and dependencies |
 
+## Question file format
+
+Each entry in [`questions.json`](questions.json) has an `id` starting with
+`syn-`, the `question` text, and `expected_documents`, a list of corpus
+document IDs used as the retrieval reference. The remaining fields record
+the question's design and review status:
+
+| Field | Meaning |
+| --- | --- |
+| `feature` | `running-cases`, `model-components`, `diagnostics`, `analysis-tools`, `environment-tooling`, or `data-access` |
+| `scenario` | `single-document`, `multi-document`, `version-specific`, `troubleshooting`, `vague`, or `should-refuse` |
+| `persona` | `new-user`, `analyst`, `model-developer`, or `researcher` |
+| `origin` | `synthetic-37` |
+| `should_refuse` | `true` when no corpus document answers the question. `expected_documents` is empty, and `make corpus-coverage` skips the entry. |
+| `needs_review`, `review_note` | Flag and explanation when the expected documents or scenario label are uncertain. |
+
 ## Local files
 
 ```text
