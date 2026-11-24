@@ -3,8 +3,7 @@
 Use this guide and review log to check the [synthetic questions](1-synthetic-questions.md)
 against the corpus before relying on them to score E3SM Chat. The agent gathers
 evidence for the expected documents and refusals; a human reviewer verifies
-findings and signs off. If the corpus changes substantially, see [when to
-rebuild the question set](#rebuild-the-question-set).
+findings and signs off. See [what to do after sign-off](#after-sign-off).
 
 ## Review setup
 
@@ -249,12 +248,28 @@ verified. Use the same [sign-off steps](#sign-off-steps) and
 | 99 | 5 | Exactly which NCO version do I get on Perlmutter with the hpc variant of E3SM-Unified 1.13.0?<br>`syn-refuse-hpc-nco-version-analyst` | Refusal warranted | Signed off | • Searched `Perlmutter`, `pm-cpu`, `hpc`, `nco`, and Spack version pins.<br>• <code>unified-<wbr>recipe</code> L59–64<br>`nco ==5.3.9` is conditional on `mpi != "hpc"`.<br>• <code>e3sm-<wbr>unified.<wbr>docs.<wbr>releasing.<wbr>conda-<wbr>vs-<wbr>spack.<wbr>md</code> L26–32, L51–64<br>Spack supplies HPC tools including NCO, but no Perlmutter build version is listed. | Keep should-refuse. | Do not substitute the conda pin. Check the loaded NCO executable or the Perlmutter deployment manifest for the exact version. |
 | 100 | 5 | How do I run the ACE emulator on the E3SM AI training data to make climate predictions?<br>`syn-refuse-ace-predictions-researcher` | Refusal warranted | Signed off | • Searched `ACE`, `ACE2`, `SamudrACE`, `inference`, and `checkpoint`.<br>• <code>e3sm_<wbr>data_<wbr>docs.<wbr>docs.<wbr>source.<wbr>AITraining.<wbr>simulation_<wbr>data.<wbr>overview.<wbr>rst.<wbr>inc</code> L6–14, L20–31<br>Data were “postprocessed for ingestion” by ACE/FourCastNet. The overview links to ACE and describes SamudrACE training data, file formats, and archive access, but gives no checkpoint or prediction commands.<br>• <code>e3sm_<wbr>data_<wbr>docs.<wbr>docs.<wbr>source.<wbr>AITraining.<wbr>simulation_<wbr>data.<wbr>simulation_<wbr>table.<wbr>rst</code> L65–72<br>Lists SamudrACE data locations, not an inference workflow. | Keep should-refuse. | Point to the linked ACE project and distinguish dataset access from instructions for running inference. |
 
-## Rebuild the question set
+## After sign-off
 
-During review, correct individual questions or scoring fields in place.
-Rebuild `corpus/questions.json` only if a corpus update makes enough of the
-existing set unsuitable that targeted edits are no longer practical. This
-creates a replacement set for review, not a copy of the original 100 questions.
+- **Status:** All 100 questions are signed off. Coverage was rerun on the
+  pinned corpus snapshot after the approved scoring changes. No additional
+  run or rebuild is needed for this review.
+- **Retrieval:** 65 of 109 required question–document pairs appeared in the
+  top 8 results.
+- **Citations:** 51 of 80 answerable questions cited at least one required source.
+- **Scope:** These counts do not measure answer quality. See the
+  [scoring guide](3-scoring.md) for the full baseline and error analysis.
+
+### Rerun coverage
+
+After applying approved scoring changes, rerun coverage once with
+`make corpus-coverage CORPUS_BUILD=<build>`, using the same corpus snapshot
+and retrieval settings. Review-note edits alone do not require a rerun.
+
+### Rebuild the question set
+
+Rebuild `corpus/questions.json` only if a corpus update makes targeted edits
+impractical. The steps below create a replacement set for review, not a copy
+of the original 100 questions.
 
 1. Use a build whose `acquisition.json` `scope_sha256` matches
    `corpus/sources.json` (`shasum -a 256 corpus/sources.json`) and that passes
